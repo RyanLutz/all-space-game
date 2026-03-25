@@ -1,0 +1,28 @@
+{
+  "damage_types": {
+    "ballistic": {
+      "vs_shields": 0.4,
+      "vs_hull": 1.5,
+      "description": "Kinetic energy dissipates on shields, excellent armor penetration"
+    },
+    "energy_beam": {
+      "vs_shields": 1.8,
+      "vs_hull": 0.5,
+      "description": "Overloads shield emitters, reflected by armor"
+    },
+    "energy_pulse": {
+      "vs_shields": 1.8,
+      "vs_hull": 0.5,
+      "description": "Same as continuous beam - optimized for shield stripping"
+    },
+    "missile": {
+      "vs_shields": 0.6,
+      "vs_hull": 1.4,
+      "description": "Explosion blocked by shields, devastating to exposed hull"
+    }
+  },
+  "shield_absorption": {
+    "base_ratio": 0.8,
+    "description": "Percentage of damage absorbed by active shields"
+  }
+}

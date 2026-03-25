@@ -6,9 +6,108 @@ class_name Ship
 @export var max_angular_accel: float = 5.0  # radians/sec²
 @export var is_player_controlled: bool = true
 
+# Power System (per ship shared pool)
+@export var power_capacity: float = 100.0
+@export var power_regen: float = 15.0
+var power_current: float = 100.0
 
-# SpaceBody._ready() covers group registration, monitor setup, and moment_of_inertia.
-# Ship does not need its own _ready().
+# Shield System
+@export var shield_max: float = 100.0
+@export var regen_rate: float = 20.0
+@export var regen_delay: float = 3.0
+@export var regen_power_draw: float = 10.0
+var shield_hp: float = 100.0
+var _time_since_last_hit: float = 999.0
+
+# Hull / Combat
+@export var hull_max: float = 200.0
+var hull_hp: float = 200.0
+
+# Damage type multipliers loaded from JSON
+var _damage_types: Dictionary = {}
+var _shield_absorption: float = 0.8
+
+@onready var _event_bus: Node = get_node("/root/GameEventBus")
+
+
+func _ready() -> void:
+	# Load damage type data
+	var damage_file = FileAccess.open("res://data/damage_types.json", FileAccess.READ)
+	if damage_file:
+		var json = JSON.new()
+		json.parse(damage_file.get_as_text())
+		var data = json.get_data()
+		if data and data.has("damage_types"):
+			_damage_types = data.damage_types
+		if data and data.has("shield_absorption"):
+			_shield_absorption = data.shield_absorption.get("base_ratio", 0.8)
+		damage_file.close()
+
+	# Initialize resources
+	power_current = power_capacity
+	shield_hp = shield_max
+	hull_hp = hull_max
+
+
+func _physics_process(delta: float) -> void:
+	super._physics_process(delta)
+	_update_resource_regen(delta)
+	_time_since_last_hit += delta
+
+
+func _update_resource_regen(delta: float) -> void:
+	# Power regen (always happens unless at max)
+	if power_current < power_capacity:
+		power_current = minf(power_current + power_regen * delta, power_capacity)
+
+	# Shield regen (only after delay, and only if we have power)
+	if shield_hp < shield_max and _time_since_last_hit >= regen_delay:
+		var power_cost = regen_power_draw * delta
+		if power_current >= power_cost:
+			var regen_amount = regen_rate * delta
+			shield_hp = minf(shield_hp + regen_amount, shield_max)
+			power_current -= power_cost
+
+
+func apply_damage(amount: float, damage_type: String, _hit_position: Vector2) -> void:
+	_time_since_last_hit = 0.0
+
+	# Get damage multipliers
+	var type_data = _damage_types.get(damage_type, {})
+	var vs_shields = type_data.get("vs_shields", 1.0)
+	var vs_hull = type_data.get("vs_hull", 1.0)
+
+	# Shield absorption
+	var shield_damage = amount * vs_shields
+	var remaining_damage = 0.0
+
+	if shield_hp > 0:
+		var absorbed = minf(shield_hp, shield_damage)
+		shield_hp -= absorbed
+		var absorbed_ratio = absorbed / shield_damage if shield_damage > 0 else 1.0
+		remaining_damage = amount * (1.0 - _shield_absorption * absorbed_ratio)
+
+		if shield_hp <= 0:
+			_event_bus.emit_signal("shield_depleted", self)
+	else:
+		remaining_damage = amount
+
+	# Hull damage with type multiplier
+	if remaining_damage > 0:
+		hull_hp -= remaining_damage * vs_hull
+		_event_bus.emit_signal("ship_damaged", self, remaining_damage * vs_hull, damage_type, _hit_position)
+
+	# Check destruction
+	if hull_hp <= 0:
+		hull_hp = 0
+		_event_bus.emit_signal("ship_destroyed", self, 0)  # owner_id 0 for now
+
+
+func consume_power(amount: float) -> bool:
+	if power_current >= amount:
+		power_current -= amount
+		return true
+	return false
 
 
 func apply_thrust_forces(delta: float) -> void:
