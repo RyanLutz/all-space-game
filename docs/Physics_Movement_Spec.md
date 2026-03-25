@@ -3,7 +3,9 @@
 
 ## Overview
 
-A sim-lite physics system built on manual velocity control via `CharacterBody2D`. All physical entities share a common `SpaceBody` base. The system prioritizes tactile, momentum-based feel over strict Newtonian accuracy — ships have weight and inertia, but the universe applies gentle drag to prevent infinite drift.
+A sim-lite physics system built on manual velocity control via `CharacterBody3D`. All physical entities share a common `SpaceBody` base. The system prioritizes tactile, momentum-based feel over strict Newtonian accuracy — ships have weight and inertia, but the universe applies gentle drag to prevent infinite drift.
+
+**2.5D convention:** Assets and physics are fully 3D. The camera is a fixed orthographic camera looking straight down the Y axis and never moves off it. All gameplay movement is locked to the **XZ plane** — the Y component of `velocity` is always `0.0`. Ship heading is rotation around the **Y axis** only (no pitch or roll). This gives the feel of a 2D top-down game with the visual quality of 3D assets.
 
 **Core Feel:**
 - Ships feel heavy and purposeful, not floaty
@@ -16,7 +18,7 @@ A sim-lite physics system built on manual velocity control via `CharacterBody2D`
 ## Entity Hierarchy
 
 ```
-CharacterBody2D
+CharacterBody3D
     └── SpaceBody.gd                  (base: mass, velocity, angular velocity, thrust)
             ├── Ship.gd               (modules, thruster budget, assisted steering)
             ├── Asteroid.gd           (static or slow-drifting, health, loot)
@@ -34,14 +36,15 @@ Projectiles are explicitly NOT `SpaceBody` instances. They inherit momentum from
 
 ### Properties
 
-| Property | Type | Description |
-|---|---|---|
-| `mass` | float | kg equivalent — affects inertia and torque response |
-| `moment_of_inertia` | float | Resistance to angular acceleration. Derived: `mass * radius_sq * 0.5` |
-| `velocity` | Vector2 | Current linear velocity (pixels/sec) |
-| `angular_velocity` | float | Current rotation speed (radians/sec) |
-| `max_speed` | float | Soft cap — drag increases above this, hard cap slightly above |
-| `linear_drag` | float | Base drag coefficient applied each frame |
+| Property | Type | Export | Description |
+|---|---|---|---|
+| `mass` | float | yes | kg equivalent — affects inertia and thrust response |
+| `moment_of_inertia` | float | no | Derived in `_ready()`: `mass * 20.0 * 0.5`. Not tuned directly. |
+| `velocity` | Vector2 | no | Current linear velocity (units/sec). Inherited from CharacterBody2D. |
+| `angular_velocity` | float | no | Current rotation speed (radians/sec). Managed manually — not from the physics engine. |
+| `max_speed` | float | yes | Hard velocity cap. Set equal to `v_terminal` so drag and thrust are balanced. |
+| `linear_drag` | float | yes | Omnidirectional drag coefficient. Controls terminal velocity and stop time. |
+| `alignment_drag` | float | yes | Lateral-only drag coefficient. Bleeds the velocity component perpendicular to the ship's heading. Set low (≤ 0.5) to preserve Newtonian drift; higher values couple velocity to heading direction. |
 
 ### Core Update Loop
 
@@ -65,17 +68,19 @@ velocity *= (1.0 - linear_drag * delta)
 
 ### Partial Alignment Drag
 
-Applied when the ship's velocity direction is misaligned with its heading. Only the **lateral component** (perpendicular to heading) bleeds off — the **axial component** (along heading) is unaffected.
+Applied when the ship's velocity direction is misaligned with its heading. Only the **lateral component** (perpendicular to heading on the XZ plane) bleeds off — the **axial component** (along heading) is unaffected.
 
 ```gdscript
 func apply_alignment_drag(delta: float) -> void:
-    var heading = Vector2.RIGHT.rotated(rotation)
+    # Heading is a unit vector on the XZ plane derived from Y-axis rotation
+    var heading = Vector3(sin(rotation.y), 0.0, cos(rotation.y))
     var axial = heading * velocity.dot(heading)        # component along heading
-    var lateral = velocity - axial                     # component perpendicular
+    var lateral = velocity - axial                     # component perpendicular (XZ only)
 
     # Only bleed lateral — axial momentum is preserved
     lateral *= (1.0 - alignment_drag * delta)
     velocity = axial + lateral
+    velocity.y = 0.0  # enforce XZ-plane constraint
 ```
 
 `alignment_drag` is tuned higher than `linear_drag` — lateral drift bleeds noticeably during hard turns, but not instantly.
@@ -88,6 +93,15 @@ func apply_alignment_drag(delta: float) -> void:
 ---
 
 ## Ship Movement
+
+### Ship Properties
+
+| Property | Type | Export | Description |
+|---|---|---|---|
+| `thruster_force` | float | yes | Total thrust budget per frame (N equivalent). Shared between turning and linear movement. |
+| `torque_thrust_ratio` | float | yes | Fraction of thruster budget that turning draws per rad/s² demanded. Heavier ships pay more for the same angular acceleration. |
+| `max_angular_accel` | float | yes | Maximum angular acceleration in rad/s². Determines how quickly the ship can rotate. |
+| `is_player_controlled` | bool | yes | When true, reads WASD + mouse input. When false, expects AI to set `target_angle` externally (not yet implemented). |
 
 ### Thruster Budget
 
@@ -104,7 +118,10 @@ func allocate_thrust(forward_input: float, strafe_input: float, torque_demand: f
     var torque_cost = abs(torque_demand) * torque_thrust_ratio
     var remaining = max(0.0, thruster_force - torque_cost)
 
-    var movement_input = Vector2(strafe_input, -forward_input)
+    # Build movement vector on XZ plane relative to ship heading
+    var heading  = Vector3(sin(rotation.y), 0.0,  cos(rotation.y))
+    var right    = Vector3(cos(rotation.y), 0.0, -sin(rotation.y))
+    var movement_input = heading * forward_input + right * strafe_input
     if movement_input.length() > 1.0:
         movement_input = movement_input.normalized()
 
@@ -122,13 +139,14 @@ func allocate_thrust(forward_input: float, strafe_input: float, torque_demand: f
 ### Input → Force Pipeline
 
 ```
-Mouse Position
-    → Target Heading Angle
-        → Heading Error (delta between current rotation and target)
-            → Torque Demand
-                → Thruster Budget Allocation
-                    → angular_velocity delta
-                        → rotation update
+Mouse Position (screen)
+    → Unproject ray onto Y=0 plane → world XZ position
+        → Target Heading Angle (atan2 on XZ delta)
+            → Heading Error (signed angle from rotation.y to target)
+                → Torque Demand
+                    → Thruster Budget Allocation
+                        → angular_velocity delta
+                            → rotation.y update
 ```
 
 ---
@@ -148,7 +166,7 @@ Each frame:
 
 ```gdscript
 func update_assisted_steering(target_angle: float, delta: float) -> float:
-    var heading_error = angle_difference(rotation, target_angle)
+    var heading_error = angle_difference(rotation.y, target_angle)
     var stopping_distance = (angular_velocity * angular_velocity) / (2.0 * max_angular_accel)
 
     var torque_direction: float
@@ -185,12 +203,14 @@ When a projectile is fired, it receives the firing ship's current velocity added
 
 ```gdscript
 # Called by Ship.gd when firing — passes to ProjectileManager
+# velocity is Vector3; aim_direction is a normalised Vector3 on XZ plane
 var inherited_velocity = self.velocity
 ProjectileManager.spawn(muzzle_position, aim_direction, muzzle_speed, inherited_velocity, weapon_data)
 ```
 
 Inside `ProjectileManager.cs`:
 ```csharp
+// All vectors are Vector3; Y component remains 0 throughout projectile lifetime
 projectile.velocity = aimDirection * muzzleSpeed + inheritedVelocity;
 ```
 
@@ -208,8 +228,8 @@ This is intentional sim-lite behavior — adds tactical depth to positioning and
 ### Asteroids
 - Extend `SpaceBody` with zero thrust
 - Slow ambient drift set at spawn, never changes
-- Use `RigidBody2D` if Godot 4.6 Jolt physics handles them cleanly — free tumbling collision response at no code cost
-- Fall back to `SpaceBody` with randomized angular velocity if RigidBody2D introduces complexity
+- Use `RigidBody3D` if Godot 4.6 Jolt physics handles them cleanly — free tumbling collision response at no code cost; tumble is visible from top-down and adds visual life
+- Fall back to `SpaceBody` with randomized angular velocity if RigidBody3D introduces complexity
 
 ### Debris
 - Extend `SpaceBody`, spawned on ship death
@@ -248,6 +268,55 @@ Performance.add_custom_monitor("AllSpace/physics_bodies",
 Performance.add_custom_monitor("AllSpace/physics_ms",
     func(): return PerformanceMonitor.get_avg_ms("Physics.move_and_slide"))
 ```
+
+---
+
+## Tuning Reference
+
+### Scale
+
+**1 unit = 1 metre.** The ship polygon in `TestScene.gd` is ~35u nose-to-tail = a 35m light fighter. At Camera2D zoom=1 a 1920px-wide viewport shows 1920m of space.
+
+### Key Formulas
+
+```
+# Terminal velocity — the actual top speed drag and thrust balance at.
+# Set max_speed equal to this so the cap is meaningful.
+v_terminal (m/s) = (thruster_force / mass) / linear_drag
+
+# Time constant — seconds to reach 63% of terminal velocity.
+tau (s) = 1 / linear_drag
+
+# Stop time (approx) — seconds to coast from v_terminal to near-zero.
+stop_time ≈ 3 × tau
+
+# Angular stop distance — radians the ship travels while braking from angular_velocity.
+stopping_distance = (angular_velocity²) / (2 × max_angular_accel)
+```
+
+### Ship Class Starting Values
+
+These are reference starting points. All values are `@export` and tunable in the editor.
+
+| Class | `mass` | `thruster_force` | `linear_drag` | `max_speed` | `max_angular_accel` | Accel feel |
+|---|---|---|---|---|---|---|
+| Fighter | 100 | 15 000 | 0.5 | 300 | 5.0 | Snappy, 2 s to top speed |
+| Corvette | 250 | 25 000 | 0.5 | 200 | 3.0 | Responsive, 3 s to top speed |
+| Frigate | 600 | 36 000 | 0.5 | 120 | 1.5 | Deliberate, 4 s to top speed |
+| Destroyer | 1 500 | 60 000 | 0.5 | 80 | 0.7 | Sluggish, 6 s to top speed |
+
+All classes share `alignment_drag = 0.2` and `torque_thrust_ratio = 0.4` unless overridden.
+
+### Parameter Effect Summary
+
+| Parameter | Increase effect | Decrease effect |
+|---|---|---|
+| `mass` | Slower acceleration, same terminal speed | Faster acceleration |
+| `thruster_force` | Higher terminal speed, faster acceleration | Weaker acceleration |
+| `linear_drag` | Lower terminal speed, quicker stop | Higher terminal speed, longer drift |
+| `alignment_drag` | Velocity couples more tightly to heading on turns | More Newtonian drift; velocity ignores heading unless thrust applied |
+| `max_angular_accel` | Snappier turning | Sluggish turning — commits to heading |
+| `torque_thrust_ratio` | Turning draws more from the linear thrust budget | Turning is cheaper, more thrust left for movement |
 
 ---
 
