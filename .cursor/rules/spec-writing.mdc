@@ -1,0 +1,37 @@
+---
+description: Spec document format and conventions for All Space
+globs:
+  - docs/**/*.md
+  - docs/**
+---
+
+# Spec Writing Conventions
+
+Spec documents are the authoritative reference for implementation. They must be
+complete enough that any model (Sonnet, Opus, Kimi, etc.) can implement the system
+from the spec alone without needing conversation context.
+
+## Required Sections (in this order)
+1. **Overview** — what the system does, 2-3 sentence design intent
+2. **Architecture** — where it fits in the project, which nodes/scripts it creates
+3. **Core Properties / Data Model** — all properties with types and descriptions
+4. **Key Algorithms** — GDScript pseudocode for non-obvious logic
+5. **JSON Data Format** — if the system owns any data files, show the full schema
+6. **Performance Instrumentation** — required; list exact metric names from the contract
+7. **Files** — exact file paths for every file this system creates or modifies
+8. **Dependencies** — what must exist before this system can be built
+9. **Assumptions** — explicit list of values/decisions deferred to balance tuning
+10. **Success Criteria** — checkbox list, concrete and testable
+
+## Writing Style
+- Be implementation-specific, not hand-wavy. "The system should handle collisions" is bad. "Call `move_and_slide()` once per `_physics_process`, then check `get_slide_collision_count()`" is good.
+- Include code snippets for anything non-obvious
+- Specify exact signal names for GameEventBus integration
+- Call out edge cases explicitly (what happens when power runs out? when a hardpoint is destroyed?)
+- List all JSON fields with types, ranges, and defaults
+
+## Anti-Patterns
+- Don't leave implementation details "to be decided" — make a reasonable assumption and note it
+- Don't reference other specs vaguely — name the exact file
+- Don't describe behavior without specifying the Godot node type or method
+- Don't skip the Performance Instrumentation section — it's mandatory

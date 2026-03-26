@@ -45,6 +45,9 @@ func _ready() -> void:
 	_perf_monitor = get_node("/root/GameBootstrap/PerformanceMonitor")
 	_event_bus = get_node("/root/GameEventBus")
 
+	# Weapon requests come through GameEventBus; this pool performs guided missile spawning.
+	_event_bus.connect("request_spawn_guided", _on_request_spawn_guided)
+
 	# Pre-allocate pool
 	for i in range(MAX_GUIDED_PROJECTILES):
 		_pool.append(GuidedProjectile.new())
@@ -52,6 +55,10 @@ func _ready() -> void:
 	# Register custom monitor for guided count
 	Performance.add_custom_monitor("AllSpace/projectiles_guided_active",
 		func(): return get_active_count())
+
+func _on_request_spawn_guided(pos: Vector2, vel: Vector2, guidance_mode: String, weapon_data: Dictionary, owner_id: int) -> void:
+	# Actual spawn logic lives in spawn(); this handler keeps request payload decoupled from pool internals.
+	spawn(pos, vel, guidance_mode, weapon_data, owner_id)
 
 
 func spawn(pos: Vector2, vel: Vector2, guidance_mode: String, weapon_data: Dictionary, owner_id: int, target: Variant = null) -> int:
@@ -92,6 +99,10 @@ func spawn(pos: Vector2, vel: Vector2, guidance_mode: String, weapon_data: Dicti
 			p.target = null
 
 	_active_count += 1
+
+	# Debug/VFX hook: emit spawned projectile snapshot via the event bus.
+	# Contract: projectile_spawned(position, velocity, weapon_data)
+	_event_bus.emit_signal("projectile_spawned", pos, vel, weapon_data)
 
 	_event_bus.emit_signal("missile_launched", weapon_data.get("id", ""), pos, p.target, owner_id)
 
@@ -134,9 +145,9 @@ func _physics_process(delta: float) -> void:
 
 	# Update combined active count for PerformanceMonitor
 	var dumb_count := 0
-	var pm := get_node_or_null("/root/ProjectileManager")
-	if pm:
-		dumb_count = pm.GetActiveCount()
+	if _perf_monitor:
+		# Route dumb projectile count through PerformanceMonitor to avoid direct cross-system queries.
+		dumb_count = _perf_monitor.get_count("ProjectileManager.active_count")
 	_perf_monitor.set_count("ProjectileManager.active_count", dumb_count + _active_count)
 
 	_perf_monitor.end("ProjectileManager.guided_update")
@@ -299,3 +310,16 @@ func get_pool_stats() -> Dictionary:
 		"active": _active_count,
 		"max": MAX_GUIDED_PROJECTILES
 	}
+
+
+func get_active_projectiles_data() -> Array[Dictionary]:
+	# Safe public getter for render/telemetry (no external access to private pool storage).
+	var result: Array[Dictionary] = []
+	for p in _pool:
+		if not p.active:
+			continue
+		result.append({
+			"position": p.position,
+			"velocity": p.velocity
+		})
+	return result

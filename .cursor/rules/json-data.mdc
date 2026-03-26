@@ -1,0 +1,44 @@
+---
+description: JSON data file conventions for All Space game data
+globs:
+  - data/**/*.json
+---
+
+# JSON Data File Conventions
+
+All tunable gameplay values live in JSON files under `data/`. This is non-negotiable.
+
+## Why
+- Balance passes happen without recompiling
+- The game is moddable by design
+- Agent coding sessions can adjust values without touching code
+- Designers can iterate on feel without programmer involvement
+
+## Structure Rules
+- One JSON file per system domain (weapons.json, ships.json, damage_types.json)
+- Use descriptive string IDs, not numeric IDs (`"laser_mk1"` not `7`)
+- Include a `"_comment"` field at the top of each file explaining its purpose
+- Nest related properties logically but don't go deeper than 3 levels
+- Include units in field names where ambiguous (`damage_per_second`, `range_pixels`, `cooldown_seconds`)
+
+## Validation
+- GDScript loading code should validate JSON on load and log clear errors for missing/invalid fields
+- Never silently fall back to defaults without logging — failed loads should be noisy
+- Use `JSON.parse_string()` in Godot, handle errors explicitly
+
+## Example Pattern
+```json
+{
+  "_comment": "Weapon definitions — see docs/Weapons_Projectiles_Spec.md for field descriptions",
+  "laser_mk1": {
+    "display_name": "Laser Mk I",
+    "archetype": "energy",
+    "damage_per_hit": 12,
+    "fire_rate_per_second": 4.0,
+    "heat_per_shot": 8,
+    "power_cost_per_shot": 15,
+    "range_pixels": 800,
+    "projectile_speed": 1200
+  }
+}
+```

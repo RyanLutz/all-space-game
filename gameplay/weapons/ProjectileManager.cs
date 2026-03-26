@@ -3,9 +3,6 @@ using System;
 
 public partial class ProjectileManager : Node
 {
-    private static Variant GetWeaponValue(Godot.Collections.Dictionary d, string key, Variant fallback)
-        => d != null && d.ContainsKey(key) ? d[key] : fallback;
-
     private struct DumbProjectile
     {
         public Vector2 Position;
@@ -39,6 +36,10 @@ public partial class ProjectileManager : Node
         _perfMonitor = GetNode<Node>("/root/GameBootstrap/PerformanceMonitor");
         _eventBus = GetNode<Node>("/root/GameEventBus");
 
+        // Weapon requests come through GameEventBus; ProjectileManager performs the actual spawn/fire.
+        _eventBus.Connect("request_spawn_dumb", new Callable(this, nameof(OnRequestSpawnDumb)));
+        _eventBus.Connect("request_fire_hitscan", new Callable(this, nameof(OnRequestFireHitscan)));
+
         LoadWeaponData();
 
         // Register custom monitors
@@ -48,29 +49,133 @@ public partial class ProjectileManager : Node
             new Callable(this, nameof(GetCollisionMs)));
     }
 
+    private void OnRequestSpawnDumb(Vector2 position, Vector2 velocity, float lifetime, string weaponId, int ownerId)
+    {
+        // Convert signal int ownerId into the ulong used by the projectile pool for instance comparisons.
+        _ = SpawnDumb(position, velocity, lifetime, weaponId, (ulong)ownerId);
+    }
+
+    private void OnRequestFireHitscan(Vector2 origin, Vector2 direction, float rangeVal, string weaponId, int ownerId)
+    {
+        FireHitscan(origin, direction, rangeVal, weaponId, (ulong)ownerId);
+    }
+
     private void LoadWeaponData()
     {
+        const string filePath = "res://data/weapons.json";
         _weaponData = new Godot.Collections.Dictionary<int, Godot.Collections.Dictionary>();
 
-        using var file = FileAccess.Open("res://data/weapons.json", FileAccess.ModeFlags.Read);
-        if (file == null) return;
+        using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
+        if (file == null)
+        {
+            GD.PushError($"ProjectileManager: Failed to open {filePath}");
+            return;
+        }
+
+        string text = file.GetAsText();
 
         var json = new Json();
-        json.Parse(file.GetAsText());
-        var data = json.GetData().As<Godot.Collections.Dictionary>();
+        var parseErr = json.Parse(text);
+        if (parseErr != Error.Ok)
+        {
+            GD.PushError(
+                $"ProjectileManager: JSON parse failed for {filePath}: {json.GetErrorMessage()} (line {json.GetErrorLine()})"
+            );
+            return;
+        }
 
-        if (data == null || !data.ContainsKey("weapons")) return;
+        var data = json.GetData().As<Godot.Collections.Dictionary>();
+        if (data == null)
+        {
+            GD.PushError($"ProjectileManager: Invalid root in {filePath} (expected Dictionary)");
+            return;
+        }
+
+        if (!data.ContainsKey("weapons"))
+        {
+            GD.PushError($"ProjectileManager: Missing 'weapons' key in {filePath}");
+            return;
+        }
 
         var weapons = data["weapons"].As<Godot.Collections.Array>();
+        if (weapons == null)
+        {
+            GD.PushError($"ProjectileManager: 'weapons' must be an Array in {filePath}");
+            return;
+        }
+
+        var seenWeaponIds = new System.Collections.Generic.HashSet<string>();
         int id = 0;
         foreach (var weaponObj in weapons)
         {
             var weapon = weaponObj.As<Godot.Collections.Dictionary>();
-            if (weapon != null && weapon.ContainsKey("id"))
+            if (weapon == null)
             {
-                _weaponData[id] = weapon;
-                id++;
+                GD.PushError($"ProjectileManager: Weapon entry must be a Dictionary in {filePath}");
+                return;
             }
+
+            if (!weapon.ContainsKey("id"))
+            {
+                GD.PushError($"ProjectileManager: Weapon entry missing 'id' in {filePath}");
+                return;
+            }
+
+            string weaponId = weapon["id"].AsString();
+            if (string.IsNullOrEmpty(weaponId))
+            {
+                GD.PushError($"ProjectileManager: Weapon entry has empty 'id' in {filePath}");
+                return;
+            }
+
+            if (!weapon.ContainsKey("archetype"))
+            {
+                GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'archetype' in {filePath}");
+                return;
+            }
+
+            string archetype = weapon["archetype"].AsString();
+
+            if (seenWeaponIds.Contains(weaponId))
+            {
+                GD.PushError($"ProjectileManager: Duplicate weapon id '{weaponId}' in {filePath}");
+                return;
+            }
+            seenWeaponIds.Add(weaponId);
+
+            // Validate keys actually used by ProjectileManager (avoid silent fallback defaults).
+            switch (archetype)
+            {
+                case "ballistic":
+                case "missile_dumb":
+                case "missile_guided":
+                    if (!weapon.ContainsKey("damage"))
+                    {
+                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing required key 'damage' in {filePath}");
+                        return;
+                    }
+                    break;
+                case "energy_beam":
+                    if (!weapon.ContainsKey("damage_per_second"))
+                    {
+                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing required key 'damage_per_second' in {filePath}");
+                        return;
+                    }
+                    break;
+                case "energy_pulse":
+                    if (!weapon.ContainsKey("damage"))
+                    {
+                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing required key 'damage' in {filePath}");
+                        return;
+                    }
+                    break;
+                default:
+                    GD.PushError($"ProjectileManager: Weapon '{weaponId}' has unknown archetype '{archetype}' in {filePath}");
+                    return;
+            }
+
+            _weaponData[id] = weapon;
+            id++;
         }
     }
 
@@ -128,6 +233,12 @@ public partial class ProjectileManager : Node
         };
 
         _activeCount++;
+
+        // Debug/VFX hook: emit spawned projectile snapshot via the event bus.
+        // Contract: projectile_spawned(position, velocity, weapon_data)
+        if (_eventBus != null && _weaponData.TryGetValue(weaponDataId, out var weaponData) && weaponData != null)
+            _eventBus.EmitSignal("projectile_spawned", position, velocity, weaponData);
+
         return index;
     }
 
@@ -198,14 +309,15 @@ public partial class ProjectileManager : Node
 
                     if (weapon != null && collider.HasMethod("apply_damage"))
                     {
-                        float damage = GetWeaponValue(weapon, "damage", 0).AsSingle();
-                        string archetype = GetWeaponValue(weapon, "archetype", "ballistic").AsString();
+                        float damage = weapon["damage"].AsSingle();
+                        string archetype = weapon["archetype"].AsString();
                         string damageType = archetype == "ballistic" ? "ballistic" : "missile";
 
                         collider.Call("apply_damage", damage, damageType, hitPoint);
 
-                        // Emit hit signal
-                        _eventBus?.EmitSignal("projectile_hit", hitPoint, weapon, collider, _pool[i].OwnerEntityId);
+                        // Emit hit signal (GameEventBus contract: projectile_hit(target, damage, type, position))
+                        var target2D = collider as Node2D;
+                        _eventBus?.EmitSignal("projectile_hit", target2D, damage, damageType, hitPoint);
                     }
 
                     _pool[i].Active = false;
@@ -228,7 +340,11 @@ public partial class ProjectileManager : Node
             }
         }
 
-        if (weapon == null) return;
+        if (weapon == null)
+        {
+            GD.PushError($"ProjectileManager: Unknown weapon id '{weaponId}' in request_fire_hitscan");
+            return;
+        }
 
         Vector2 end = origin + direction.Normalized() * range;
         var query = PhysicsRayQueryParameters2D.Create(origin, end, _collisionMask);
@@ -245,9 +361,25 @@ public partial class ProjectileManager : Node
 
             if (collider != null && collider.GetInstanceId() != ownerId && collider.HasMethod("apply_damage"))
             {
-                float damage = GetWeaponValue(weapon, "damage_per_second", 0).AsSingle() * (1.0f / 60.0f);
-                string archetype = GetWeaponValue(weapon, "archetype", "energy_beam").AsString();
-                string damageType = archetype == "energy_pulse" ? "energy_pulse" : "energy_beam";
+                string archetype = weapon["archetype"].AsString();
+                float damage;
+                string damageType;
+
+                if (archetype == "energy_beam")
+                {
+                    damageType = "energy_beam";
+                    damage = weapon["damage_per_second"].AsSingle() * (1.0f / 60.0f);
+                }
+                else if (archetype == "energy_pulse")
+                {
+                    damageType = "energy_pulse";
+                    damage = weapon["damage"].AsSingle();
+                }
+                else
+                {
+                    GD.PushError($"ProjectileManager: Unsupported hitscan archetype '{archetype}' for weapon '{weaponId}'");
+                    return;
+                }
 
                 collider.Call("apply_damage", damage, damageType, hitPoint);
             }
@@ -270,7 +402,10 @@ public partial class ProjectileManager : Node
                 weapon = _weaponData[_pool[i].WeaponDataId];
             var entry = new Godot.Collections.Dictionary();
             entry["position"] = _pool[i].Position;
-            entry["archetype"] = weapon != null ? GetWeaponValue(weapon, "archetype", "ballistic").AsString() : "ballistic";
+            if (weapon != null && weapon.ContainsKey("archetype"))
+                entry["archetype"] = weapon["archetype"].AsString();
+            else
+                entry["archetype"] = "unknown";
             result.Add(entry);
         }
         return result;

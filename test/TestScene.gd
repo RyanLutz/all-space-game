@@ -14,13 +14,11 @@ const STRESS_TEST_MAX: int = 200
 
 var _event_bus: Node
 var _perf_monitor: Node
-var _projectile_manager: Node
 
 
 func _ready() -> void:
 	_event_bus = get_node("/root/GameEventBus")
 	_perf_monitor = get_node("/root/GameBootstrap/PerformanceMonitor")
-	_projectile_manager = get_node("/root/ProjectileManager")
 
 	_setup_background()
 	_setup_ship()
@@ -44,6 +42,7 @@ func _setup_ship() -> void:
 	_ship = Ship.new()
 	_ship.name = "PlayerShip"
 	_ship.is_player_controlled = true
+	_ship.faction = "player"
 	_ship.position = Vector2(0.0, 0.0)
 	_ship.add_to_group("ships")
 	add_child(_ship)
@@ -97,6 +96,7 @@ func _setup_targets() -> void:
 		var target := Ship.new()
 		target.name = "TargetShip%d" % i
 		target.is_player_controlled = false
+		target.faction = "enemy"
 		target.position = target_positions[i]
 		target.hull_max = 200.0
 		target.hull_hp = 200.0
@@ -186,7 +186,7 @@ func _start_stress_test() -> void:
 	print("Stress test started: firing %d rounds..." % STRESS_TEST_MAX)
 
 
-func _on_ship_destroyed(ship: Node, _destroyer_id: int) -> void:
+func _on_ship_destroyed(ship: Node2D, _position: Vector2, _faction: String) -> void:
 	if ship in _targets:
 		_targets.erase(ship)
 		print("Target destroyed!")
@@ -198,7 +198,6 @@ func _process(_delta: float) -> void:
 
 	# Handle stress test
 	if _stress_test_active and _stress_test_rounds < STRESS_TEST_MAX:
-		var pm := get_node("/root/ProjectileManager")
 		# Fire toward first target or forward if no targets
 		var aim_dir := Vector2.RIGHT.rotated(_ship.rotation)
 		if not _targets.is_empty() and _targets[0] != null:
@@ -207,7 +206,14 @@ func _process(_delta: float) -> void:
 		var muzzle_pos := _ship.position + aim_dir * 32.0
 		var velocity := aim_dir * 900.0 + _ship.velocity
 
-		pm.call("SpawnDumb", muzzle_pos, velocity, 1.5, "autocannon_light", _ship.get_instance_id())
+		_event_bus.emit_signal(
+			"request_spawn_dumb",
+			muzzle_pos,
+			velocity,
+			1.5,
+			"autocannon_light",
+			_ship.get_instance_id()
+		)
 		_stress_test_rounds += 1
 
 		if _stress_test_rounds >= STRESS_TEST_MAX:
@@ -218,9 +224,7 @@ func _process(_delta: float) -> void:
 	var target := _targets[0] if not _targets.is_empty() else null
 
 	# Get projectile count
-	var proj_count := 0
-	if _projectile_manager != null:
-		proj_count = _projectile_manager.call("GetActiveCount")
+	var proj_count: int = _perf_monitor.get_count("ProjectileManager.active_count")
 
 	# Build HUD text
 	var text := ""

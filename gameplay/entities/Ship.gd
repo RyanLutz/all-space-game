@@ -23,6 +23,9 @@ var _time_since_last_hit: float = 999.0
 @export var hull_max: float = 200.0
 var hull_hp: float = 200.0
 
+# Used by GameEventBus payloads (e.g. ship_destroyed) and AI/threat integration.
+@export var faction: String = "neutral"
+
 # Damage type multipliers loaded from JSON
 var _damage_types: Dictionary = {}
 var _shield_absorption: float = 0.8
@@ -32,16 +35,73 @@ var _shield_absorption: float = 0.8
 
 func _ready() -> void:
 	# Load damage type data
-	var damage_file = FileAccess.open("res://data/damage_types.json", FileAccess.READ)
-	if damage_file:
-		var json = JSON.new()
-		json.parse(damage_file.get_as_text())
-		var data = json.get_data()
-		if data and data.has("damage_types"):
-			_damage_types = data.damage_types
-		if data and data.has("shield_absorption"):
-			_shield_absorption = data.shield_absorption.get("base_ratio", 0.8)
-		damage_file.close()
+	var file_path := "res://data/damage_types.json"
+	var damage_file = FileAccess.open(file_path, FileAccess.READ)
+	if not damage_file:
+		push_error("Ship: Failed to open %s" % file_path)
+		return
+
+	var text := damage_file.get_as_text()
+	damage_file.close()
+
+	var json := JSON.new()
+	var parse_err := json.parse(text)
+	if parse_err != OK:
+		push_error(
+			"Ship: JSON parse failed for %s: %s (line %d)" % [
+				file_path, json.get_error_message(), json.get_error_line()
+			]
+		)
+		return
+
+	var data: Dictionary = json.get_data()
+	if typeof(data) != TYPE_DICTIONARY:
+		push_error("Ship: Invalid root in %s (expected Dictionary)" % file_path)
+		return
+
+	if not data.has("_comment") or typeof(data["_comment"]) != TYPE_STRING:
+		push_error("Ship: Missing/invalid top-level _comment in %s" % file_path)
+		return
+
+	if not data.has("damage_types") or typeof(data["damage_types"]) != TYPE_DICTIONARY:
+		push_error("Ship: Missing/invalid 'damage_types' dictionary in %s" % file_path)
+		return
+
+	if not data.has("shield_absorption") or typeof(data["shield_absorption"]) != TYPE_DICTIONARY:
+		push_error("Ship: Missing/invalid 'shield_absorption' dictionary in %s" % file_path)
+		return
+
+	var shield_absorption: Dictionary = data["shield_absorption"]
+	if not shield_absorption.has("base_ratio"):
+		push_error("Ship: Missing 'shield_absorption.base_ratio' in %s" % file_path)
+		return
+
+	var base_ratio_val = shield_absorption["base_ratio"]
+	var base_ratio_type := typeof(base_ratio_val)
+	if base_ratio_type != TYPE_INT and base_ratio_type != TYPE_FLOAT:
+		push_error("Ship: 'shield_absorption.base_ratio' must be a number in %s" % file_path)
+		return
+	_shield_absorption = float(base_ratio_val)
+
+	var damage_types: Dictionary = data["damage_types"]
+	for damage_type in damage_types.keys():
+		var type_data = damage_types[damage_type]
+		if typeof(type_data) != TYPE_DICTIONARY:
+			push_error("Ship: damage_types.%s must be a Dictionary in %s" % [str(damage_type), file_path])
+			return
+		if not type_data.has("vs_shields") or not type_data.has("vs_hull"):
+			push_error("Ship: damage_types.%s missing 'vs_shields' or 'vs_hull' in %s" % [str(damage_type), file_path])
+			return
+
+		var vs_shields_val = type_data["vs_shields"]
+		var vs_hull_val = type_data["vs_hull"]
+		var vs_shields_ok := typeof(vs_shields_val) == TYPE_INT or typeof(vs_shields_val) == TYPE_FLOAT
+		var vs_hull_ok := typeof(vs_hull_val) == TYPE_INT or typeof(vs_hull_val) == TYPE_FLOAT
+		if not (vs_shields_ok and vs_hull_ok):
+			push_error("Ship: damage_types.%s multipliers must be numbers in %s" % [str(damage_type), file_path])
+			return
+
+	_damage_types = damage_types
 
 	# Initialize resources
 	power_current = power_capacity
@@ -100,7 +160,7 @@ func apply_damage(amount: float, damage_type: String, _hit_position: Vector2) ->
 	# Check destruction
 	if hull_hp <= 0:
 		hull_hp = 0
-		_event_bus.emit_signal("ship_destroyed", self, 0)  # owner_id 0 for now
+		_event_bus.emit_signal("ship_destroyed", self, global_position, faction)
 
 
 func consume_power(amount: float) -> bool:

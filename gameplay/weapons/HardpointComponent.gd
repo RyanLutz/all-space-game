@@ -3,6 +3,7 @@ class_name HardpointComponent
 
 # Hardpoint configuration
 @export var hardpoint_id: String = ""
+@export var hardpoint_index: int = 0
 @export var offset: Vector2 = Vector2.ZERO
 @export var facing: float = 0.0  # degrees
 @export var arc_degrees: float = 5.0  # 5 = fixed, 25 = gimbal, 120 = partial turret, 360 = full turret
@@ -149,13 +150,13 @@ func request_fire(aim_direction: Vector2, target_pos: Vector2) -> bool:
 			var guidance: String = weapon_data.get("guidance", "auto_lock")
 			_fire_missile(target_pos, guidance)
 
-	_event_bus.emit_signal("weapon_fired", weapon_data.get("id", ""), hardpoint_id, _ship.get_instance_id())
+	# Align with GameEventBus contract: weapon_fired(ship, weapon_id, position)
+	_event_bus.emit_signal("weapon_fired", _ship, weapon_data.get("id", ""), get_world_position())
 
 	return true
 
 
 func _fire_ballistic(target_pos: Vector2) -> void:
-	var projectile_manager: Node = get_node("/root/ProjectileManager")
 	var world_pos := get_world_position()
 	var muzzle_speed: float = weapon_data.get("muzzle_speed", 800.0)
 	var lifetime: float = weapon_data.get("projectile_lifetime", 1.5)
@@ -163,16 +164,31 @@ func _fire_ballistic(target_pos: Vector2) -> void:
 	var aim_dir := (target_pos - world_pos).normalized()
 	var projectile_vel := aim_dir * muzzle_speed + _ship.velocity
 
-	projectile_manager.call("SpawnDumb", world_pos, projectile_vel, lifetime, weapon_data.get("id", ""), _ship.get_instance_id())
+	# Weapon request is handled by ProjectileManager via GameEventBus.
+	_event_bus.emit_signal(
+		"request_spawn_dumb",
+		world_pos,
+		projectile_vel,
+		lifetime,
+		weapon_data.get("id", ""),
+		_ship.get_instance_id()
+	)
 
 
 func _fire_beam(target_pos: Vector2) -> void:
-	var projectile_manager: Node = get_node("/root/ProjectileManager")
 	var world_pos := get_world_position()
 	var range_val: float = weapon_data.get("range", 500.0)
 	var aim_dir := (target_pos - world_pos).normalized()
 
-	projectile_manager.call("FireHitscan", world_pos, aim_dir, range_val, weapon_data.get("id", ""), _ship.get_instance_id())
+	# Weapon request is handled by ProjectileManager via GameEventBus.
+	_event_bus.emit_signal(
+		"request_fire_hitscan",
+		world_pos,
+		aim_dir,
+		range_val,
+		weapon_data.get("id", ""),
+		_ship.get_instance_id()
+	)
 
 
 func _fire_pulse(target_pos: Vector2) -> void:
@@ -181,14 +197,21 @@ func _fire_pulse(target_pos: Vector2) -> void:
 
 
 func _fire_missile(target_pos: Vector2, guidance: String) -> void:
-	var guided_pool: Node = get_node("/root/GuidedProjectilePool")
 	var world_pos := get_world_position()
 	var speed: float = weapon_data.get("speed", 400.0)
 
 	var aim_dir := (target_pos - world_pos).normalized()
 	var missile_vel := aim_dir * speed
 
-	guided_pool.call("spawn", world_pos, missile_vel, guidance, weapon_data, _ship.get_instance_id())
+	# Weapon request is handled by GuidedProjectilePool via GameEventBus.
+	_event_bus.emit_signal(
+		"request_spawn_guided",
+		world_pos,
+		missile_vel,
+		guidance,
+		weapon_data,
+		_ship.get_instance_id()
+	)
 
 
 func apply_damage(amount: float) -> void:
@@ -196,7 +219,7 @@ func apply_damage(amount: float) -> void:
 	_update_damage_state()
 
 	if damage_state == "destroyed":
-		_event_bus.emit_signal("hardpoint_destroyed", _ship, hardpoint_id)
+		_event_bus.emit_signal("hardpoint_destroyed", _ship, hardpoint_index)
 
 
 func _update_damage_state() -> void:

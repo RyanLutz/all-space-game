@@ -1,15 +1,17 @@
 extends Node2D
 
 # ProjectileRenderer — Debug visualization for all projectile types
-# Uses _draw() for zero-allocation rendering. Reads from autoload pools each frame.
+# Uses _draw() for zero-allocation rendering. Renders from GameEventBus events (no direct pool access).
 
-var _projectile_manager: Node
-var _guided_pool: Node
 var _event_bus: Node
 
 # Beam flash tracking — stores {start: Vector2, end: Vector2, timer: float}
 var _beam_flashes: Array[Dictionary] = []
 const BEAM_FLASH_DURATION: float = 0.1
+
+# Projectile flash tracking — stores {pos: Vector2, vel: Vector2, timer: float, archetype: String}
+var _projectile_flashes: Array[Dictionary] = []
+const PROJECTILE_FLASH_DURATION: float = 0.25
 
 # Visual settings by archetype
 const COLOR_BALLISTIC := Color.WHITE
@@ -24,12 +26,21 @@ const RADIUS_MISSILE: float = 4.0
 
 
 func _ready() -> void:
-	_projectile_manager = get_node("/root/ProjectileManager")
-	_guided_pool = get_node("/root/GuidedProjectilePool")
 	_event_bus = get_node("/root/GameEventBus")
 
-	# Subscribe to beam fired events
+	# Subscribe to projectile/beam events
 	_event_bus.connect("beam_fired", _on_beam_fired)
+	_event_bus.connect("projectile_spawned", _on_projectile_spawned)
+
+
+func _on_projectile_spawned(spawn_pos: Vector2, velocity: Vector2, weapon_data: Dictionary) -> void:
+	var archetype: String = weapon_data.get("archetype", "ballistic")
+	_projectile_flashes.append({
+		"pos": spawn_pos,
+		"vel": velocity,
+		"timer": PROJECTILE_FLASH_DURATION,
+		"archetype": archetype
+	})
 
 
 func _on_beam_fired(start_pos: Vector2, end_pos: Vector2, _weapon_data: Dictionary, _owner_id: int) -> void:
@@ -50,58 +61,46 @@ func _process(delta: float) -> void:
 		else:
 			i += 1
 
+	# Tick down and integrate projectile flashes
+	i = 0
+	while i < _projectile_flashes.size():
+		_projectile_flashes[i]["timer"] -= delta
+		if _projectile_flashes[i]["timer"] <= 0:
+			_projectile_flashes.remove_at(i)
+			continue
+		_projectile_flashes[i]["pos"] += _projectile_flashes[i]["vel"] * delta
+		i += 1
+
 	queue_redraw()
 
 
 func _draw() -> void:
-	_draw_dumb_projectiles()
-	_draw_guided_projectiles()
+	_draw_projectile_flashes()
 	_draw_beam_flashes()
 
 
-func _draw_dumb_projectiles() -> void:
-	if _projectile_manager == null:
-		return
-
-	var data: Array = _projectile_manager.call("GetActiveProjectileData")
-	if data == null or data.is_empty():
-		return
-
-	for entry in data:
-		var pos: Vector2 = entry.get("position", Vector2.ZERO)
+func _draw_projectile_flashes() -> void:
+	for entry in _projectile_flashes:
+		var pos: Vector2 = entry.get("pos", Vector2.ZERO)
+		var vel: Vector2 = entry.get("vel", Vector2.ZERO)
 		var archetype: String = entry.get("archetype", "ballistic")
 
 		match archetype:
-			"ballistic", "missile_dumb":
-				var color := COLOR_MISSILE_DUMB if archetype == "missile_dumb" else COLOR_BALLISTIC
-				draw_circle(pos, RADIUS_MISSILE if archetype == "missile_dumb" else RADIUS_BALLISTIC, color)
+			"ballistic":
+				draw_circle(pos, RADIUS_BALLISTIC, COLOR_BALLISTIC)
 			"energy_pulse":
 				draw_circle(pos, RADIUS_PULSE, COLOR_PULSE)
+			"missile_dumb":
+				draw_circle(pos, RADIUS_MISSILE, COLOR_MISSILE_DUMB)
+			"missile_guided":
+				draw_circle(pos, RADIUS_MISSILE, COLOR_MISSILE_GUIDED)
 			_:
-				# Default fallback
 				draw_circle(pos, RADIUS_BALLISTIC, COLOR_BALLISTIC)
 
-
-func _draw_guided_projectiles() -> void:
-	if _guided_pool == null:
-		return
-
-	# Access the internal pool array directly
-	var pool = _guided_pool._pool
-	if pool == null or pool.is_empty():
-		return
-
-	for p in pool:
-		if not p.active:
-			continue
-
-		# Draw missile as circle + velocity line
-		draw_circle(p.position, RADIUS_MISSILE, COLOR_MISSILE_GUIDED)
-
 		# Small line showing velocity direction (10 px)
-		if p.velocity.length() > 0.1:
-			var end_pos: Vector2 = p.position + p.velocity.normalized() * 10.0
-			draw_line(p.position, end_pos, COLOR_MISSILE_GUIDED, 1.0)
+		if vel.length() > 0.1:
+			var end_pos: Vector2 = pos + vel.normalized() * 10.0
+			draw_line(pos, end_pos, COLOR_BALLISTIC, 1.0)
 
 
 func _draw_beam_flashes() -> void:

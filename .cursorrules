@@ -1,0 +1,53 @@
+# All Space — Cursor Project Rules
+# This file is always loaded. Keep it lean. System-specific details live in .cursor/rules/
+
+## Project
+All Space is a top-down 2D space combat sim built in Godot 4.6.1 (GDScript primary, C# for ProjectileManager only). Current focus: **combat MVP** — streaming map, player ship vs AI, sim-lite physics, modular weapons/ship systems.
+
+## Architecture — Non-Negotiable Rules
+1. **No hardcoded tunable values.** Anything a designer would tweak belongs in a JSON file under `data/`. If you're typing a number into GDScript that affects gameplay, it's wrong.
+2. **No direct cross-system references.** Systems communicate through `GameEventBus.gd` (signals). Never `get_node()` across system boundaries.
+3. **PerformanceMonitor instrumentation is required.** Every system that does meaningful work must call `PerformanceMonitor.begin()` / `.end()` using the canonical metric names from `docs/PerformanceMonitor_Spec.md`.
+4. **One system per session.** Don't implement physics and weapons in the same session. Focus.
+5. **Specs are authoritative.** Read the spec in `docs/` before implementing. If something conflicts, flag it — don't silently resolve.
+6. **C# only for ProjectileManager.** Everything else is GDScript.
+7. **Event bus for cross-system comms.** `GameEventBus.gd` is the only allowed channel between systems.
+
+## Project Structure
+```
+/all_space_mvp/
+    .cursorrules              ← you are here
+    .cursor/rules/            ← contextual rules (auto-loaded by file pattern)
+    docs/                     ← all spec documents (authoritative reference)
+    core/
+        services/
+            ServiceLocator.cs
+            PerformanceMonitor.gd
+        GameEventBus.gd
+        GameBootstrap.gd
+    gameplay/
+        physics/              ← SpaceBody.gd, movement logic
+        entities/             ← Ship.gd, Asteroid.gd, Debris.gd
+        weapons/              ← ProjectileManager.cs, WeaponComponent.gd, etc.
+    data/                     ← JSON config files (weapons.json, damage_types.json, etc.)
+    ui/debug/                 ← PerformanceOverlay
+    test/                     ← Test scenes
+```
+
+## Before You Write Code
+1. Check if a spec exists in `docs/` for the system you're working on
+2. Read the spec fully — it contains architecture, algorithms, data formats, and success criteria
+3. Check `data/` for any JSON files the system depends on
+4. Identify which `GameEventBus` signals you need to emit or connect to
+
+## GDScript Conventions
+- Use `class_name` for all scripts that other systems reference
+- Type hints on all function signatures and member variables
+- `@export` for inspector-editable values (but tunable gameplay values still go in JSON)
+- `snake_case` for functions and variables, `PascalCase` for classes
+- Prefer composition over inheritance
+
+## Testing
+- Every system should have a minimal test scene in `test/`
+- Test scenes should be self-contained — launchable without the full game running
+- Print statements are fine during development but wrap in `if OS.is_debug_build()`
