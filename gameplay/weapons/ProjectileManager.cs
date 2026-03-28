@@ -25,6 +25,13 @@ public partial class ProjectileManager : Node
 
     private uint _collisionMask = 1; // Layer 1 for ships/obstacles
 
+    private static float GetWeaponFloat(Godot.Collections.Dictionary weapon, string key, float defaultValue = 0f)
+    {
+        if (weapon == null || !weapon.ContainsKey(key)) return defaultValue;
+        // JSON numbers may arrive as int/long/double; AsDouble() is the most reliable numeric conversion.
+        return (float)weapon[key].AsDouble();
+    }
+
     public override void _Ready()
     {
         _pool = new DumbProjectile[_poolSize];
@@ -274,14 +281,14 @@ public partial class ProjectileManager : Node
 
         // Collision checks (separate timing)
         _perfMonitor?.Call("begin", "ProjectileManager.collision_checks");
-        ProcessCollisions();
+        ProcessCollisions(deltaF);
         _perfMonitor?.Call("end", "ProjectileManager.collision_checks");
 
         _activeCount = newActiveCount;
         _perfMonitor?.Call("set_count", "ProjectileManager.active_count", _activeCount);
     }
 
-    private void ProcessCollisions()
+    private void ProcessCollisions(float delta)
     {
         for (int i = 0; i < _poolSize; i++)
         {
@@ -289,8 +296,7 @@ public partial class ProjectileManager : Node
 
             Vector2 pos = _pool[i].Position;
             Vector2 vel = _pool[i].Velocity;
-            float step = 1.0f / 60.0f; // Assume 60fps step for raycast
-            Vector2 motion = vel * step;
+            Vector2 motion = vel * delta;
 
             var query = PhysicsRayQueryParameters2D.Create(pos - motion, pos, _collisionMask);
             query.CollideWithBodies = true;
@@ -309,7 +315,7 @@ public partial class ProjectileManager : Node
 
                     if (weapon != null && collider.HasMethod("apply_damage"))
                     {
-                        float damage = weapon["damage"].AsSingle();
+                        float damage = GetWeaponFloat(weapon, "damage", 0f);
                         string archetype = weapon["archetype"].AsString();
                         string damageType = archetype == "ballistic" ? "ballistic" : "missile";
 
@@ -368,12 +374,13 @@ public partial class ProjectileManager : Node
                 if (archetype == "energy_beam")
                 {
                     damageType = "energy_beam";
-                    damage = weapon["damage_per_second"].AsSingle() * (1.0f / 60.0f);
+                    float delta = Engine.PhysicsTicksPerSecond > 0 ? (1.0f / Engine.PhysicsTicksPerSecond) : 0f;
+                    damage = GetWeaponFloat(weapon, "damage_per_second", 0f) * delta;
                 }
                 else if (archetype == "energy_pulse")
                 {
                     damageType = "energy_pulse";
-                    damage = weapon["damage"].AsSingle();
+                    damage = GetWeaponFloat(weapon, "damage", 0f);
                 }
                 else
                 {
