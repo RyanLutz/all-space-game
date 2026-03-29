@@ -51,6 +51,44 @@ signal explosion_triggered(position: Vector2, radius: float, intensity: float)
 @warning_ignore("unused_signal")
 signal overheat_warning(hardpoint_id: String, heat_percent: float)
 
+# Ship State Signals
+@warning_ignore("unused_signal")
+signal hull_critical(ship: Node2D, percent: float)
+
+@warning_ignore("unused_signal")
+signal power_depleted(ship: Node2D)
+
+# AI Signals
+@warning_ignore("unused_signal")
+signal ai_state_changed(payload: Dictionary)
+
+@warning_ignore("unused_signal")
+signal ai_target_acquired(payload: Dictionary)
+
+@warning_ignore("unused_signal")
+signal ai_target_lost(payload: Dictionary)
+
+# World Signals
+@warning_ignore("unused_signal")
+signal chunk_loaded(chunk_coords: Vector2i)
+
+@warning_ignore("unused_signal")
+signal chunk_unloaded(chunk_coords: Vector2i)
+
+# Station Signals
+@warning_ignore("unused_signal")
+signal dock_requested(ship: Node2D, station: Node2D)
+
+@warning_ignore("unused_signal")
+signal dock_complete(ship: Node2D, station: Node2D)
+
+@warning_ignore("unused_signal")
+signal undock_requested(ship: Node2D)
+
+# Player State Signals
+@warning_ignore("unused_signal")
+signal player_ship_changed(ship: Node2D)
+
 
 func _ready() -> void:
 	ServiceLocator.Register("GameEventBus", self)

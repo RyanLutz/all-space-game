@@ -1,0 +1,14 @@
+{
+  "_comment": "Heavy Power Plant module. See docs/Ship_Content_Data_Architecture_Spec.md.",
+  "display_name": "Heavy Power Plant",
+  "type": "powerplant",
+  "size": "medium",
+  "stats": {
+    "power_capacity": 200,
+    "power_regen": 30.0,
+    "mass_addition": 250
+  },
+  "assets": {
+    "icon": "icon.png"
+  }
+}

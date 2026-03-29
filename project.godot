@@ -20,6 +20,8 @@ config/icon="res://icon.svg"
 ServiceLocator="*res://core/services/ServiceLocator.cs"
 GameBootstrap="*res://GameBootstrap.gd"
 GameEventBus="*res://core/GameEventBus.gd"
+ContentRegistry="*res://core/services/ContentRegistry.gd"
+PlayerState="*res://core/services/PlayerState.gd"
 ProjectileManager="*res://gameplay/weapons/ProjectileManager.cs"
 GuidedProjectilePool="*res://gameplay/weapons/GuidedProjectilePool.gd"
 

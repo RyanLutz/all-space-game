@@ -22,6 +22,7 @@ var _time_since_last_hit: float = 999.0
 # Hull / Combat
 @export var hull_max: float = 200.0
 var hull_hp: float = 200.0
+var is_dead: bool = false
 
 # Used by GameEventBus payloads (e.g. ship_destroyed) and AI/threat integration.
 @export var faction: String = "neutral"
@@ -33,14 +34,78 @@ var _hardpoint_radius_by_size: Dictionary = {}
 var _hardpoint_radius_hp_scale: float = 0.35
 
 var _weapon_component: WeaponComponent = null
+var _ai_controller: Node = null
+
+# Data-driven initialization — set by initialize() before entering the scene tree.
+var _pending_ship_data: Dictionary = {}
+var _pending_loadout: Dictionary = {}
+
+# Guard flag to avoid emitting hull_critical every frame once below threshold.
+var _hull_critical_emitted: bool = false
 
 @onready var _event_bus: Node = ServiceLocator.GetService("GameEventBus") as Node
 
 
+## Called by ShipFactory before the ship enters the scene tree.
+## Stores ship data; _ready() applies it once children are available.
+func initialize(ship_data: Dictionary, loadout_override: Dictionary = {}) -> void:
+	_pending_ship_data = ship_data
+	_pending_loadout = loadout_override if not loadout_override.is_empty() \
+		else ship_data.get("default_loadout", {})
+
+
 func _ready() -> void:
-	# Load damage type data
+	_load_damage_types()
+
+	# Apply hull stats and weapon loadout if we were initialized from content data.
+	if not _pending_ship_data.is_empty():
+		_apply_hull_stats(_pending_ship_data.get("hull", {}))
+
+	# Initialize resources after hull stats are set.
+	power_current = power_capacity
+	shield_hp = shield_max
+	hull_hp = hull_max
+
+	# Find child nodes.
+	for c in get_children():
+		if c is WeaponComponent:
+			_weapon_component = c
+			break
+
+	_ai_controller = get_node_or_null("AIController")
+
+	# Wire up weapon loadout from content data now that WeaponComponent exists.
+	if not _pending_ship_data.is_empty() and _weapon_component != null:
+		var content_registry := ServiceLocator.GetService("ContentRegistry") as Node
+		if content_registry != null:
+			_weapon_component.initialize_from_ship_data(
+				_pending_ship_data.get("hardpoints", []),
+				_pending_loadout.get("weapons", {}),
+				content_registry
+			)
+
+
+func _apply_hull_stats(hull: Dictionary) -> void:
+	if hull.is_empty():
+		return
+	mass             = float(hull.get("mass",              mass))
+	max_speed        = float(hull.get("max_speed",         max_speed))
+	linear_drag      = float(hull.get("linear_drag",       linear_drag))
+	alignment_drag   = float(hull.get("alignment_drag",    alignment_drag))
+	thruster_force   = float(hull.get("thruster_force",    thruster_force))
+	torque_thrust_ratio = float(hull.get("torque_thrust_ratio", torque_thrust_ratio))
+	hull_max         = float(hull.get("hp",                hull_max))
+	power_capacity   = float(hull.get("power_capacity",    power_capacity))
+	power_regen      = float(hull.get("power_regen",       power_regen))
+	shield_max       = float(hull.get("shield_max",        shield_max))
+	regen_rate       = float(hull.get("regen_rate",        regen_rate))
+	regen_delay      = float(hull.get("regen_delay",       regen_delay))
+	regen_power_draw = float(hull.get("regen_power_draw",  regen_power_draw))
+
+
+func _load_damage_types() -> void:
 	var file_path := "res://data/damage_types.json"
-	var damage_file = FileAccess.open(file_path, FileAccess.READ)
+	var damage_file := FileAccess.open(file_path, FileAccess.READ)
 	if not damage_file:
 		push_error("Ship: Failed to open %s" % file_path)
 		return
@@ -133,16 +198,6 @@ func _ready() -> void:
 		return
 	_hardpoint_radius_hp_scale = float(hp_scale_val)
 
-	# Initialize resources
-	power_current = power_capacity
-	shield_hp = shield_max
-	hull_hp = hull_max
-
-	for c in get_children():
-		if c is WeaponComponent:
-			_weapon_component = c
-			break
-
 
 func _physics_process(delta: float) -> void:
 	super._physics_process(delta)
@@ -157,9 +212,9 @@ func _update_resource_regen(delta: float) -> void:
 
 	# Shield regen (only after delay, and only if we have power)
 	if shield_hp < shield_max and _time_since_last_hit >= regen_delay:
-		var power_cost = regen_power_draw * delta
+		var power_cost := regen_power_draw * delta
 		if power_current >= power_cost:
-			var regen_amount = regen_rate * delta
+			var regen_amount := regen_rate * delta
 			shield_hp = minf(shield_hp + regen_amount, shield_max)
 			power_current -= power_cost
 
@@ -172,7 +227,7 @@ func apply_damage(amount: float, damage_type: String, hit_position: Vector2, com
 	var vs_shields: float = float(type_data.get("vs_shields", 1.0))
 	var vs_hull: float = float(type_data.get("vs_hull", 1.0))
 
-	# Shield absorption (see Weapons_Projectiles_Spec — shields first; leakage uses vs_shields + absorption curve)
+	# Shield absorption
 	var shield_damage: float = amount * vs_shields
 	var remaining_damage: float = 0.0
 
@@ -190,7 +245,7 @@ func apply_damage(amount: float, damage_type: String, hit_position: Vector2, com
 	if remaining_damage <= 0:
 		return
 
-	# Post-shield damage budget with hull type multiplier, then optional hardpoint split
+	# Post-shield damage with hull type multiplier, then optional hardpoint split
 	var effective_hull: float = remaining_damage * vs_hull
 	var to_hull: float = effective_hull
 	var to_hardpoint: float = 0.0
@@ -210,8 +265,17 @@ func apply_damage(amount: float, damage_type: String, hit_position: Vector2, com
 		hull_hp -= to_hull
 		_event_bus.emit_signal("ship_damaged", self, to_hull, damage_type, hit_position)
 
-	if hull_hp <= 0:
+		# hull_critical signal — once per engage until healed above threshold
+		var hull_percent: float = hull_hp / hull_max if hull_max > 0.0 else 0.0
+		if hull_percent < 0.25 and not _hull_critical_emitted:
+			_hull_critical_emitted = true
+			_event_bus.emit_signal("hull_critical", self, hull_percent)
+		elif hull_percent >= 0.25:
+			_hull_critical_emitted = false
+
+	if hull_hp <= 0 and not is_dead:
 		hull_hp = 0
+		is_dead = true
 		_event_bus.emit_signal("ship_destroyed", self, global_position, faction)
 
 
@@ -247,6 +311,8 @@ func _hardpoint_threshold(hp: HardpointComponent) -> float:
 func consume_power(amount: float) -> bool:
 	if power_current >= amount:
 		power_current -= amount
+		if power_current <= 0:
+			_event_bus.emit_signal("power_depleted", self)
 		return true
 	return false
 
@@ -254,32 +320,35 @@ func consume_power(amount: float) -> bool:
 func apply_thrust_forces(delta: float) -> void:
 	# Step 1 — Determine target heading angle.
 	var target_angle: float
+	var forward_input := 0.0
+	var strafe_input := 0.0
+
 	if is_player_controlled:
 		var mouse_pos := get_global_mouse_position()
 		target_angle = position.direction_to(mouse_pos).angle()
+		forward_input = (Input.get_action_strength("thrust_forward")
+				- Input.get_action_strength("thrust_reverse"))
+		strafe_input = (Input.get_action_strength("strafe_right")
+				- Input.get_action_strength("strafe_left"))
+	elif _ai_controller != null:
+		var aim: Vector2 = _ai_controller.ai_aim_target
+		target_angle = position.direction_to(aim).angle() if aim != Vector2.ZERO else rotation
+		forward_input = _ai_controller.ai_forward_input
+		strafe_input  = _ai_controller.ai_strafe_input
 	else:
-		target_angle = rotation  # AI will write a real target later.
+		target_angle = rotation
 
 	_perf.begin("Physics.thruster_allocation")
 
 	# Step 2 — Compute torque demand via assisted steering.
 	var torque_demand := _update_assisted_steering(target_angle)
 
-	# Step 3 — Read movement input (zero for non-player).
-	var forward_input := 0.0
-	var strafe_input := 0.0
-	if is_player_controlled:
-		forward_input = (Input.get_action_strength("thrust_forward")
-				- Input.get_action_strength("thrust_reverse"))
-		strafe_input = (Input.get_action_strength("strafe_right")
-				- Input.get_action_strength("strafe_left"))
-
-	# Step 4 — Allocate thruster budget; turning wins.
+	# Step 3 — Allocate thruster budget; turning wins.
 	_allocate_thrust(forward_input, strafe_input, torque_demand, delta)
 
 	_perf.end("Physics.thruster_allocation")
 
-	# Step 5 — Soft speed cap.
+	# Step 4 — Soft speed cap.
 	if velocity.length() > max_speed:
 		velocity = velocity.normalized() * max_speed
 
@@ -287,35 +356,30 @@ func apply_thrust_forces(delta: float) -> void:
 func _update_assisted_steering(target_angle: float) -> float:
 	var heading_error := angle_difference(rotation, target_angle)
 	var stopping_distance := (angular_velocity * angular_velocity) / \
-			(2.0 * max_angular_accel + 0.0001)  # epsilon avoids div-by-zero at rest
+			(2.0 * max_angular_accel + 0.0001)
 
 	var torque_direction: float
 	if stopping_distance >= absf(heading_error):
-		torque_direction = -signf(angular_velocity)  # brake: we will overshoot
+		torque_direction = -signf(angular_velocity)
 	else:
-		torque_direction = signf(heading_error)       # accelerate toward target
+		torque_direction = signf(heading_error)
 
 	return torque_direction * max_angular_accel
 
 
 func _allocate_thrust(forward_input: float, strafe_input: float,
 		torque_demand: float, delta: float) -> void:
-	# Clamp torque demand to what thrusters can deliver (turning wins, but cap it).
 	var max_torque_output := thruster_force / torque_thrust_ratio
 	var clamped_torque := clampf(torque_demand, -max_torque_output, max_torque_output)
 
 	var torque_cost := absf(clamped_torque) * torque_thrust_ratio
 	var remaining := maxf(0.0, thruster_force - torque_cost)
 
-	# Build 2D movement vector in ship-local space (X = forward, Y = strafe).
-	# Ship polygon points right (+X), so forward_input maps to +X.
 	var movement_input := Vector2(forward_input, strafe_input)
 	if movement_input.length() > 1.0:
 		movement_input = movement_input.normalized()
 
-	# Apply angular change first (turning wins, but was capped above).
 	angular_velocity += clamped_torque * delta
 
-	# Rotate local movement into world space and apply as a force.
 	var world_force := movement_input.rotated(rotation) * remaining
 	velocity += world_force * delta / mass

@@ -298,3 +298,82 @@ func get_all_hardpoints() -> Array:
 		if child is HardpointComponent:
 			result.append(child)
 	return result
+
+
+## Data-driven initialization from ship.json and ContentRegistry.
+## Replaces the default hardpoints spawned by _spawn_hardpoints().
+## Called by Ship._ready() when the ship was created via ShipFactory.
+func initialize_from_ship_data(
+		hardpoint_defs: Array,
+		weapon_assignments: Dictionary,
+		content_registry: Node) -> void:
+	# Remove hardpoints already spawned by the default _spawn_hardpoints() path.
+	for child in get_children():
+		if child is HardpointComponent:
+			child.queue_free()
+	_primary_hardpoints.clear()
+	_secondary_hardpoints.clear()
+	_missile_hardpoints.clear()
+	_active_beams.clear()
+
+	# Fetch weapon data from ContentRegistry for every assigned weapon id.
+	var weapons_data: Dictionary = {}
+	for _hp_id in weapon_assignments:
+		var weapon_id: String = weapon_assignments[_hp_id]
+		if weapon_id.is_empty():
+			continue
+		var w_data: Dictionary = content_registry.get_weapon(weapon_id)
+		if not w_data.is_empty():
+			weapons_data[weapon_id] = w_data
+
+	# Hardpoint type → arc_degrees mapping
+	const TYPE_TO_ARC: Dictionary = {
+		"fixed":         5.0,
+		"gimbal":        25.0,
+		"partial_turret": 120.0,
+		"full_turret":   360.0
+	}
+
+	for i in range(hardpoint_defs.size()):
+		var def: Dictionary = hardpoint_defs[i]
+		var hp := HardpointComponent.new()
+
+		hp.name           = def.get("id", "hardpoint_%d" % i)
+		hp.hardpoint_id   = def.get("id", "")
+		hp.hardpoint_index = i
+
+		var off: Array = def.get("offset", [0, 0])
+		hp.offset = Vector2(float(off[0]), float(off[1]))
+		hp.facing = float(def.get("facing", 0.0))
+		hp.size   = def.get("size", "small")
+
+		var hp_type: String = def.get("type", "fixed")
+		hp.arc_degrees = TYPE_TO_ARC.get(hp_type, 5.0)
+
+		hp.allowed_groups = Array(def.get("groups", ["primary"]), TYPE_STRING, "", null)
+
+		var weapon_id: String = weapon_assignments.get(hp.hardpoint_id, "")
+		if not weapon_id.is_empty() and weapons_data.has(weapon_id):
+			hp.set_weapon(weapon_id, weapons_data)
+
+		add_child(hp)
+
+		for group in hp.allowed_groups:
+			match group:
+				"primary":   _primary_hardpoints.append(hp)
+				"secondary": _secondary_hardpoints.append(hp)
+				"missile":   _missile_hardpoints.append(hp)
+
+
+## Fire all primary hardpoints toward target_pos. Used by AIController.
+func fire_primary_at(target_pos: Vector2) -> void:
+	for hp in _primary_hardpoints:
+		var aim_dir := (target_pos - hp.get_world_position()).normalized()
+		hp.request_fire(aim_dir, target_pos)
+
+
+## Fire all secondary hardpoints toward target_pos. Used by AIController.
+func fire_secondary_at(target_pos: Vector2) -> void:
+	for hp in _secondary_hardpoints:
+		var aim_dir := (target_pos - hp.get_world_position()).normalized()
+		hp.request_fire(aim_dir, target_pos)
