@@ -20,6 +20,16 @@
       "vs_shields": 0.6,
       "vs_hull": 1.4,
       "description": "Explosion blocked by shields, devastating to exposed hull"
+    },
+    "missile_dumb": {
+      "vs_shields": 0.6,
+      "vs_hull": 1.4,
+      "description": "Alias for missile — dumb rockets use the same damage profile"
+    },
+    "missile_guided": {
+      "vs_shields": 0.6,
+      "vs_hull": 1.4,
+      "description": "Alias for missile — guided missiles use the same damage profile"
     }
   },
   "shield_absorption": {

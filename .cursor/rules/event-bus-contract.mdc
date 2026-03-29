@@ -55,6 +55,11 @@ to reach across system boundaries.
 | `dock_complete` | `ship: Node2D, station: Node2D` | Station | UI (open loadout) |
 | `undock_requested` | `ship: Node2D` | UI | Station |
 
+### Player State Signals
+| Signal | Args | Emitted By | Listened By |
+|---|---|---|---|
+| `player_ship_changed` | `ship: Node2D` | PlayerState | Camera (follow), Input, UI |
+
 This registry is a living document. Add signals here BEFORE implementing them.
 The emitter and listener columns must be kept accurate — they define the dependency
 graph between systems.

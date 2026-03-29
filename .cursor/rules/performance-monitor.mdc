@@ -42,6 +42,7 @@ PerformanceMonitor.set_count("System.metric_name", value)
 | Active AI ships | `AIController.active_count` |
 | Active physics bodies | `Physics.active_bodies` |
 | Loaded chunks | `ChunkStreamer.loaded_chunks` |
+| Content registry scan | `ContentRegistry.load` |
 
 ## Rules
 - Only instrument operations expected to take > 0.1ms

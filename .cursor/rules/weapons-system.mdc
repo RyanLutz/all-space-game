@@ -5,7 +5,7 @@ globs:
   - "**/Projectile*"
   - "**/Weapon*"
   - "**/Hardpoint*"
-  - data/weapons.json
+  - content/weapons/**
   - data/damage_types.json
 ---
 
@@ -31,8 +31,9 @@ Read `docs/Weapons_Projectiles_Spec.md` before making any changes.
 - `HitDetection.component_resolve` — damage application to components
 
 ## Data Files
-- `data/weapons.json` — all weapon stats (damage, fire rate, heat, power cost, etc.)
-- `data/damage_types.json` — damage type effectiveness matrix
+- `content/weapons/<id>/weapon.json` — per-weapon stats (damage, fire rate, heat, power cost, etc.)
+- `data/damage_types.json` — damage type effectiveness matrix (global config — stays in /data/)
+- See `docs/Ship_Content_Data_Architecture_Spec.md` for the folder-per-item content structure
 
 ## Watch Out For
 - ProjectileManager.cs is the ONLY C# file in the project — everything else is GDScript

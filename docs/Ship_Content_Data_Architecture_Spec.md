@@ -429,7 +429,7 @@ var active_ship: Node = null
 
 func set_active_ship(ship: Node) -> void:
     active_ship = ship
-    GameEventBus.emit("player_ship_changed", { "ship": ship })
+    GameEventBus.player_ship_changed.emit(ship)
 
 func get_active_ship() -> Node:
     return active_ship

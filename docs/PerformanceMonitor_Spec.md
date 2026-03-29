@@ -41,6 +41,7 @@ All metric names use the format `"System.method"`. Use these exact names — con
 | Active projectiles (count) | `ProjectileManager.active_count` |
 | Active AI ships (count) | `AIController.active_count` |
 | Loaded chunks (count) | `ChunkStreamer.loaded_chunks` |
+| Content registry startup scan | `ContentRegistry.load` |
 
 New systems must add their metric names to this table before implementation.
 
