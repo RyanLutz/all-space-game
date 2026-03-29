@@ -1,0 +1,49 @@
+---
+description: AI controller and patrol behavior conventions for All Space
+globs:
+  - gameplay/ai/**
+  - "**/AIController*"
+  - data/ai_profiles.json
+---
+
+# AI & Patrol Behavior System
+
+Read `docs/AI_Patrol_Behavior_Spec.md` before making any changes.
+
+## Core Design Decisions
+- State machine: IDLE (wander) → PURSUE → ENGAGE → IDLE
+- AI produces physics inputs, not direct movement — same pipeline as the player
+- AI ships obey the same thruster budget, angular inertia, and drag as the player
+- No physics cheating: AI cannot exceed max_speed, turn instantly, or teleport
+- `AIController.gd` is attached only to AI ships — the player ship never has one
+- Behavior profiles in `data/ai_profiles.json` — one entry per behavior archetype
+
+## PerformanceMonitor Metrics (use exactly these strings)
+- `AIController.state_updates` — wrap the full state machine update per ship
+- `AIController.active_count` — set_count each frame (from scene manager or spawner)
+
+## Key Classes & Components
+- `AIController.gd` — state machine, decision logic, produces `ai_forward_input`, `ai_strafe_input`, `ai_aim_target`
+- `DetectionArea` (Area2D child of the ship) — circle trigger for player detection
+
+## Interface — AI Inputs to Ship
+```gdscript
+# AIController sets these; Ship.gd reads them in _physics_process
+var ai_forward_input: float = 0.0     # -1.0 to 1.0
+var ai_strafe_input: float = 0.0      # -1.0 to 1.0
+var ai_aim_target: Vector2 = Vector2.ZERO
+var ai_fire_primary: bool = false
+```
+
+## GameEventBus Signals (emit on every state transition)
+- `ai_state_changed` — `{ ship_id: int, old_state: String, new_state: String }`
+- `ai_target_acquired` — `{ ship_id: int, target_id: int }`
+- `ai_target_lost` — `{ ship_id: int }`
+
+## Watch Out For
+- Leash range is measured from `_spawn_position`, not from the player detection point
+- `_spawn_position` is set in `_ready()` from `global_position` — do NOT update it
+- Circle direction (clockwise or CCW) is chosen on entering ENGAGE and held until exit
+- `aim_accuracy` (0–1) in the behavior profile is the primary difficulty knob
+- Never call `move_and_slide()` from AIController — the AI feeds inputs to Ship, Ship moves
+- All tuning values (ranges, thrust fractions, aim accuracy) come from `ai_profiles.json`

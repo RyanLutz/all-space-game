@@ -355,9 +355,14 @@ Performance.add_custom_monitor("AllSpace/projectile_guided_ms",
     WeaponComponent.gd            (attached to Ship, manages hardpoints)
     HardpointComponent.gd         (per hardpoint: heat, damage state, fire logic)
 /data/
-    weapons.json
     damage_types.json
 ```
+
+> **Migration note:** The `weapons.json` monolithic file referenced above is superseded by the
+> folder-per-item content architecture (`docs/Ship_Content_Data_Architecture_Spec.md`). Each
+> weapon now lives at `/content/weapons/<id>/weapon.json` alongside its model and icon. The
+> per-weapon JSON schema is identical to individual entries from the old `weapons.json`. The
+> `damage_types.json` global config table remains in `/data/` unchanged.
 
 ---
 

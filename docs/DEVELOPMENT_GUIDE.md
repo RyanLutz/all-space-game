@@ -13,8 +13,12 @@ context automatically:
 | Always-on | `.cursorrules` | Every conversation, every model |
 | Physics | `.cursor/rules/physics-system.mdc` | When you're editing files in `gameplay/physics/` |
 | Weapons | `.cursor/rules/weapons-system.mdc` | When you're editing files in `gameplay/weapons/` |
+| AI | `.cursor/rules/ai.mdc` | When you're editing files in `gameplay/ai/` |
+| Camera | `.cursor/rules/camera-system.mdc` | When you're editing files in `gameplay/camera/` |
+| Content/data | `.cursor/rules/content-architecture.mdc` | When you're editing files in `content/` |
 | Perf monitor | `.cursor/rules/performance-monitor.mdc` | When you're editing `PerformanceMonitor` files |
-| JSON data | `.cursor/rules/json-data.mdc` | When you're editing files in `data/` |
+| JSON data | `.cursor/rules/json-data.mdc` | When you're editing files in `data/` or `content/` |
+| Event bus | `.cursor/rules/event-bus-contract.mdc` | When you're editing `GameEventBus` files |
 | Spec writing | `.cursor/rules/spec-writing.mdc` | When you're editing files in `docs/` |
 | C# | `.cursor/rules/csharp-projectiles.mdc` | When you're editing `.cs` files |
 | Godot | `.cursor/rules/godot-conventions.mdc` | When you're editing `.gd`, `.tscn`, `.tres` files |
@@ -99,7 +103,7 @@ Each row is one atomic session. Do them in order. Check them off as you go.
 ### Weapons Layer
 | # | Task | Spec | Status |
 |---|---|---|---|
-| 8 | JSON data files — weapons.json + damage_types.json | `docs/Weapons_Projectiles_Spec.md` | 🔲 |
+| 8 | JSON data files — content/weapons/<id>/weapon.json + data/damage_types.json | `docs/Weapons_Projectiles_Spec.md`, `docs/Ship_Content_Data_Architecture_Spec.md` | 🔲 |
 | 9 | ProjectileManager.cs — dumb projectile pool (spawn, move, despawn) | `docs/Weapons_Projectiles_Spec.md` | 🔲 |
 | 10 | HardpointComponent — fire arc, heat tracking, damage states | `docs/Weapons_Projectiles_Spec.md` | 🔲 |
 | 11 | WeaponComponent — fire logic, power draw, projectile spawning | `docs/Weapons_Projectiles_Spec.md` | 🔲 |

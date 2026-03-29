@@ -19,17 +19,27 @@ All Space is a top-down 2D space combat sim built in Godot 4.6.1 (GDScript prima
     .cursorrules              ← you are here
     .cursor/rules/            ← contextual rules (auto-loaded by file pattern)
     docs/                     ← all spec documents (authoritative reference)
+    GameBootstrap.gd          ← at project root (autoloaded — see project.godot)
     core/
         services/
             ServiceLocator.cs
             PerformanceMonitor.gd
+            ContentRegistry.gd
+            PlayerState.gd
         GameEventBus.gd
-        GameBootstrap.gd
     gameplay/
         physics/              ← SpaceBody.gd, movement logic
-        entities/             ← Ship.gd, Asteroid.gd, Debris.gd
+        entities/             ← Ship.gd, ShipFactory.gd, Asteroid.gd, Debris.gd
         weapons/              ← ProjectileManager.cs, WeaponComponent.gd, etc.
-    data/                     ← JSON config files (weapons.json, damage_types.json, etc.)
+        camera/               ← GameCamera.gd
+        ai/                   ← AIController.gd
+    content/                  ← per-item content (folder-per-item, folder name = ID)
+        ships/<id>/           ← ship.json + model.glb + icon.png
+        weapons/<id>/         ← weapon.json + model.glb + icon.png
+        modules/<id>/         ← module.json + icon.png
+    data/                     ← global config tables only (NOT per-item content)
+        damage_types.json
+        ai_profiles.json
     ui/debug/                 ← PerformanceOverlay
     test/                     ← Test scenes
 ```
@@ -37,7 +47,7 @@ All Space is a top-down 2D space combat sim built in Godot 4.6.1 (GDScript prima
 ## Before You Write Code
 1. Check if a spec exists in `docs/` for the system you're working on
 2. Read the spec fully — it contains architecture, algorithms, data formats, and success criteria
-3. Check `data/` for any JSON files the system depends on
+3. Check `data/` for global config files and `content/` for per-item content the system depends on
 4. Identify which `GameEventBus` signals you need to emit or connect to
 
 ## GDScript Conventions
