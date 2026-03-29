@@ -41,6 +41,10 @@ signal shield_regenerated(ship: Node)
 @warning_ignore("unused_signal")
 signal hardpoint_destroyed(ship: Node2D, hardpoint_index: int)
 
+# Player State Events
+@warning_ignore("unused_signal")
+signal player_ship_changed(ship: Node2D)
+
 # VFX / Audio Events (for future VFX system)
 @warning_ignore("unused_signal")
 signal projectile_spawned(position: Vector2, velocity: Vector2, weapon_data: Dictionary)

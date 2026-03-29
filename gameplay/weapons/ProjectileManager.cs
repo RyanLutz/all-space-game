@@ -8,7 +8,7 @@ public partial class ProjectileManager : Node
         public Vector2 Position;
         public Vector2 Velocity;
         public float Lifetime;
-        public int WeaponDataId;
+        public string WeaponId;      // content ID — matches ContentRegistry key
         public ulong OwnerEntityId;
         public bool Active;
     }
@@ -21,7 +21,8 @@ public partial class ProjectileManager : Node
 
     private Node _perfMonitor;
     private Node _eventBus;
-    private Godot.Collections.Dictionary<int, Godot.Collections.Dictionary> _weaponData;
+    // Keyed by content ID string (folder name = weapon ID).
+    private Godot.Collections.Dictionary<string, Godot.Collections.Dictionary> _weaponData;
 
     private uint _collisionMask = 1; // Layer 1 for ships/obstacles
 
@@ -60,7 +61,7 @@ public partial class ProjectileManager : Node
         _eventBus.Connect("request_spawn_dumb", new Callable(this, nameof(OnRequestSpawnDumb)));
         _eventBus.Connect("request_fire_hitscan", new Callable(this, nameof(OnRequestFireHitscan)));
 
-        LoadWeaponData();
+        _LoadWeaponDataFromRegistry(locator);
 
         // Register custom monitors
         Performance.AddCustomMonitor("AllSpace/projectile_dumb_ms",
@@ -80,90 +81,41 @@ public partial class ProjectileManager : Node
         FireHitscan(origin, direction, rangeVal, weaponId, (ulong)ownerId);
     }
 
-    private void LoadWeaponData()
+    private void _LoadWeaponDataFromRegistry(ServiceLocator locator)
     {
-        const string filePath = "res://data/weapons.json";
-        _weaponData = new Godot.Collections.Dictionary<int, Godot.Collections.Dictionary>();
+        _weaponData = new Godot.Collections.Dictionary<string, Godot.Collections.Dictionary>();
 
-        using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
-        if (file == null)
+        var registry = locator.GetService("ContentRegistry") as Node;
+        if (registry == null)
         {
-            GD.PushError($"ProjectileManager: Failed to open {filePath}");
+            GD.PushError("ProjectileManager: ContentRegistry not registered — cannot load weapons");
             return;
         }
 
-        string text = file.GetAsText();
-
-        var json = new Json();
-        var parseErr = json.Parse(text);
-        if (parseErr != Error.Ok)
+        // ContentRegistry.get_all_weapons() returns Dictionary keyed by weapon ID string.
+        var allWeapons = registry.Call("get_all_weapons").As<Godot.Collections.Dictionary>();
+        if (allWeapons == null || allWeapons.Count == 0)
         {
-            GD.PushError(
-                $"ProjectileManager: JSON parse failed for {filePath}: {json.GetErrorMessage()} (line {json.GetErrorLine()})"
-            );
+            GD.PushError("ProjectileManager: ContentRegistry returned no weapons");
             return;
         }
 
-        var data = json.GetData().As<Godot.Collections.Dictionary>();
-        if (data == null)
+        foreach (var key in allWeapons.Keys)
         {
-            GD.PushError($"ProjectileManager: Invalid root in {filePath} (expected Dictionary)");
-            return;
-        }
-
-        if (!data.ContainsKey("weapons"))
-        {
-            GD.PushError($"ProjectileManager: Missing 'weapons' key in {filePath}");
-            return;
-        }
-
-        var weapons = data["weapons"].As<Godot.Collections.Array>();
-        if (weapons == null)
-        {
-            GD.PushError($"ProjectileManager: 'weapons' must be an Array in {filePath}");
-            return;
-        }
-
-        var seenWeaponIds = new System.Collections.Generic.HashSet<string>();
-        int id = 0;
-        foreach (var weaponObj in weapons)
-        {
-            var weapon = weaponObj.As<Godot.Collections.Dictionary>();
-            if (weapon == null)
-            {
-                GD.PushError($"ProjectileManager: Weapon entry must be a Dictionary in {filePath}");
-                return;
-            }
-
-            if (!weapon.ContainsKey("id"))
-            {
-                GD.PushError($"ProjectileManager: Weapon entry missing 'id' in {filePath}");
-                return;
-            }
-
-            string weaponId = weapon["id"].AsString();
-            if (string.IsNullOrEmpty(weaponId))
-            {
-                GD.PushError($"ProjectileManager: Weapon entry has empty 'id' in {filePath}");
-                return;
-            }
+            string weaponId = key.AsString();
+            var weapon = allWeapons[key].As<Godot.Collections.Dictionary>();
+            if (weapon == null) continue;
 
             if (!weapon.ContainsKey("archetype"))
             {
-                GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'archetype' in {filePath}");
-                return;
+                GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'archetype'");
+                continue;
             }
 
             string archetype = weapon["archetype"].AsString();
 
-            if (seenWeaponIds.Contains(weaponId))
-            {
-                GD.PushError($"ProjectileManager: Duplicate weapon id '{weaponId}' in {filePath}");
-                return;
-            }
-            seenWeaponIds.Add(weaponId);
-
-            // Validate keys actually used by ProjectileManager (avoid silent fallback defaults).
+            // Validate keys that ProjectileManager reads directly.
+            bool valid = true;
             switch (archetype)
             {
                 case "ballistic":
@@ -171,31 +123,32 @@ public partial class ProjectileManager : Node
                 case "missile_guided":
                     if (!weapon.ContainsKey("damage"))
                     {
-                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing required key 'damage' in {filePath}");
-                        return;
+                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'damage'");
+                        valid = false;
                     }
                     break;
                 case "energy_beam":
                     if (!weapon.ContainsKey("damage_per_second"))
                     {
-                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing required key 'damage_per_second' in {filePath}");
-                        return;
+                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'damage_per_second'");
+                        valid = false;
                     }
                     break;
                 case "energy_pulse":
                     if (!weapon.ContainsKey("damage"))
                     {
-                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing required key 'damage' in {filePath}");
-                        return;
+                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'damage'");
+                        valid = false;
                     }
                     break;
                 default:
-                    GD.PushError($"ProjectileManager: Weapon '{weaponId}' has unknown archetype '{archetype}' in {filePath}");
-                    return;
+                    GD.PushError($"ProjectileManager: Weapon '{weaponId}' has unknown archetype '{archetype}'");
+                    valid = false;
+                    break;
             }
 
-            _weaponData[id] = weapon;
-            id++;
+            if (valid)
+                _weaponData[weaponId] = weapon;
         }
     }
 
@@ -213,18 +166,7 @@ public partial class ProjectileManager : Node
 
     public int SpawnDumb(Vector2 position, Vector2 velocity, float lifetime, string weaponId, ulong ownerId)
     {
-        int weaponDataId = -1;
-        foreach (var kvp in _weaponData)
-        {
-            var weapon = kvp.Value;
-            if (weapon.ContainsKey("id") && weapon["id"].AsString() == weaponId)
-            {
-                weaponDataId = kvp.Key;
-                break;
-            }
-        }
-
-        if (weaponDataId < 0) return -1;
+        if (!_weaponData.ContainsKey(weaponId)) return -1;
 
         // Find free slot starting from last freed index
         int startIndex = _lastFreedIndex;
@@ -247,7 +189,7 @@ public partial class ProjectileManager : Node
             Position = position,
             Velocity = velocity,
             Lifetime = lifetime,
-            WeaponDataId = weaponDataId,
+            WeaponId = weaponId,
             OwnerEntityId = ownerId,
             Active = true
         };
@@ -256,7 +198,7 @@ public partial class ProjectileManager : Node
 
         // Debug/VFX hook: emit spawned projectile snapshot via the event bus.
         // Contract: projectile_spawned(position, velocity, weapon_data)
-        if (_eventBus != null && _weaponData.TryGetValue(weaponDataId, out var weaponData) && weaponData != null)
+        if (_eventBus != null && _weaponData.TryGetValue(weaponId, out var weaponData) && weaponData != null)
             _eventBus.EmitSignal("projectile_spawned", position, velocity, weaponData);
 
         return index;
@@ -324,7 +266,7 @@ public partial class ProjectileManager : Node
                 {
                     // Hit!
                     Vector2 hitPoint = result["position"].AsVector2();
-                    _weaponData.TryGetValue(_pool[i].WeaponDataId, out var weapon);
+                    _weaponData.TryGetValue(_pool[i].WeaponId, out var weapon);
 
                     if (weapon != null && collider.HasMethod("apply_damage"))
                     {
@@ -349,18 +291,7 @@ public partial class ProjectileManager : Node
 
     public void FireHitscan(Vector2 origin, Vector2 direction, float range, string weaponId, ulong ownerId)
     {
-        Godot.Collections.Dictionary weapon = null;
-        foreach (var kvp in _weaponData)
-        {
-            var w = kvp.Value;
-            if (w.ContainsKey("id") && w["id"].AsString() == weaponId)
-            {
-                weapon = w;
-                break;
-            }
-        }
-
-        if (weapon == null)
+        if (!_weaponData.TryGetValue(weaponId, out var weapon))
         {
             GD.PushError($"ProjectileManager: Unknown weapon id '{weaponId}' in request_fire_hitscan");
             return;
@@ -419,15 +350,12 @@ public partial class ProjectileManager : Node
         for (int i = 0; i < _poolSize; i++)
         {
             if (!_pool[i].Active) continue;
-            Godot.Collections.Dictionary weapon = null;
-            if (_weaponData.ContainsKey(_pool[i].WeaponDataId))
-                weapon = _weaponData[_pool[i].WeaponDataId];
+            _weaponData.TryGetValue(_pool[i].WeaponId ?? "", out var weapon);
             var entry = new Godot.Collections.Dictionary();
             entry["position"] = _pool[i].Position;
-            if (weapon != null && weapon.ContainsKey("archetype"))
-                entry["archetype"] = weapon["archetype"].AsString();
-            else
-                entry["archetype"] = "unknown";
+            entry["archetype"] = (weapon != null && weapon.ContainsKey("archetype"))
+                ? weapon["archetype"].AsString()
+                : "unknown";
             result.Add(entry);
         }
         return result;

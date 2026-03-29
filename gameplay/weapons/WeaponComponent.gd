@@ -27,99 +27,54 @@ func _ready() -> void:
 
 
 func _load_weapons_data() -> void:
-	var file_path := "res://data/weapons.json"
-	var file = FileAccess.open(file_path, FileAccess.READ)
-	if not file:
-		push_error("WeaponComponent: Failed to open %s" % file_path)
+	var registry := ServiceLocator.GetService("ContentRegistry") as Node
+	if registry == null:
+		push_error("WeaponComponent: ContentRegistry not registered — cannot load weapons")
 		return
 
-	var text := file.get_as_text()
-	file.close()
+	_weapons_data = registry.get_all_weapons()
 
-	var json := JSON.new()
-	var parse_err := json.parse(text)
-	if parse_err != OK:
-		push_error(
-			"WeaponComponent: JSON parse failed for %s: %s (line %d)" % [
-				file_path, json.get_error_message(), json.get_error_line()
-			]
-		)
+	if _weapons_data.is_empty():
+		push_warning("WeaponComponent: ContentRegistry returned no weapons")
 		return
 
-	var data: Dictionary = json.get_data()
-	if typeof(data) != TYPE_DICTIONARY:
-		push_error("WeaponComponent: Invalid root in %s (expected Dictionary)" % file_path)
-		return
-
-	if not data.has("_comment") or typeof(data["_comment"]) != TYPE_STRING:
-		push_error("WeaponComponent: Missing/invalid top-level _comment in %s" % file_path)
-		return
-
-	if not data.has("weapons") or typeof(data["weapons"]) != TYPE_ARRAY:
-		push_error("WeaponComponent: Missing/invalid 'weapons' array in %s" % file_path)
-		return
-
-	_weapons_data.clear()
-
-	var weapons: Array = data["weapons"]
-	for weapon in weapons:
-		if typeof(weapon) != TYPE_DICTIONARY:
-			push_error("WeaponComponent: Weapon entry must be a Dictionary in %s" % file_path)
-			return
-
-		if not weapon.has("id") or typeof(weapon["id"]) != TYPE_STRING:
-			push_error("WeaponComponent: Weapon entry missing string 'id' in %s" % file_path)
-			return
-
-		var weapon_id: String = weapon["id"]
+	# Validate required fields for each weapon to catch bad content files early.
+	for weapon_id in _weapons_data:
+		var weapon: Dictionary = _weapons_data[weapon_id]
 
 		if not weapon.has("archetype") or typeof(weapon["archetype"]) != TYPE_STRING:
-			push_error("WeaponComponent: Weapon '%s' missing string 'archetype' in %s" % [weapon_id, file_path])
-			return
+			push_error("WeaponComponent: Weapon '%s' missing string 'archetype'" % weapon_id)
+			continue
 
 		var archetype: String = weapon["archetype"]
-		if _weapons_data.has(weapon_id):
-			push_error("WeaponComponent: Duplicate weapon id '%s' in %s" % [weapon_id, file_path])
-			return
-
-		# Validate required keys to avoid silent default fallback downstream.
-		var required_common := ["id", "archetype", "fire_rate", "heat_per_shot", "power_per_shot", "component_damage_ratio"]
+		var required_common := ["fire_rate", "heat_per_shot", "power_per_shot", "component_damage_ratio"]
 		for key in required_common:
 			if not weapon.has(key):
-				push_error("WeaponComponent: Weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-				return
+				push_error("WeaponComponent: Weapon '%s' missing required field '%s'" % [weapon_id, key])
 
 		match archetype:
 			"ballistic":
 				for key in ["damage", "muzzle_speed", "projectile_lifetime"]:
 					if not weapon.has(key):
-						push_error("WeaponComponent: Ballistic weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-						return
+						push_error("WeaponComponent: Ballistic weapon '%s' missing '%s'" % [weapon_id, key])
 			"energy_beam":
 				for key in ["damage_per_second", "range"]:
 					if not weapon.has(key):
-						push_error("WeaponComponent: Energy beam weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-						return
+						push_error("WeaponComponent: Energy beam weapon '%s' missing '%s'" % [weapon_id, key])
 			"energy_pulse":
 				for key in ["damage", "range"]:
 					if not weapon.has(key):
-						push_error("WeaponComponent: Energy pulse weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-						return
+						push_error("WeaponComponent: Energy pulse weapon '%s' missing '%s'" % [weapon_id, key])
 			"missile_dumb":
 				for key in ["damage", "blast_radius", "speed", "fuel", "turn_rate"]:
 					if not weapon.has(key):
-						push_error("WeaponComponent: Dumb rocket weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-						return
+						push_error("WeaponComponent: Dumb rocket '%s' missing '%s'" % [weapon_id, key])
 			"missile_guided":
 				for key in ["damage", "blast_radius", "speed", "turn_rate", "fuel", "guidance"]:
 					if not weapon.has(key):
-						push_error("WeaponComponent: Guided missile weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-						return
+						push_error("WeaponComponent: Guided missile '%s' missing '%s'" % [weapon_id, key])
 			_:
-				push_error("WeaponComponent: Weapon '%s' has unknown archetype '%s' in %s" % [weapon_id, archetype, file_path])
-				return
-
-		_weapons_data[weapon_id] = weapon
+				push_error("WeaponComponent: Weapon '%s' has unknown archetype '%s'" % [weapon_id, archetype])
 
 
 func _spawn_hardpoints() -> void:

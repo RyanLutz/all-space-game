@@ -1,0 +1,20 @@
+{
+  "display_name": "Heat-Seeking Missile",
+  "archetype": "missile_guided",
+  "size": "medium",
+  "guidance": "auto_lock",
+  "fire_rate": 1.0,
+  "damage": 200,
+  "blast_radius": 60,
+  "speed": 400,
+  "turn_rate": 90,
+  "fuel": 4.0,
+  "heat_per_shot": 25,
+  "power_per_shot": 8,
+  "component_damage_ratio": 0.25,
+  "ammo_capacity": 12,
+  "assets": {
+    "model": "model.glb",
+    "icon": "icon.png"
+  }
+}

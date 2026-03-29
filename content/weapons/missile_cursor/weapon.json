@@ -1,0 +1,20 @@
+{
+  "display_name": "Cursor-Guided Missile",
+  "archetype": "missile_guided",
+  "size": "small",
+  "guidance": "track_cursor",
+  "fire_rate": 1.0,
+  "damage": 150,
+  "blast_radius": 50,
+  "speed": 450,
+  "turn_rate": 110,
+  "fuel": 3.5,
+  "heat_per_shot": 18,
+  "power_per_shot": 6,
+  "component_damage_ratio": 0.18,
+  "ammo_capacity": 16,
+  "assets": {
+    "model": "model.glb",
+    "icon": "icon.png"
+  }
+}

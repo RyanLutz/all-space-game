@@ -21,6 +21,8 @@ func _ready() -> void:
 		func(): return get_avg_ms("AIController.state_updates"))
 	Performance.add_custom_monitor("AllSpace/physics_ms",
 		func(): return get_avg_ms("Physics.move_and_slide"))
+	Performance.add_custom_monitor("AllSpace/content_load_ms",
+		func(): return get_avg_ms("ContentRegistry.load"))
 
 
 func begin(metric: String) -> void:
