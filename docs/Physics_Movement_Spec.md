@@ -3,9 +3,9 @@
 
 ## Overview
 
-A sim-lite physics system built on manual velocity control via `CharacterBody3D`. All physical entities share a common `SpaceBody` base. The system prioritizes tactile, momentum-based feel over strict Newtonian accuracy — ships have weight and inertia, but the universe applies gentle drag to prevent infinite drift.
+A sim-lite physics system built on manual velocity control via `CharacterBody2D`. All physical entities share a common `SpaceBody` base. The system prioritizes tactile, momentum-based feel over strict Newtonian accuracy — ships have weight and inertia, but the universe applies gentle drag to prevent infinite drift.
 
-**2.5D convention:** Assets and physics are fully 3D. The camera is a fixed orthographic camera looking straight down the Y axis and never moves off it. All gameplay movement is locked to the **XZ plane** — the Y component of `velocity` is always `0.0`. Ship heading is rotation around the **Y axis** only (no pitch or roll). This gives the feel of a 2D top-down game with the visual quality of 3D assets.
+**2.5D convention:** Assets are 3D but physics are 2D. The camera is a fixed `Camera2D` looking straight down at the XY gameplay plane. All gameplay movement is locked to this 2D plane — `CharacterBody2D.velocity` is always a `Vector2`. Ship heading is `rotation` (radians around the Z axis in 2D terms). This gives the feel of a top-down game with the visual quality of 3D assets.
 
 **Core Feel:**
 - Ships feel heavy and purposeful, not floaty
@@ -18,7 +18,7 @@ A sim-lite physics system built on manual velocity control via `CharacterBody3D`
 ## Entity Hierarchy
 
 ```
-CharacterBody3D
+CharacterBody2D
     └── SpaceBody.gd                  (base: mass, velocity, angular velocity, thrust)
             ├── Ship.gd               (modules, thruster budget, assisted steering)
             ├── Asteroid.gd           (static or slow-drifting, health, loot)
@@ -40,7 +40,7 @@ Projectiles are explicitly NOT `SpaceBody` instances. They inherit momentum from
 |---|---|---|---|
 | `mass` | float | yes | kg equivalent — affects inertia and thrust response |
 | `moment_of_inertia` | float | no | Derived in `_ready()`: `mass * 20.0 * 0.5`. Not tuned directly. |
-| `velocity` | Vector2 | no | Current linear velocity (units/sec). Inherited from CharacterBody2D. |
+| `velocity` | Vector2 | no | Current linear velocity (units/sec). Set before calling `move_and_slide()`. |
 | `angular_velocity` | float | no | Current rotation speed (radians/sec). Managed manually — not from the physics engine. |
 | `max_speed` | float | yes | Hard velocity cap. Set equal to `v_terminal` so drag and thrust are balanced. |
 | `linear_drag` | float | yes | Omnidirectional drag coefficient. Controls terminal velocity and stop time. |
@@ -68,19 +68,18 @@ velocity *= (1.0 - linear_drag * delta)
 
 ### Partial Alignment Drag
 
-Applied when the ship's velocity direction is misaligned with its heading. Only the **lateral component** (perpendicular to heading on the XZ plane) bleeds off — the **axial component** (along heading) is unaffected.
+Applied when the ship's velocity direction is misaligned with its heading. Only the **lateral component** (perpendicular to heading) bleeds off — the **axial component** (along heading) is unaffected.
 
 ```gdscript
 func apply_alignment_drag(delta: float) -> void:
-    # Heading is a unit vector on the XZ plane derived from Y-axis rotation
-    var heading = Vector3(sin(rotation.y), 0.0, cos(rotation.y))
-    var axial = heading * velocity.dot(heading)        # component along heading
-    var lateral = velocity - axial                     # component perpendicular (XZ only)
+    # Heading is a unit vector derived from the ship's 2D rotation angle
+    var heading = Vector2(sin(rotation), -cos(rotation))
+    var axial = heading * velocity.dot(heading)    # component along heading
+    var lateral = velocity - axial                 # component perpendicular
 
     # Only bleed lateral — axial momentum is preserved
     lateral *= (1.0 - alignment_drag * delta)
     velocity = axial + lateral
-    velocity.y = 0.0  # enforce XZ-plane constraint
 ```
 
 `alignment_drag` is tuned higher than `linear_drag` — lateral drift bleeds noticeably during hard turns, but not instantly.
@@ -101,7 +100,7 @@ func apply_alignment_drag(delta: float) -> void:
 | `thruster_force` | float | yes | Total thrust budget per frame (N equivalent). Shared between turning and linear movement. |
 | `torque_thrust_ratio` | float | yes | Fraction of thruster budget that turning draws per rad/s² demanded. Heavier ships pay more for the same angular acceleration. |
 | `max_angular_accel` | float | yes | Maximum angular acceleration in rad/s². Determines how quickly the ship can rotate. |
-| `is_player_controlled` | bool | yes | When true, reads WASD + mouse input. When false, expects AI to set `target_angle` externally (not yet implemented). |
+| `is_player_controlled` | bool | yes | When true, reads WASD + mouse input. When false, expects AI to set `target_angle` externally. |
 
 ### Thruster Budget
 
@@ -118,9 +117,9 @@ func allocate_thrust(forward_input: float, strafe_input: float, torque_demand: f
     var torque_cost = abs(torque_demand) * torque_thrust_ratio
     var remaining = max(0.0, thruster_force - torque_cost)
 
-    # Build movement vector on XZ plane relative to ship heading
-    var heading  = Vector3(sin(rotation.y), 0.0,  cos(rotation.y))
-    var right    = Vector3(cos(rotation.y), 0.0, -sin(rotation.y))
+    # Build movement vector relative to ship heading in 2D
+    var heading = Vector2(sin(rotation), -cos(rotation))
+    var right   = Vector2(cos(rotation),  sin(rotation))
     var movement_input = heading * forward_input + right * strafe_input
     if movement_input.length() > 1.0:
         movement_input = movement_input.normalized()
@@ -140,13 +139,13 @@ func allocate_thrust(forward_input: float, strafe_input: float, torque_demand: f
 
 ```
 Mouse Position (screen)
-    → Unproject ray onto Y=0 plane → world XZ position
-        → Target Heading Angle (atan2 on XZ delta)
-            → Heading Error (signed angle from rotation.y to target)
+    → get_global_mouse_position() → world position
+        → Target Heading Angle (atan2 on delta from ship position)
+            → Heading Error (angle_difference from rotation to target)
                 → Torque Demand
                     → Thruster Budget Allocation
                         → angular_velocity delta
-                            → rotation.y update
+                            → rotation update
 ```
 
 ---
@@ -166,7 +165,7 @@ Each frame:
 
 ```gdscript
 func update_assisted_steering(target_angle: float, delta: float) -> float:
-    var heading_error = angle_difference(rotation.y, target_angle)
+    var heading_error = angle_difference(rotation, target_angle)
     var stopping_distance = (angular_velocity * angular_velocity) / (2.0 * max_angular_accel)
 
     var torque_direction: float
@@ -203,15 +202,15 @@ When a projectile is fired, it receives the firing ship's current velocity added
 
 ```gdscript
 # Called by Ship.gd when firing — passes to ProjectileManager
-# velocity is Vector3; aim_direction is a normalised Vector3 on XZ plane
-var inherited_velocity = self.velocity
+# velocity is Vector2; aim_direction is a normalised Vector2
+var inherited_velocity: Vector2 = self.velocity
 ProjectileManager.spawn(muzzle_position, aim_direction, muzzle_speed, inherited_velocity, weapon_data)
 ```
 
 Inside `ProjectileManager.cs`:
 ```csharp
-// All vectors are Vector3; Y component remains 0 throughout projectile lifetime
-projectile.velocity = aimDirection * muzzleSpeed + inheritedVelocity;
+// All vectors are Vector2
+projectile.Velocity = aimDirection * muzzleSpeed + inheritedVelocity;
 ```
 
 **Effect in play:**
@@ -228,8 +227,8 @@ This is intentional sim-lite behavior — adds tactical depth to positioning and
 ### Asteroids
 - Extend `SpaceBody` with zero thrust
 - Slow ambient drift set at spawn, never changes
-- Use `RigidBody3D` if Godot 4.6 Jolt physics handles them cleanly — free tumbling collision response at no code cost; tumble is visible from top-down and adds visual life
-- Fall back to `SpaceBody` with randomized angular velocity if RigidBody3D introduces complexity
+- Angular velocity randomized at spawn for visual spin effect (rotation applied each frame)
+- Fall back to `SpaceBody` if `RigidBody2D` introduces complexity
 
 ### Debris
 - Extend `SpaceBody`, spawned on ship death
@@ -261,13 +260,7 @@ PerformanceMonitor.end("Physics.thruster_allocation")
 PerformanceMonitor.set_count("Physics.active_bodies", get_tree().get_nodes_in_group("space_bodies").size())
 ```
 
-Register in `_ready()`:
-```gdscript
-Performance.add_custom_monitor("AllSpace/physics_bodies",
-    func(): return PerformanceMonitor.get_count("Physics.active_bodies"))
-Performance.add_custom_monitor("AllSpace/physics_ms",
-    func(): return PerformanceMonitor.get_avg_ms("Physics.move_and_slide"))
-```
+Custom monitor registration is handled centrally in `PerformanceMonitor.gd` — do not register `AllSpace/physics_*` monitors here.
 
 ---
 
@@ -275,7 +268,7 @@ Performance.add_custom_monitor("AllSpace/physics_ms",
 
 ### Scale
 
-**1 unit = 1 metre.** The ship polygon in `TestScene.gd` is ~35u nose-to-tail = a 35m light fighter. At Camera2D zoom=1 a 1920px-wide viewport shows 1920m of space.
+**1 unit = 1 metre.** At `Camera2D` zoom = 1 a 1920px-wide viewport shows 1920m of space.
 
 ### Key Formulas
 

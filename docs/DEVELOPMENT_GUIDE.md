@@ -107,13 +107,12 @@ Each row is one atomic session. Do them in order. Check them off as you go.
 | 13 | Damage system — hit detection, shield/hull/component damage | `docs/Weapons_Projectiles_Spec.md` | 🔲 |
 | 14 | Weapons test scene — ship with weapons firing at target dummy | — | 🔲 |
 
-### AI Layer (spec needed)
+### AI Layer
 | # | Task | Spec | Status |
 |---|---|---|---|
-| 15 | Write AI & Patrol Behavior spec | — | 🔲 |
-| 16 | AI state machine — idle, patrol, chase, attack, flee | `docs/AI_Patrol_Spec.md` | 🔲 |
-| 17 | AI weapon usage — target selection, firing logic | `docs/AI_Patrol_Spec.md` | 🔲 |
-| 18 | AI test scene — player vs 3 AI patrol ships | — | 🔲 |
+| 15 | AI state machine — idle, patrol, pursue, engage | `docs/AI_Patrol_Behavior_Spec.md` | 🔲 |
+| 16 | AI weapon usage — aim prediction, firing logic | `docs/AI_Patrol_Behavior_Spec.md` | 🔲 |
+| 17 | AI test scene — player vs 3 AI patrol ships | — | 🔲 |
 
 ### World Layer (spec needed)
 | # | Task | Spec | Status |
