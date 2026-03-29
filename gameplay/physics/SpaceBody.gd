@@ -12,8 +12,8 @@ var angular_velocity: float = 0.0
 # Guard so multiple SpaceBody instances only register the monitor once.
 static var _monitors_registered := false
 
-# PerformanceMonitor lives as a named child of the GameBootstrap autoload.
-@onready var _perf: Node = get_node("/root/GameBootstrap/PerformanceMonitor")
+# PerformanceMonitor is registered on GameBootstrap via ServiceLocator.
+@onready var _perf: Node = ServiceLocator.GetService("PerformanceMonitor") as Node
 
 
 func _ready() -> void:

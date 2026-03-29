@@ -26,7 +26,7 @@ const RADIUS_MISSILE: float = 4.0
 
 
 func _ready() -> void:
-	_event_bus = get_node("/root/GameEventBus")
+	_event_bus = ServiceLocator.GetService("GameEventBus") as Node
 
 	# Subscribe to projectile/beam events
 	_event_bus.connect("beam_fired", _on_beam_fired)

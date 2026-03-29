@@ -29,8 +29,12 @@ var hull_hp: float = 200.0
 # Damage type multipliers loaded from JSON
 var _damage_types: Dictionary = {}
 var _shield_absorption: float = 0.8
+var _hardpoint_radius_by_size: Dictionary = {}
+var _hardpoint_radius_hp_scale: float = 0.35
 
-@onready var _event_bus: Node = get_node("/root/GameEventBus")
+var _weapon_component: WeaponComponent = null
+
+@onready var _event_bus: Node = ServiceLocator.GetService("GameEventBus") as Node
 
 
 func _ready() -> void:
@@ -103,10 +107,41 @@ func _ready() -> void:
 
 	_damage_types = damage_types
 
+	if not data.has("hardpoint_hit_regions") or typeof(data["hardpoint_hit_regions"]) != TYPE_DICTIONARY:
+		push_error("Ship: Missing/invalid 'hardpoint_hit_regions' in %s" % file_path)
+		return
+
+	var hhr: Dictionary = data["hardpoint_hit_regions"]
+	if not hhr.has("radius_by_size") or typeof(hhr["radius_by_size"]) != TYPE_DICTIONARY:
+		push_error("Ship: hardpoint_hit_regions missing 'radius_by_size' in %s" % file_path)
+		return
+
+	var rbs: Dictionary = hhr["radius_by_size"]
+	for sz in ["small", "medium", "large"]:
+		if not rbs.has(sz):
+			push_error("Ship: hardpoint_hit_regions.radius_by_size missing '%s' in %s" % [sz, file_path])
+			return
+		var rv = rbs[sz]
+		if typeof(rv) != TYPE_INT and typeof(rv) != TYPE_FLOAT:
+			push_error("Ship: hardpoint_hit_regions.radius_by_size.%s must be a number in %s" % [sz, file_path])
+			return
+
+	_hardpoint_radius_by_size = rbs.duplicate()
+	var hp_scale_val = hhr.get("radius_extra_from_hp_max", 0.35)
+	if typeof(hp_scale_val) != TYPE_INT and typeof(hp_scale_val) != TYPE_FLOAT:
+		push_error("Ship: hardpoint_hit_regions.radius_extra_from_hp_max must be a number in %s" % file_path)
+		return
+	_hardpoint_radius_hp_scale = float(hp_scale_val)
+
 	# Initialize resources
 	power_current = power_capacity
 	shield_hp = shield_max
 	hull_hp = hull_max
+
+	for c in get_children():
+		if c is WeaponComponent:
+			_weapon_component = c
+			break
 
 
 func _physics_process(delta: float) -> void:
@@ -129,22 +164,22 @@ func _update_resource_regen(delta: float) -> void:
 			power_current -= power_cost
 
 
-func apply_damage(amount: float, damage_type: String, _hit_position: Vector2) -> void:
+func apply_damage(amount: float, damage_type: String, hit_position: Vector2, component_damage_ratio: float = 0.0) -> void:
 	_time_since_last_hit = 0.0
 
 	# Get damage multipliers
-	var type_data = _damage_types.get(damage_type, {})
-	var vs_shields = type_data.get("vs_shields", 1.0)
-	var vs_hull = type_data.get("vs_hull", 1.0)
+	var type_data: Dictionary = _damage_types.get(damage_type, {})
+	var vs_shields: float = float(type_data.get("vs_shields", 1.0))
+	var vs_hull: float = float(type_data.get("vs_hull", 1.0))
 
-	# Shield absorption
-	var shield_damage = amount * vs_shields
-	var remaining_damage = 0.0
+	# Shield absorption (see Weapons_Projectiles_Spec — shields first; leakage uses vs_shields + absorption curve)
+	var shield_damage: float = amount * vs_shields
+	var remaining_damage: float = 0.0
 
 	if shield_hp > 0:
-		var absorbed = minf(shield_hp, shield_damage)
+		var absorbed: float = minf(shield_hp, shield_damage)
 		shield_hp -= absorbed
-		var absorbed_ratio = absorbed / shield_damage if shield_damage > 0 else 1.0
+		var absorbed_ratio: float = absorbed / shield_damage if shield_damage > 0 else 1.0
 		remaining_damage = amount * (1.0 - _shield_absorption * absorbed_ratio)
 
 		if shield_hp <= 0:
@@ -152,15 +187,61 @@ func apply_damage(amount: float, damage_type: String, _hit_position: Vector2) ->
 	else:
 		remaining_damage = amount
 
-	# Hull damage with type multiplier
-	if remaining_damage > 0:
-		hull_hp -= remaining_damage * vs_hull
-		_event_bus.emit_signal("ship_damaged", self, remaining_damage * vs_hull, damage_type, _hit_position)
+	if remaining_damage <= 0:
+		return
 
-	# Check destruction
+	# Post-shield damage budget with hull type multiplier, then optional hardpoint split
+	var effective_hull: float = remaining_damage * vs_hull
+	var to_hull: float = effective_hull
+	var to_hardpoint: float = 0.0
+
+	if component_damage_ratio > 0.0 and is_finite(component_damage_ratio):
+		var ratio_clamped: float = clampf(component_damage_ratio, 0.0, 1.0)
+		if ratio_clamped > 0.0:
+			_perf.begin("HitDetection.component_resolve")
+			var hp_hit: HardpointComponent = _resolve_hardpoint_at(hit_position)
+			if hp_hit != null:
+				to_hardpoint = effective_hull * ratio_clamped
+				to_hull = effective_hull * (1.0 - ratio_clamped)
+				hp_hit.apply_damage(to_hardpoint)
+			_perf.end("HitDetection.component_resolve")
+
+	if to_hull > 0:
+		hull_hp -= to_hull
+		_event_bus.emit_signal("ship_damaged", self, to_hull, damage_type, hit_position)
+
 	if hull_hp <= 0:
 		hull_hp = 0
 		_event_bus.emit_signal("ship_destroyed", self, global_position, faction)
+
+
+func _resolve_hardpoint_at(world_pos: Vector2) -> HardpointComponent:
+	if _weapon_component == null:
+		return null
+
+	var best: HardpointComponent = null
+	var best_dist: float = INF
+
+	for node in _weapon_component.get_all_hardpoints():
+		var hp: HardpointComponent = node as HardpointComponent
+		if hp == null:
+			continue
+		if hp.damage_state == "destroyed":
+			continue
+
+		var threshold: float = _hardpoint_threshold(hp)
+		var dist: float = world_pos.distance_to(hp.get_world_position())
+		if dist <= threshold and dist < best_dist:
+			best = hp
+			best_dist = dist
+
+	return best
+
+
+func _hardpoint_threshold(hp: HardpointComponent) -> float:
+	var base: Variant = _hardpoint_radius_by_size.get(hp.size, _hardpoint_radius_by_size.get("medium", 40.0))
+	var base_f: float = float(base)
+	return maxf(base_f, hp.hardpoint_hp_max * _hardpoint_radius_hp_scale)
 
 
 func consume_power(amount: float) -> bool:

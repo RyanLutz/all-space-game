@@ -40,7 +40,7 @@ func _ready() -> void:
 	_ship = get_parent().get_parent() as Ship
 	if _ship == null:
 		push_error("HardpointComponent '%s': could not find Ship in parent chain." % hardpoint_id)
-	_event_bus = get_node("/root/GameEventBus")
+	_event_bus = ServiceLocator.GetService("GameEventBus") as Node
 	hardpoint_hp = hardpoint_hp_max
 
 
@@ -75,7 +75,7 @@ func can_fire(aim_direction: Vector2) -> bool:
 		return false
 
 	# Check arc (convert to local space)
-	var local_aim = aim_direction.rotated(-_ship.rotation)
+	var local_aim = aim_direction.rotated(-_ship.global_rotation)
 	var hardpoint_dir = Vector2.RIGHT.rotated(deg_to_rad(facing))
 	var angle_diff = rad_to_deg(local_aim.angle_to(hardpoint_dir))
 	if absf(angle_diff) > arc_degrees * 0.5:
@@ -89,11 +89,11 @@ func can_fire(aim_direction: Vector2) -> bool:
 
 
 func get_world_position() -> Vector2:
-	return _ship.position + offset.rotated(_ship.rotation)
+	return _ship.global_position + offset.rotated(_ship.global_rotation)
 
 
 func get_world_facing() -> float:
-	return _ship.rotation + deg_to_rad(facing)
+	return _ship.global_rotation + deg_to_rad(facing)
 
 
 func request_fire(aim_direction: Vector2, target_pos: Vector2) -> bool:
@@ -215,20 +215,22 @@ func _fire_missile(target_pos: Vector2, guidance: String) -> void:
 
 
 func apply_damage(amount: float) -> void:
-	hardpoint_hp -= amount
+	var was_destroyed: bool = damage_state == "destroyed"
+	hardpoint_hp = maxf(0.0, hardpoint_hp - amount)
 	_update_damage_state()
 
-	if damage_state == "destroyed":
+	if damage_state == "destroyed" and not was_destroyed:
 		_event_bus.emit_signal("hardpoint_destroyed", _ship, hardpoint_index)
 
 
 func _update_damage_state() -> void:
-	var ratio := hardpoint_hp / hardpoint_hp_max
+	var ratio: float = hardpoint_hp / hardpoint_hp_max if hardpoint_hp_max > 0.0 else 0.0
+	# Spec thresholds: nominal 100–60%, damaged 59–25%, critical 24–1%, destroyed 0%.
 	if ratio <= 0.0:
 		damage_state = "destroyed"
 	elif ratio < 0.25:
 		damage_state = "critical"
-	elif ratio < 0.6:
+	elif ratio < 0.60:
 		damage_state = "damaged"
 	else:
 		damage_state = "nominal"

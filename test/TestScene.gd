@@ -17,8 +17,8 @@ var _perf_monitor: Node
 
 
 func _ready() -> void:
-	_event_bus = get_node("/root/GameEventBus")
-	_perf_monitor = get_node("/root/GameBootstrap/PerformanceMonitor")
+	_event_bus = ServiceLocator.GetService("GameEventBus") as Node
+	_perf_monitor = ServiceLocator.GetService("PerformanceMonitor") as Node
 
 	_setup_background()
 	_setup_ship()

@@ -40,8 +40,21 @@ public partial class ProjectileManager : Node
             _pool[i].Active = false;
         }
 
-        _perfMonitor = GetNode<Node>("/root/GameBootstrap/PerformanceMonitor");
-        _eventBus = GetNode<Node>("/root/GameEventBus");
+        var locator = GetNodeOrNull<ServiceLocator>("/root/ServiceLocator");
+        if (locator == null)
+        {
+            GD.PushError("ProjectileManager: ServiceLocator autoload missing.");
+            return;
+        }
+
+        _perfMonitor = locator.GetService("PerformanceMonitor") as Node;
+        _eventBus = locator.GetService("GameEventBus") as Node;
+
+        if (_eventBus == null)
+        {
+            GD.PushError("ProjectileManager: GameEventBus not registered with ServiceLocator.");
+            return;
+        }
 
         // Weapon requests come through GameEventBus; ProjectileManager performs the actual spawn/fire.
         _eventBus.Connect("request_spawn_dumb", new Callable(this, nameof(OnRequestSpawnDumb)));
@@ -316,10 +329,11 @@ public partial class ProjectileManager : Node
                     if (weapon != null && collider.HasMethod("apply_damage"))
                     {
                         float damage = GetWeaponFloat(weapon, "damage", 0f);
+                        float componentDamageRatio = GetWeaponFloat(weapon, "component_damage_ratio", 0f);
                         string archetype = weapon["archetype"].AsString();
                         string damageType = archetype == "ballistic" ? "ballistic" : "missile";
 
-                        collider.Call("apply_damage", damage, damageType, hitPoint);
+                        collider.Call("apply_damage", damage, damageType, hitPoint, componentDamageRatio);
 
                         // Emit hit signal (GameEventBus contract: projectile_hit(target, damage, type, position))
                         var target2D = collider as Node2D;
@@ -388,7 +402,8 @@ public partial class ProjectileManager : Node
                     return;
                 }
 
-                collider.Call("apply_damage", damage, damageType, hitPoint);
+                float componentDamageRatioHs = GetWeaponFloat(weapon, "component_damage_ratio", 0f);
+                collider.Call("apply_damage", damage, damageType, hitPoint, componentDamageRatioHs);
             }
         }
 

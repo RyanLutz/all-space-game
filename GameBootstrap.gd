@@ -5,8 +5,7 @@ extends Node
 # the lifetime of the application.
 #
 # Depends on:
-#   ServiceLocator.cs — must be registered as an autoload before this one.
-#                       Uncomment the ServiceLocator line once that system exists.
+#   ServiceLocator (autoload, C#) — registered before this node; call Register / GetService (PascalCase from GDScript).
 
 const _OVERLAY_SCENE := preload("res://ui/debug/PerformanceOverlay.tscn")
 
@@ -23,8 +22,7 @@ func _init_performance_monitor() -> void:
 	perf_monitor.name = "PerformanceMonitor"
 	add_child(perf_monitor)
 
-	# Uncomment once ServiceLocator.cs is implemented:
-	# ServiceLocator.register("PerformanceMonitor", perf_monitor)
+	ServiceLocator.Register("PerformanceMonitor", perf_monitor)
 
 
 func _init_debug_overlay() -> void:

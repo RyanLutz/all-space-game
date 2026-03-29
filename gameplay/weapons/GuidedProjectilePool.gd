@@ -42,8 +42,8 @@ var _player_locked_target: Node = null
 
 
 func _ready() -> void:
-	_perf_monitor = get_node("/root/GameBootstrap/PerformanceMonitor")
-	_event_bus = get_node("/root/GameEventBus")
+	_perf_monitor = ServiceLocator.GetService("PerformanceMonitor") as Node
+	_event_bus = ServiceLocator.GetService("GameEventBus") as Node
 
 	# Weapon requests come through GameEventBus; this pool performs guided missile spawning.
 	_event_bus.connect("request_spawn_guided", _on_request_spawn_guided)
@@ -218,7 +218,7 @@ func _check_collision(p: GuidedProjectile, old_pos: Vector2) -> bool:
 			# Apply damage
 			if collider.has_method("apply_damage"):
 				# Explosion - apply to all in radius
-				_apply_explosion(hit_point, blast_radius, damage, p.owner_id)
+				_apply_explosion(hit_point, blast_radius, damage, p.owner_id, p.weapon_data)
 
 			# Emit explosion VFX event
 			_event_bus.emit_signal("explosion_triggered", hit_point, blast_radius, 1.0)
@@ -229,7 +229,7 @@ func _check_collision(p: GuidedProjectile, old_pos: Vector2) -> bool:
 	return false
 
 
-func _apply_explosion(center: Vector2, blast_radius: float, base_damage: float, owner_id: int) -> void:
+func _apply_explosion(center: Vector2, blast_radius: float, base_damage: float, owner_id: int, weapon_data: Dictionary) -> void:
 	# Find all ships in explosion radius
 	var space_state: PhysicsDirectSpaceState2D = get_viewport().get_world_2d().direct_space_state
 
@@ -252,11 +252,14 @@ func _apply_explosion(center: Vector2, blast_radius: float, base_damage: float, 
 
 		if collider.has_method("apply_damage"):
 			# Falloff based on distance from center
-			var dist := center.distance_to(collider.position)
+			var c2 := collider as Node2D
+			var sample_pos: Vector2 = c2.global_position if c2 else center
+			var dist := center.distance_to(sample_pos)
 			var falloff := 1.0 - clampf(dist / blast_radius, 0.0, 1.0)
 			var damage := base_damage * falloff * falloff  # Square falloff
+			var cdr: float = float(weapon_data.get("component_damage_ratio", 0.0))
 
-			collider.call("apply_damage", damage, "missile", center)
+			collider.call("apply_damage", damage, "missile", sample_pos, cdr)
 
 
 func _find_nearest_enemy(pos: Vector2, forward_dir: Vector2, owner_id: int) -> Node:

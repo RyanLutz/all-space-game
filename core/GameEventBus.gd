@@ -1,7 +1,7 @@
 extends Node
 
 # GameEventBus - Global signal bus for cross-system communication
-# No logic here - just signals that systems can emit and subscribe to
+# No gameplay logic — only signals; self-registers with ServiceLocator in _ready().
 
 # Projectile / Weapon Events
 @warning_ignore("unused_signal")
@@ -50,3 +50,7 @@ signal explosion_triggered(position: Vector2, radius: float, intensity: float)
 
 @warning_ignore("unused_signal")
 signal overheat_warning(hardpoint_id: String, heat_percent: float)
+
+
+func _ready() -> void:
+	ServiceLocator.Register("GameEventBus", self)

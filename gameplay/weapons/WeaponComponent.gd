@@ -20,7 +20,7 @@ var _active_beams: Array[HardpointComponent] = []
 
 func _ready() -> void:
 	_ship = get_parent() as Ship
-	_event_bus = get_node("/root/GameEventBus")
+	_event_bus = ServiceLocator.GetService("GameEventBus") as Node
 
 	_load_weapons_data()
 	_spawn_hardpoints()

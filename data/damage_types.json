@@ -25,5 +25,14 @@
   "shield_absorption": {
     "base_ratio": 0.8,
     "description": "Percentage of damage absorbed by active shields"
+  },
+  "hardpoint_hit_regions": {
+    "radius_by_size": {
+      "small": 28.0,
+      "medium": 40.0,
+      "large": 52.0
+    },
+    "radius_extra_from_hp_max": 0.35,
+    "description": "MVP radial thresholds around each hardpoint world position; extra term scales with hardpoint_hp_max"
   }
 }
