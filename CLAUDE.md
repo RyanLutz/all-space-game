@@ -1,13 +1,16 @@
-# CLAUDE.md
+# All Space MVP — Agent Context
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## IMPORTANT: Read Before Every Session
+- Read the relevant spec in `/docs/` before implementing anything — specs are authoritative
+- One system per session — don't mix concerns
+- Review the Build Order below and implement in sequence
 
-## Project
-
-Godot 4.6, GDScript primary, C# for ProjectileManager only.
-Jolt physics enabled for 3D debris — **ship physics use CharacterBody2D with manual velocity**.
-2.5D: 3D assets rendered on a 2D gameplay plane, fixed top-down Camera2D. Movement is Vector2; ship heading is `rotation` (Z-axis in 2D).
-Forward Plus renderer.
+## Stack
+Godot 4.6 · GDScript primary · C# for ProjectileManager only
+2.5D rendering: 3D ship models rendered over 2D gameplay plane
+Physics: `CharacterBody2D` with manual velocity — all gameplay is 2D
+Jolt physics available for 3D visual debris only — does NOT apply to `CharacterBody2D`
+Forward Plus renderer
 
 ## Running the Project
 
@@ -18,12 +21,15 @@ godot --path "/home/lutz/Projects/All Space"
 
 ## Architecture
 
+Core services (autoloaded or registered via ServiceLocator):
 - `ServiceLocator.cs` — global service registry (autoloaded; registers GDScript services)
 - `GameEventBus.gd` — all cross-system communication goes through here (autoloaded)
+- `PerformanceMonitor.gd` — instrument every system per spec; **implement this first**
 - `ContentRegistry.gd` — scans `/content/` on startup; indexes all ships, weapons, modules
 - `PlayerState.gd` — tracks the currently piloted ship; emits `player_ship_changed`
-- `PerformanceMonitor.gd` — instrument every system per spec; **implement this first**
-- All system specs are in `/docs/` — read the relevant spec before implementing any system
+- `GameBootstrap.gd` — autoload setup, service registration (autoloaded from project root)
+
+All system specs are in `/docs/` — read the relevant spec before implementing any system.
 
 **File layout:**
 ```
@@ -34,7 +40,7 @@ godot --path "/home/lutz/Projects/All Space"
     PlayerState.gd
 /core/
     GameEventBus.gd
-    GameBootstrap.gd
+GameBootstrap.gd                   # at project root (see project.godot autoload)
 /ui/debug/
     PerformanceOverlay.tscn
     PerformanceOverlay.gd
@@ -43,7 +49,7 @@ godot --path "/home/lutz/Projects/All Space"
 /gameplay/entities/
     Ship.gd
     Ship.tscn                  # single scene, configured from data at spawn time
-    ShipFactory.gd
+    ShipFactory.gd             # only way to create ships — spawns from content data
     Asteroid.gd
     Debris.gd
 /gameplay/weapons/
@@ -66,6 +72,47 @@ godot --path "/home/lutz/Projects/All Space"
     ai_profiles.json           # global config — stays here
 ```
 
+## Specs (in /docs/)
+
+| Spec File | Covers |
+|---|---|
+| `PerformanceMonitor_Spec.md` | Observability service, canonical metric names, F3 overlay |
+| `Physics_Movement_Spec.md` | SpaceBody, Ship movement, thruster budget, assisted steering |
+| `Weapons_Projectiles_Spec.md` | Archetypes, hardpoints, heat/power, damage pipeline |
+| `Camera_System_Spec.md` | Independent Camera2D, spring smoothing, cursor offset |
+| `AI_Patrol_Behavior_Spec.md` | State machine, aim prediction, behavior profiles |
+| `Ship_Content_Data_Architecture_Spec.md` | Folder-per-item, ContentRegistry, ShipFactory |
+
+## Rules
+
+### Always
+- Never hardcode values that belong in JSON
+- Always add PerformanceMonitor instrumentation per spec using canonical metric names
+- Cross-system calls go through GameEventBus, not direct references
+- One system per Claude Code session
+- C# is used **only** for `ProjectileManager.cs`; everything else is GDScript
+- Ships are `CharacterBody2D` — do not use CharacterBody3D for ships
+- Read the spec fully before implementing — it contains the algorithm, not just the shape
+
+### Content & Data
+- `/content/` — ships, weapons, modules (player-visible, equippable items)
+- `/data/` — global config tables (`damage_types.json`, `ai_profiles.json`)
+- The folder name IS the item ID — no separate ID field needed in JSON
+- `ShipFactory.spawn_ship(id, pos)` is the only way to create ships — never instantiate Ship.tscn directly
+- `default_loadout` in `ship.json` maps slot/hardpoint IDs to content IDs (folder names)
+
+### Ships & Camera
+- One `Ship.tscn` configured from data at spawn time — no per-ship-class scenes
+- Camera (`GameCamera`) is a sibling of the game world — **never** a child of any ship node
+- Camera must survive player ship destruction — check `is_instance_valid(_follow_target)` each frame
+- Retargeting the camera is a single `follow(target)` call
+
+### AI
+- `AIController.gd` produces physics inputs (thrust, strafe, target heading) — no physics cheating
+- AI ships obey the same thruster budget, angular inertia, and drag as the player
+- Behavior values in `data/ai_profiles.json`
+- AI state transitions are broadcast via `GameEventBus` signals
+
 ## System Summaries
 
 ### PerformanceMonitor (`docs/PerformanceMonitor_Spec.md`)
@@ -75,7 +122,7 @@ Rolling 60-frame average using `Time.get_ticks_usec()`. API: `begin(metric)` / `
 `SpaceBody.gd` extends `CharacterBody2D` with manual `Vector2` velocity. Physics loop order: apply thruster forces → partial alignment drag → linear drag (`velocity *= 1.0 - linear_drag * delta`) → angular drag → `move_and_slide()`. Single `thruster_force` stat shared across thrust/strafe/torque — torque deducted first ("turning wins"). Assisted steering uses stopping-distance calculation to prevent overshoot. Projectiles inherit firing ship's velocity. Rotation is a 2D `rotation` float.
 
 ### Weapons & Projectiles (`docs/Weapons_Projectiles_Spec.md`)
-Five archetypes: ballistic, energy_beam (hitscan held), energy_pulse (hitscan burst), missile_dumb, missile_guided. All stats in per-weapon JSON under `/content/weapons/`. `ProjectileManager.cs` manages a pre-allocated `DumbProjectile` struct array; raycast collision per frame. Heat system is per-hardpoint; power is a per-ship shared pool. Damage pipeline: hit point → HitDetection region → shield absorption → hull damage with type multiplier from `data/damage_types.json` → hardpoint split → state threshold check.
+Five archetypes: `ballistic`, `energy_beam` (hitscan held), `energy_pulse` (hitscan burst), `missile_dumb`, `missile_guided`. All stats in per-weapon JSON under `/content/weapons/`. `ProjectileManager.cs` manages a pre-allocated `DumbProjectile` struct array; raycast collision per frame. Heat system is per-hardpoint; power is a per-ship shared pool. Damage pipeline: hit point → HitDetection region → shield absorption → hull damage with type multiplier from `data/damage_types.json` → hardpoint split → state threshold check.
 
 ### Camera System (`docs/Camera_System_Spec.md`)
 `Camera2D` — sibling of the game world, never a child of any ship. Follows target with cursor-direction offset and critically damped spring smoothing. Zoom via scroll wheel. Retargeting is a single `follow(target)` call. All code uses `Vector2` / `Node2D`.
@@ -96,16 +143,6 @@ HitDetection.component_resolve
 ChunkStreamer.load · ChunkStreamer.unload · ChunkStreamer.loaded_chunks
 ContentRegistry.load
 ```
-
-## Rules
-
-- Never hardcode values that belong in JSON
-- Always add PerformanceMonitor instrumentation per spec using canonical metric names
-- Cross-system calls go through GameEventBus, not direct references
-- One system per Claude Code session
-- C# is used **only** for `ProjectileManager.cs`; everything else is GDScript
-- Ships are `CharacterBody2D` — do not use CharacterBody3D for ships
-- Weapon and ship data lives in `/content/<type>/<id>/`; global config tables live in `/data/`
 
 ## Build Order
 1. PerformanceMonitor + overlay (must exist before anything else)
@@ -128,3 +165,18 @@ ContentRegistry.load
 - `Performance.add_custom_monitor()` takes a `Callable` as second argument — lambda syntax works fine
 - C# in Godot 4.6 uses .NET 8 — use `GodotObject`, not `Godot.Object`
 - Jolt is 3D-only — ship physics (`CharacterBody2D`) are unaffected by Jolt
+
+## Key Design Decisions
+
+| Decision | What It Is |
+|---|---|
+| 2.5D | All physics/gameplay is 2D (`CharacterBody2D`, `Vector2`); 3D assets are a rendering concern only |
+| Thruster budget | Single `thruster_force` shared between thrust, strafe, and torque — turning wins |
+| Partial alignment drag | Only lateral velocity bleeds on hard turns, not forward momentum |
+| Projectile inheritance | All projectiles inherit the firing ship's velocity at spawn |
+| Content architecture | Folder-per-item; folder name is the ID; no per-class scenes for ships |
+| Single Ship.tscn | All ships use one scene configured from JSON data at spawn time |
+| Camera independence | Camera never parented to a ship — decoupled for retargeting and survival |
+| AI physics parity | AI uses same physics inputs as player; no velocity or turn-rate cheating |
+| Heat per-hardpoint | Heat tracked per hardpoint; each gun manages its own overheat independently |
+| Power per-ship | Power is a shared ship pool; energy weapons and shield regen compete for it |
