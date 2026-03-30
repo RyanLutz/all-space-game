@@ -82,88 +82,43 @@ public partial class ProjectileManager : Node
 
     private void LoadWeaponData()
     {
-        const string filePath = "res://data/weapons.json";
         _weaponData = new Godot.Collections.Dictionary<int, Godot.Collections.Dictionary>();
 
-        using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
-        if (file == null)
+        var locator = GetNodeOrNull<ServiceLocator>("/root/ServiceLocator");
+        if (locator == null)
         {
-            GD.PushError($"ProjectileManager: Failed to open {filePath}");
+            GD.PushError("ProjectileManager: ServiceLocator not found — weapon data not loaded");
             return;
         }
 
-        string text = file.GetAsText();
-
-        var json = new Json();
-        var parseErr = json.Parse(text);
-        if (parseErr != Error.Ok)
+        var contentRegistry = locator.GetService("ContentRegistry") as Node;
+        if (contentRegistry == null)
         {
-            GD.PushError(
-                $"ProjectileManager: JSON parse failed for {filePath}: {json.GetErrorMessage()} (line {json.GetErrorLine()})"
-            );
+            GD.PushError("ProjectileManager: ContentRegistry not registered — weapon data not loaded");
             return;
         }
 
-        var data = json.GetData().As<Godot.Collections.Dictionary>();
-        if (data == null)
+        var allWeapons = contentRegistry.Get("weapons").As<Godot.Collections.Dictionary>();
+        if (allWeapons == null)
         {
-            GD.PushError($"ProjectileManager: Invalid root in {filePath} (expected Dictionary)");
+            GD.PushError("ProjectileManager: ContentRegistry.weapons is not a Dictionary");
             return;
         }
 
-        if (!data.ContainsKey("weapons"))
-        {
-            GD.PushError($"ProjectileManager: Missing 'weapons' key in {filePath}");
-            return;
-        }
-
-        var weapons = data["weapons"].As<Godot.Collections.Array>();
-        if (weapons == null)
-        {
-            GD.PushError($"ProjectileManager: 'weapons' must be an Array in {filePath}");
-            return;
-        }
-
-        var seenWeaponIds = new System.Collections.Generic.HashSet<string>();
         int id = 0;
-        foreach (var weaponObj in weapons)
+        foreach (var entry in allWeapons)
         {
-            var weapon = weaponObj.As<Godot.Collections.Dictionary>();
-            if (weapon == null)
-            {
-                GD.PushError($"ProjectileManager: Weapon entry must be a Dictionary in {filePath}");
-                return;
-            }
+            var weapon = entry.Value.As<Godot.Collections.Dictionary>();
+            if (weapon == null) continue;
 
-            if (!weapon.ContainsKey("id"))
-            {
-                GD.PushError($"ProjectileManager: Weapon entry missing 'id' in {filePath}");
-                return;
-            }
-
-            string weaponId = weapon["id"].AsString();
-            if (string.IsNullOrEmpty(weaponId))
-            {
-                GD.PushError($"ProjectileManager: Weapon entry has empty 'id' in {filePath}");
-                return;
-            }
-
+            string weaponId = weapon.ContainsKey("id") ? weapon["id"].AsString() : entry.Key.AsString();
             if (!weapon.ContainsKey("archetype"))
             {
-                GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'archetype' in {filePath}");
-                return;
+                GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'archetype' — skipping");
+                continue;
             }
 
             string archetype = weapon["archetype"].AsString();
-
-            if (seenWeaponIds.Contains(weaponId))
-            {
-                GD.PushError($"ProjectileManager: Duplicate weapon id '{weaponId}' in {filePath}");
-                return;
-            }
-            seenWeaponIds.Add(weaponId);
-
-            // Validate keys actually used by ProjectileManager (avoid silent fallback defaults).
             switch (archetype)
             {
                 case "ballistic":
@@ -171,27 +126,27 @@ public partial class ProjectileManager : Node
                 case "missile_guided":
                     if (!weapon.ContainsKey("damage"))
                     {
-                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing required key 'damage' in {filePath}");
-                        return;
+                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'damage' — skipping");
+                        continue;
                     }
                     break;
                 case "energy_beam":
                     if (!weapon.ContainsKey("damage_per_second"))
                     {
-                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing required key 'damage_per_second' in {filePath}");
-                        return;
+                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'damage_per_second' — skipping");
+                        continue;
                     }
                     break;
                 case "energy_pulse":
                     if (!weapon.ContainsKey("damage"))
                     {
-                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing required key 'damage' in {filePath}");
-                        return;
+                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'damage' — skipping");
+                        continue;
                     }
                     break;
                 default:
-                    GD.PushError($"ProjectileManager: Weapon '{weaponId}' has unknown archetype '{archetype}' in {filePath}");
-                    return;
+                    GD.PushError($"ProjectileManager: Weapon '{weaponId}' has unknown archetype '{archetype}' — skipping");
+                    continue;
             }
 
             _weaponData[id] = weapon;
