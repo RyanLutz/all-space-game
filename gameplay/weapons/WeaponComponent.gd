@@ -27,99 +27,15 @@ func _ready() -> void:
 
 
 func _load_weapons_data() -> void:
-	var file_path := "res://data/weapons.json"
-	var file = FileAccess.open(file_path, FileAccess.READ)
-	if not file:
-		push_error("WeaponComponent: Failed to open %s" % file_path)
+	var content_registry := ServiceLocator.GetService("ContentRegistry")
+	if content_registry == null:
+		push_error("WeaponComponent: ContentRegistry not registered — weapons unavailable")
 		return
-
-	var text := file.get_as_text()
-	file.close()
-
-	var json := JSON.new()
-	var parse_err := json.parse(text)
-	if parse_err != OK:
-		push_error(
-			"WeaponComponent: JSON parse failed for %s: %s (line %d)" % [
-				file_path, json.get_error_message(), json.get_error_line()
-			]
-		)
+	var all_weapons = content_registry.get("weapons")
+	if typeof(all_weapons) != TYPE_DICTIONARY:
+		push_error("WeaponComponent: ContentRegistry.weapons is not a Dictionary")
 		return
-
-	var data: Dictionary = json.get_data()
-	if typeof(data) != TYPE_DICTIONARY:
-		push_error("WeaponComponent: Invalid root in %s (expected Dictionary)" % file_path)
-		return
-
-	if not data.has("_comment") or typeof(data["_comment"]) != TYPE_STRING:
-		push_error("WeaponComponent: Missing/invalid top-level _comment in %s" % file_path)
-		return
-
-	if not data.has("weapons") or typeof(data["weapons"]) != TYPE_ARRAY:
-		push_error("WeaponComponent: Missing/invalid 'weapons' array in %s" % file_path)
-		return
-
-	_weapons_data.clear()
-
-	var weapons: Array = data["weapons"]
-	for weapon in weapons:
-		if typeof(weapon) != TYPE_DICTIONARY:
-			push_error("WeaponComponent: Weapon entry must be a Dictionary in %s" % file_path)
-			return
-
-		if not weapon.has("id") or typeof(weapon["id"]) != TYPE_STRING:
-			push_error("WeaponComponent: Weapon entry missing string 'id' in %s" % file_path)
-			return
-
-		var weapon_id: String = weapon["id"]
-
-		if not weapon.has("archetype") or typeof(weapon["archetype"]) != TYPE_STRING:
-			push_error("WeaponComponent: Weapon '%s' missing string 'archetype' in %s" % [weapon_id, file_path])
-			return
-
-		var archetype: String = weapon["archetype"]
-		if _weapons_data.has(weapon_id):
-			push_error("WeaponComponent: Duplicate weapon id '%s' in %s" % [weapon_id, file_path])
-			return
-
-		# Validate required keys to avoid silent default fallback downstream.
-		var required_common := ["id", "archetype", "fire_rate", "heat_per_shot", "power_per_shot", "component_damage_ratio"]
-		for key in required_common:
-			if not weapon.has(key):
-				push_error("WeaponComponent: Weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-				return
-
-		match archetype:
-			"ballistic":
-				for key in ["damage", "muzzle_speed", "projectile_lifetime"]:
-					if not weapon.has(key):
-						push_error("WeaponComponent: Ballistic weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-						return
-			"energy_beam":
-				for key in ["damage_per_second", "range"]:
-					if not weapon.has(key):
-						push_error("WeaponComponent: Energy beam weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-						return
-			"energy_pulse":
-				for key in ["damage", "range"]:
-					if not weapon.has(key):
-						push_error("WeaponComponent: Energy pulse weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-						return
-			"missile_dumb":
-				for key in ["damage", "blast_radius", "speed", "fuel", "turn_rate"]:
-					if not weapon.has(key):
-						push_error("WeaponComponent: Dumb rocket weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-						return
-			"missile_guided":
-				for key in ["damage", "blast_radius", "speed", "turn_rate", "fuel", "guidance"]:
-					if not weapon.has(key):
-						push_error("WeaponComponent: Guided missile weapon '%s' missing '%s' in %s" % [weapon_id, key, file_path])
-						return
-			_:
-				push_error("WeaponComponent: Weapon '%s' has unknown archetype '%s' in %s" % [weapon_id, archetype, file_path])
-				return
-
-		_weapons_data[weapon_id] = weapon
+	_weapons_data = (all_weapons as Dictionary).duplicate()
 
 
 func _spawn_hardpoints() -> void:
@@ -298,3 +214,82 @@ func get_all_hardpoints() -> Array:
 		if child is HardpointComponent:
 			result.append(child)
 	return result
+
+
+## Data-driven initialization from ship.json and ContentRegistry.
+## Replaces the default hardpoints spawned by _spawn_hardpoints().
+## Called by Ship._ready() when the ship was created via ShipFactory.
+func initialize_from_ship_data(
+		hardpoint_defs: Array,
+		weapon_assignments: Dictionary,
+		content_registry: Node) -> void:
+	# Remove hardpoints already spawned by the default _spawn_hardpoints() path.
+	for child in get_children():
+		if child is HardpointComponent:
+			child.queue_free()
+	_primary_hardpoints.clear()
+	_secondary_hardpoints.clear()
+	_missile_hardpoints.clear()
+	_active_beams.clear()
+
+	# Fetch weapon data from ContentRegistry for every assigned weapon id.
+	var weapons_data: Dictionary = {}
+	for _hp_id in weapon_assignments:
+		var weapon_id: String = weapon_assignments[_hp_id]
+		if weapon_id.is_empty():
+			continue
+		var w_data: Dictionary = content_registry.get_weapon(weapon_id)
+		if not w_data.is_empty():
+			weapons_data[weapon_id] = w_data
+
+	# Hardpoint type → arc_degrees mapping
+	const TYPE_TO_ARC: Dictionary = {
+		"fixed":         5.0,
+		"gimbal":        25.0,
+		"partial_turret": 120.0,
+		"full_turret":   360.0
+	}
+
+	for i in range(hardpoint_defs.size()):
+		var def: Dictionary = hardpoint_defs[i]
+		var hp := HardpointComponent.new()
+
+		hp.name           = def.get("id", "hardpoint_%d" % i)
+		hp.hardpoint_id   = def.get("id", "")
+		hp.hardpoint_index = i
+
+		var off: Array = def.get("offset", [0, 0])
+		hp.offset = Vector2(float(off[0]), float(off[1]))
+		hp.facing = float(def.get("facing", 0.0))
+		hp.size   = def.get("size", "small")
+
+		var hp_type: String = def.get("type", "fixed")
+		hp.arc_degrees = TYPE_TO_ARC.get(hp_type, 5.0)
+
+		hp.allowed_groups = Array(def.get("groups", ["primary"]), TYPE_STRING, "", null)
+
+		var weapon_id: String = weapon_assignments.get(hp.hardpoint_id, "")
+		if not weapon_id.is_empty() and weapons_data.has(weapon_id):
+			hp.set_weapon(weapon_id, weapons_data)
+
+		add_child(hp)
+
+		for group in hp.allowed_groups:
+			match group:
+				"primary":   _primary_hardpoints.append(hp)
+				"secondary": _secondary_hardpoints.append(hp)
+				"missile":   _missile_hardpoints.append(hp)
+
+
+## Fire all primary hardpoints toward target_pos. Used by AIController.
+func fire_primary_at(target_pos: Vector2) -> void:
+	for hp in _primary_hardpoints:
+		var aim_dir := (target_pos - hp.get_world_position()).normalized()
+		hp.request_fire(aim_dir, target_pos)
+
+
+## Fire all secondary hardpoints toward target_pos. Used by AIController.
+func fire_secondary_at(target_pos: Vector2) -> void:
+	for hp in _secondary_hardpoints:
+		var aim_dir := (target_pos - hp.get_world_position()).normalized()
+		hp.request_fire(aim_dir, target_pos)

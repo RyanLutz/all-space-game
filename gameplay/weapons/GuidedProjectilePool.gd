@@ -143,12 +143,8 @@ func _physics_process(delta: float) -> void:
 
 	_active_count = new_active
 
-	# Update combined active count for PerformanceMonitor
-	var dumb_count := 0
-	if _perf_monitor:
-		# Route dumb projectile count through PerformanceMonitor to avoid direct cross-system queries.
-		dumb_count = _perf_monitor.get_count("ProjectileManager.active_count")
-	_perf_monitor.set_count("ProjectileManager.active_count", dumb_count + _active_count)
+	# Publish guided count as its own metric; overlay reads this separately.
+	_perf_monitor.set_count("ProjectileManager.guided_count", _active_count)
 
 	_perf_monitor.end("ProjectileManager.guided_update")
 

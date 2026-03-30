@@ -1,0 +1,34 @@
+{
+  "_comment": "AI behavior profiles for All Space. See docs/AI_Patrol_Behavior_Spec.md. Add new profiles here; assign via behavior_profile in ship.json.",
+  "ai_profiles": [
+    {
+      "id": "default",
+      "display_name": "Standard Patrol",
+
+      "detection_range": 800,
+      "leash_range": 1500,
+      "engage_distance": 500,
+      "preferred_engage_distance": 350,
+
+      "wander_radius": 600,
+      "wander_thrust_fraction": 0.4,
+      "wander_arrival_distance": 40,
+      "wander_pause_min": 1.0,
+      "wander_pause_max": 3.0,
+
+      "pursue_thrust_fraction": 0.85,
+
+      "engage_thrust_fraction": 0.7,
+      "strafe_thrust_fraction": 0.3,
+      "fire_angle_threshold": 15,
+
+      "aim_accuracy": 0.7,
+
+      "flee_enabled": false,
+      "flee_hp_threshold": 0.0,
+
+      "faction": "neutral",
+      "personality": "standard"
+    }
+  ]
+}

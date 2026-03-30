@@ -47,6 +47,7 @@ func _build_text() -> String:
 
 	var proj_guided_ms   : float = _pm.get_avg_ms("ProjectileManager.guided_update")
 	var proj_guided_peak : float = _pm.get_peak_ms("ProjectileManager.guided_update")
+	var proj_guided_cnt  : int   = _pm.get_count("ProjectileManager.guided_count")
 
 	var ai_ms   : float = _pm.get_avg_ms("AIController.state_updates")
 	var ai_peak : float = _pm.get_peak_ms("AIController.state_updates")
@@ -73,9 +74,8 @@ func _build_text() -> String:
 	t += _SEP + "\n"
 	t += "%-22s  %4d active  %5.2fms avg  %5.2fms peak\n" % [
 			"Projectiles (dumb)", proj_dumb_cnt, proj_dumb_ms, proj_dumb_peak]
-	# Guided count metric added when GuidedProjectilePool is implemented
 	t += "%-22s  %4d active  %5.2fms avg  %5.2fms peak\n" % [
-			"Projectiles (guided)", 0, proj_guided_ms, proj_guided_peak]
+			"Projectiles (guided)", proj_guided_cnt, proj_guided_ms, proj_guided_peak]
 	t += "%-22s  %4d ships   %5.2fms avg  %5.2fms peak\n" % [
 			"AI state updates", ai_cnt, ai_ms, ai_peak]
 	t += "%-22s             %5.2fms avg\n" % ["Hit detection", hit_ms]

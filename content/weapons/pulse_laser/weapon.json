@@ -1,0 +1,16 @@
+{
+  "_comment": "Pulse Laser — burst hitscan energy weapon. See docs/Weapons_Projectiles_Spec.md.",
+  "display_name": "Pulse Laser",
+  "archetype": "energy_pulse",
+  "size": "small",
+  "damage": 22,
+  "fire_rate": 6.0,
+  "heat_per_shot": 8,
+  "power_per_shot": 10,
+  "component_damage_ratio": 0.08,
+  "range": 500,
+  "assets": {
+    "model": "model.glb",
+    "icon": "icon.png"
+  }
+}
