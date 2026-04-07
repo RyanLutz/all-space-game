@@ -27,7 +27,7 @@ func _ready() -> void:
 
 
 func _load_weapons_data() -> void:
-	var content_registry := ServiceLocator.GetService("ContentRegistry")
+	var content_registry: Node = ServiceLocator.GetService("ContentRegistry") as Node
 	if content_registry == null:
 		push_error("WeaponComponent: ContentRegistry not registered — weapons unavailable")
 		return
@@ -42,42 +42,42 @@ func _spawn_hardpoints() -> void:
 	# If no configs provided, use defaults for testing
 	if hardpoint_configs.is_empty():
 		hardpoint_configs = [
-			{
-				"id": "hp_nose",
-				"offset": Vector2(32, 0),
-				"facing": 0.0,
-				"arc_degrees": 25.0,
-				"size": "medium",
-				"groups": ["primary"],
-				"weapon_id": "autocannon_light"
-			},
-			{
-				"id": "hp_port",
-				"offset": Vector2(-8, -20),
-				"facing": 270.0,
-				"arc_degrees": 120.0,
-				"size": "small",
-				"groups": ["secondary"],
-				"weapon_id": "pulse_laser"
-			},
-			{
-				"id": "hp_starboard",
-				"offset": Vector2(-8, 20),
-				"facing": 90.0,
-				"arc_degrees": 120.0,
-				"size": "small",
-				"groups": ["secondary"],
-				"weapon_id": "pulse_laser"
-			},
-			{
-				"id": "hp_missile",
-				"offset": Vector2(-16, 0),
-				"facing": 0.0,
-				"arc_degrees": 45.0,
-				"size": "small",
-				"groups": ["missile"],
-				"weapon_id": "rocket_dumb"
-			}
+		{
+			"id": "hp_nose",
+			"offset": Vector2(32, 0),
+			"facing": 0.0,
+			"arc_degrees": 45.0,
+			"size": "medium",
+			"groups": ["primary"],
+			"weapon_id": "autocannon_light"
+		},
+		{
+			"id": "hp_port",
+			"offset": Vector2(-8, -20),
+			"facing": 0.0,
+			"arc_degrees": 90.0,
+			"size": "small",
+			"groups": ["secondary"],
+			"weapon_id": "pulse_laser"
+		},
+		{
+			"id": "hp_starboard",
+			"offset": Vector2(-8, 20),
+			"facing": 0.0,
+			"arc_degrees": 90.0,
+			"size": "small",
+			"groups": ["secondary"],
+			"weapon_id": "pulse_laser"
+		},
+		{
+			"id": "hp_missile",
+			"offset": Vector2(-16, 0),
+			"facing": 0.0,
+			"arc_degrees": 45.0,
+			"size": "small",
+			"groups": ["missile"],
+			"weapon_id": "rocket_dumb"
+		}
 		]
 
 	for i in range(hardpoint_configs.size()):
@@ -109,7 +109,7 @@ func _spawn_hardpoints() -> void:
 					_missile_hardpoints.append(hp)
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not _ship.is_player_controlled:
 		return
 

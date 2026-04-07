@@ -379,6 +379,7 @@ public partial class ProjectileManager : Node
                 weapon = _weaponData[_pool[i].WeaponDataId];
             var entry = new Godot.Collections.Dictionary();
             entry["position"] = _pool[i].Position;
+            entry["velocity"] = _pool[i].Velocity;
             if (weapon != null && weapon.ContainsKey("archetype"))
                 entry["archetype"] = weapon["archetype"].AsString();
             else

@@ -15,6 +15,13 @@ const STRESS_TEST_MAX: int = 200
 var _event_bus: Node
 var _perf_monitor: Node
 
+# Enemy health hover overlay
+var _hover_canvas: CanvasLayer
+var _hover_panel: PanelContainer
+var _hover_label: Label
+# Screen-space radius for hover detection (px)
+const HOVER_RADIUS_PX: float = 30.0
+
 
 func _ready() -> void:
 	_event_bus = ServiceLocator.GetService("GameEventBus") as Node
@@ -25,6 +32,7 @@ func _ready() -> void:
 	_setup_targets()
 	_setup_obstacles()
 	_setup_hud()
+	_setup_hover_overlay()
 
 	# Connect to ship destruction for cleanup
 	_event_bus.connect("ship_destroyed", _on_ship_destroyed)
@@ -161,17 +169,36 @@ func _setup_hud() -> void:
 
 	var panel := PanelContainer.new()
 	panel.position = Vector2(10.0, 10.0)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(panel)
 
 	_label = Label.new()
 	_label.add_theme_font_size_override("font_size", 14)
+	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(_label)
 
 	var hint := Label.new()
 	hint.text = "WASD — move | Mouse — aim | LClick — primary | RClick — beam | Space — missile | T — stress test | F3 — perf"
 	hint.add_theme_font_size_override("font_size", 11)
 	hint.position = Vector2(10.0, 120.0)
+	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(hint)
+
+
+func _setup_hover_overlay() -> void:
+	_hover_canvas = CanvasLayer.new()
+	_hover_canvas.layer = 10  # Above the main HUD canvas
+	add_child(_hover_canvas)
+
+	_hover_panel = PanelContainer.new()
+	_hover_panel.visible = false
+	_hover_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hover_canvas.add_child(_hover_panel)
+
+	_hover_label = Label.new()
+	_hover_label.add_theme_font_size_override("font_size", 12)
+	_hover_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hover_panel.add_child(_hover_label)
 
 
 func _input(event: InputEvent) -> void:
@@ -190,6 +217,8 @@ func _on_ship_destroyed(ship: Node2D, _position: Vector2, _faction: String) -> v
 	if ship in _targets:
 		_targets.erase(ship)
 		print("Target destroyed!")
+	if is_instance_valid(ship):
+		ship.queue_free()
 
 
 func _process(_delta: float) -> void:
@@ -262,3 +291,39 @@ func _process(_delta: float) -> void:
 		text += "\nSTRESS TEST: %d / %d" % [_stress_test_rounds, STRESS_TEST_MAX]
 
 	_label.text = text
+
+	_update_hover_overlay()
+
+
+func _update_hover_overlay() -> void:
+	var canvas_xform: Transform2D = get_viewport().get_canvas_transform()
+	var mouse_screen: Vector2 = get_viewport().get_mouse_position()
+
+	var hovered: Ship = null
+	var hovered_screen_pos := Vector2.ZERO
+
+	for t in _targets:
+		if not is_instance_valid(t):
+			continue
+		var screen_pos: Vector2 = canvas_xform * t.global_position
+		if screen_pos.distance_to(mouse_screen) <= HOVER_RADIUS_PX:
+			hovered = t
+			hovered_screen_pos = screen_pos
+			break
+
+	if hovered == null:
+		_hover_panel.visible = false
+		return
+
+	# Build health readout text
+	var shield_pct: float = (hovered.shield_hp / hovered.shield_max * 100.0) if hovered.shield_max > 0 else 0.0
+	var hull_pct: float   = (hovered.hull_hp   / hovered.hull_max   * 100.0) if hovered.hull_max   > 0 else 0.0
+	_hover_label.text = "%s\nShield: %.0f / %.0f  (%.0f%%)\nHull:   %.0f / %.0f  (%.0f%%)" % [
+		hovered.name,
+		hovered.shield_hp, hovered.shield_max, shield_pct,
+		hovered.hull_hp,   hovered.hull_max,   hull_pct
+	]
+
+	# Position the panel slightly above and to the right of the ship.
+	_hover_panel.position = hovered_screen_pos + Vector2(12.0, -60.0)
+	_hover_panel.visible  = true
