@@ -293,3 +293,20 @@ func fire_secondary_at(target_pos: Vector2) -> void:
 	for hp in _secondary_hardpoints:
 		var aim_dir := (target_pos - hp.get_world_position()).normalized()
 		hp.request_fire(aim_dir, target_pos)
+
+
+## Swap the weapon on a specific hardpoint. Called by LoadoutUI at dock time.
+## weapon_data must be a full weapon dictionary from ContentRegistry.
+func set_hardpoint_weapon(hardpoint_id: String, weapon_data: Dictionary) -> void:
+	var hp := get_hardpoint(hardpoint_id)
+	if hp == null:
+		push_error("WeaponComponent: hardpoint '%s' not found" % hardpoint_id)
+		return
+	# Stop any continuous fire on this hardpoint before swapping.
+	_active_beams.erase(hp)
+	var weapon_id: String = weapon_data.get("id", weapon_data.get("_id", ""))
+	if not weapon_id.is_empty():
+		_weapons_data[weapon_id] = weapon_data
+		hp.set_weapon(weapon_id, _weapons_data)
+	else:
+		hp.weapon_data = {}

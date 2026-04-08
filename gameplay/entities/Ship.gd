@@ -40,6 +40,11 @@ var _ai_controller: Node = null
 var _pending_ship_data: Dictionary = {}
 var _pending_loadout: Dictionary = {}
 
+# Module tracking — slot_id → module_id; updated by LoadoutUI at dock time.
+var _active_modules: Dictionary = {}
+# Cached ContentRegistry reference for apply_module_stats().
+var _content_registry_ref: Node = null
+
 # Guard flag to avoid emitting hull_critical every frame once below threshold.
 var _hull_critical_emitted: bool = false
 
@@ -56,6 +61,7 @@ func initialize(ship_data: Dictionary, loadout_override: Dictionary = {}) -> voi
 
 func _ready() -> void:
 	_load_damage_types()
+	_content_registry_ref = ServiceLocator.GetService("ContentRegistry") as Node
 
 	# Apply hull stats and weapon loadout if we were initialized from content data.
 	if not _pending_ship_data.is_empty():
@@ -76,13 +82,17 @@ func _ready() -> void:
 
 	# Wire up weapon loadout from content data now that WeaponComponent exists.
 	if not _pending_ship_data.is_empty() and _weapon_component != null:
-		var content_registry := ServiceLocator.GetService("ContentRegistry") as Node
-		if content_registry != null:
+		if _content_registry_ref != null:
 			_weapon_component.initialize_from_ship_data(
 				_pending_ship_data.get("hardpoints", []),
 				_pending_loadout.get("weapons", {}),
-				content_registry
+				_content_registry_ref
 			)
+
+	# Initialize module tracking and apply initial module bonuses.
+	_active_modules = _pending_loadout.get("modules", {}).duplicate()
+	if not _active_modules.is_empty() and _content_registry_ref != null:
+		apply_module_stats(true)
 
 
 func _apply_hull_stats(hull: Dictionary) -> void:
@@ -306,6 +316,58 @@ func _hardpoint_threshold(hp: HardpointComponent) -> float:
 	var base: Variant = _hardpoint_radius_by_size.get(hp.size, _hardpoint_radius_by_size.get("medium", 40.0))
 	var base_f: float = float(base)
 	return maxf(base_f, hp.hardpoint_hp_max * _hardpoint_radius_hp_scale)
+
+
+## Recompute all hull stats from base JSON then stack installed module bonuses.
+## Call with refill=true at spawn to fill all HP pools; false at loadout to clamp
+## current values to new maxima without healing.
+func apply_module_stats(refill: bool = false) -> void:
+	if _content_registry_ref == null or _pending_ship_data.is_empty():
+		return
+
+	# Reset to base hull stats before summing module bonuses.
+	_apply_hull_stats(_pending_ship_data.get("hull", {}))
+
+	# Stack additive/multiplicative bonuses from each installed module.
+	for slot_id in _active_modules.keys():
+		var module_id: String = _active_modules[slot_id]
+		if module_id.is_empty():
+			continue
+		var mdata: Dictionary = _content_registry_ref.get_module(module_id)
+		if mdata.is_empty():
+			continue
+		var stats: Dictionary = mdata.get("stats", {})
+		# Shield module stats
+		shield_max     += float(stats.get("shield_hp",        0.0))
+		regen_rate     += float(stats.get("regen_rate",       0.0))
+		regen_power_draw += float(stats.get("regen_power_draw", 0.0))
+		if stats.has("regen_delay"):
+			regen_delay = minf(regen_delay, float(stats["regen_delay"]))
+		# Engine module stats (thrust_multiplier of 1.3 = 30% increase over base)
+		thruster_force *= float(stats.get("thrust_multiplier", 1.0))
+		max_speed      += float(stats.get("max_speed_bonus",  0.0))
+		max_speed      -= float(stats.get("speed_penalty",    0.0))
+		# Powerplant module stats
+		power_capacity += float(stats.get("power_capacity",   0.0))
+		power_regen    += float(stats.get("power_regen",      0.0))
+		# Armor module stats
+		hull_max       += float(stats.get("hull_hp_bonus",    0.0))
+		# Mass is shared — a heavier ship turns and accelerates slower
+		mass           += float(stats.get("mass_addition",    0.0))
+
+	# Clamp max values to be at least 1
+	shield_max = maxf(shield_max, 0.0)
+	hull_max = maxf(hull_max, 1.0)
+	power_capacity = maxf(power_capacity, 1.0)
+
+	if refill:
+		power_current = power_capacity
+		shield_hp = shield_max
+		hull_hp = hull_max
+	else:
+		power_current = minf(power_current, power_capacity)
+		shield_hp = minf(shield_hp, shield_max)
+		hull_hp = minf(hull_hp, hull_max)
 
 
 func consume_power(amount: float) -> bool:

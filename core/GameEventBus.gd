@@ -85,6 +85,9 @@ signal dock_complete(ship: Node2D, station: Node2D)
 @warning_ignore("unused_signal")
 signal undock_requested(ship: Node2D)
 
+@warning_ignore("unused_signal")
+signal loadout_changed(ship: Node2D, slot_id: String, item_id: String)
+
 # Player State Signals
 @warning_ignore("unused_signal")
 signal player_ship_changed(ship: Node2D)

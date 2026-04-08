@@ -66,9 +66,10 @@ Signals are defined in `core/GameEventBus.gd`. **Define signals here before impl
 
 | Signal | Args | Emitted By | Listened By |
 |---|---|---|---|
-| `dock_requested` | `ship: Node2D, station: Node2D` | Ship | Station |
-| `dock_complete` | `ship: Node2D, station: Node2D` | Station | UI (open loadout) |
-| `undock_requested` | `ship: Node2D` | UI | Station |
+| `dock_requested` | `ship: Node2D, station: Node2D` | Station (F key) | Station (_on_dock_requested validates) |
+| `dock_complete` | `ship: Node2D, station: Node2D` | Station | LoadoutUI (open screen) |
+| `undock_requested` | `ship: Node2D` | LoadoutUI (undock button) | Station (_on_undock_requested restores ship) |
+| `loadout_changed` | `ship: Node2D, slot_id: String, item_id: String` | LoadoutUI | (future: savegame, economy) |
 
 ---
 
