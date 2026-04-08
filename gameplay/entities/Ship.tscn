@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://gameplay/entities/Ship.gd" id="1_ship"]
+[ext_resource type="Script" path="res://gameplay/weapons/WeaponComponent.gd" id="2_weapon"]
+
+[sub_resource type="CircleShape2D" id="Shape2D_hull"]
+radius = 15.0
+
+[node name="Ship" type="CharacterBody2D"]
+script = ExtResource("1_ship")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("Shape2D_hull")
+
+[node name="WeaponComponent" type="Node" parent="."]
+script = ExtResource("2_weapon")

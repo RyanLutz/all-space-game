@@ -1,6 +1,14 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://gameplay/ai/AIController.gd" id="1"]
+[ext_resource type="Script" path="res://gameplay/ai/AIController.gd" id="1_ai"]
+
+[sub_resource type="CircleShape2D" id="Shape2D_detect"]
+radius = 800.0
 
 [node name="AIController" type="Node"]
-script = ExtResource("1")
+script = ExtResource("1_ai")
+
+[node name="DetectionArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+shape = SubResource("Shape2D_detect")
