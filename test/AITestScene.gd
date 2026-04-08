@@ -31,6 +31,8 @@ func _ready() -> void:
 
 	_setup_background()
 	_setup_player()
+	_setup_camera()
+	_setup_chunk_streamer()
 	_setup_ai_ships()
 	_setup_hud()
 
@@ -57,14 +59,33 @@ func _setup_player() -> void:
 	add_child(_player_ship)
 	_add_ship_visual(_player_ship, Color.CYAN)
 
-	var cam := Camera2D.new()
-	cam.name = "Camera"
-	cam.zoom = Vector2(0.4, 0.4)
-	_player_ship.add_child(cam)
-
 	var renderer: Node = load("res://gameplay/weapons/ProjectileRenderer.gd").new()
 	renderer.name = "ProjectileRenderer"
 	add_child(renderer)
+
+
+func _setup_camera() -> void:
+	# GameCamera is a sibling of the world content — never a child of any ship.
+	# It auto-follows nodes in the "player" group and listens for player_ship_changed.
+	var cam_scene := load("res://gameplay/camera/GameCamera.tscn")
+	if cam_scene == null:
+		push_error("AITestScene: GameCamera.tscn not found")
+		return
+	var cam: GameCamera = cam_scene.instantiate() as GameCamera
+	# Start zoomed out so the full combat arena is visible.
+	cam.default_zoom = 0.5
+	cam.min_zoom = 0.3
+	add_child(cam)
+
+
+func _setup_chunk_streamer() -> void:
+	var streamer_script := load("res://gameplay/world/ChunkStreamer.gd")
+	if streamer_script == null:
+		push_error("AITestScene: ChunkStreamer.gd not found")
+		return
+	var streamer: Node = streamer_script.new()
+	streamer.name = "ChunkStreamer"
+	add_child(streamer)
 
 
 func _setup_ai_ships() -> void:
@@ -120,7 +141,7 @@ func _setup_hud() -> void:
 	panel.add_child(_label)
 
 	var hint := Label.new()
-	hint.text = "WASD — move  |  Mouse — aim  |  LClick — fire  |  F3 — perf overlay"
+	hint.text = "WASD — move  |  Mouse — aim  |  LClick — fire  |  Scroll — zoom  |  F3 — perf overlay"
 	hint.add_theme_font_size_override("font_size", 11)
 	hint.position = Vector2(10.0, 130.0)
 	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -58,17 +58,18 @@ func _build_text() -> String:
 	var physics_ms  : float = _pm.get_avg_ms("Physics.move_and_slide")
 	var physics_cnt : int   = _pm.get_count("Physics.active_bodies")
 
-	var chunk_load_ms : float = _pm.get_avg_ms("ChunkStreamer.load")
-	var chunks_loaded : int   = _pm.get_count("ChunkStreamer.loaded_chunks")
+	var chunk_load_ms   : float = _pm.get_avg_ms("ChunkStreamer.load")
+	var chunk_unload_ms : float = _pm.get_avg_ms("ChunkStreamer.unload")
+	var chunks_loaded   : int   = _pm.get_count("ChunkStreamer.loaded_chunks")
 
 	var total_ms   := proj_dumb_ms + proj_guided_ms + ai_ms + hit_ms + physics_ms
 	var budget_pct := int((total_ms / FRAME_BUDGET) * 100.0)
 
 	var chunk_str: String
-	if chunk_load_ms < 0.01:
+	if chunk_load_ms < 0.01 and chunk_unload_ms < 0.01:
 		chunk_str = "idle"
 	else:
-		chunk_str = "last: %.1fms" % chunk_load_ms
+		chunk_str = "ld:%.1f un:%.1fms" % [chunk_load_ms, chunk_unload_ms]
 
 	var t := "[ All Space — Performance Monitor ]\n"
 	t += _SEP + "\n"
@@ -80,7 +81,7 @@ func _build_text() -> String:
 			"AI state updates", ai_cnt, ai_ms, ai_peak]
 	t += "%-22s             %5.2fms avg\n" % ["Hit detection", hit_ms]
 	t += "%-22s  %4d        %5.2fms avg\n" % ["Physics bodies", physics_cnt, physics_ms]
-	t += "%-22s  %-16s %2d chunks\n" % ["Chunk streaming", chunk_str, chunks_loaded]
+	t += "%-22s  %-22s %2d chunks\n" % ["Chunk streaming", chunk_str, chunks_loaded]
 	t += _SEP + "\n"
 	t += "Frame budget used    %.2fms / %.1fms (%d%%)" % [total_ms, FRAME_BUDGET, budget_pct]
 
