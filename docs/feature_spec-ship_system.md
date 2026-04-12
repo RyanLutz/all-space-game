@@ -4,7 +4,7 @@
 ## 1. Overview
 
 The Ship System defines what a ship is, how it is assembled from data, and how it enters
-the world. Ships are `CharacterBody3D` nodes configured entirely at spawn time from JSON
+the world. Ships are `RigidBody3D` nodes configured entirely at spawn time from JSON
 — no ship-type-specific scene files. Every ship is the same `Ship.tscn` with different
 data applied to it.
 
@@ -52,7 +52,7 @@ ShipFactory.gd
             ├── Applies shared color material
             └── Attaches AIController (AI) or adds to "player" group (player)
 
-Ship.tscn (CharacterBody3D)
+Ship.tscn (RigidBody3D)
     ├── Ship.gd                          ← physics, stats, unified input interface
     └── ShipVisual (Node3D)
             ├── [hull part MeshInstance3D]
@@ -71,8 +71,8 @@ PlayerState (autoload)
 Ships live on the **XZ plane (Y = 0)**. Enforced explicitly at every physics step.
 
 - All positions: `Vector3` with `position.y = 0` at all times
-- All velocities: `Vector3` with `velocity.y = 0` at all times — set explicitly after
-  every `move_and_slide()` call
+- All velocities: `Vector3` with `linear_velocity.y = 0` at all times — enforced
+  explicitly as a backstop after every `_integrate_forces()` call
 - Rotation: **Y axis only (yaw)**. `rotation.x = 0`, `rotation.z = 0` always.
   Angular velocity is a `float` applied to `rotation.y`.
 - Ship forward direction: `-transform.basis.z`
@@ -744,15 +744,9 @@ func _physics_process(delta: float) -> void:
     _update_input(delta)
     PerformanceMonitor.begin("Physics.thruster_allocation")
     _allocate_thrust(delta)
-    PerformanceMonitor.end("Physics.thruster_allocation")
     _apply_alignment_drag(delta)
-    _apply_linear_drag(delta)
-    _apply_angular_drag(delta)
-    PerformanceMonitor.begin("Physics.move_and_slide")
-    move_and_slide()
-    PerformanceMonitor.end("Physics.move_and_slide")
-    velocity.y = 0.0    # enforce Y = 0 — always explicit
-    position.y = 0.0    # enforce Y = 0 — always explicit
+    PerformanceMonitor.end("Physics.thruster_allocation")
+    # Jolt integrates forces — no move_and_slide() call
     _update_shield_regen(delta)
     _update_power_regen(delta)
 ```
@@ -804,7 +798,7 @@ Parts are fixed by `variant_id`. Only weapons and modules are overridable at spa
 ```gdscript
 func spawn_ship(class_id: String, variant_id: String, pos: Vector3, faction: String,
                 is_player: bool = false,
-                weapon_loadout_override: Dictionary = {}) -> CharacterBody3D:
+                weapon_loadout_override: Dictionary = {}) -> RigidBody3D:
     var class_data := ContentRegistry.get_ship(class_id)
     if class_data.is_empty():
         push_error("ShipFactory: unknown class '%s'" % class_id)
@@ -816,7 +810,7 @@ func spawn_ship(class_id: String, variant_id: String, pos: Vector3, faction: Str
     var resolved_stats := _resolve_stats(class_data, variant_id)
 
     # 2. Instantiate base scene
-    var ship: CharacterBody3D = preload("res://gameplay/entities/Ship.tscn").instantiate()
+    var ship: RigidBody3D = preload("res://gameplay/entities/Ship.tscn").instantiate()
     ship.global_position = pos
     ship.position.y = 0.0
 
@@ -1036,13 +1030,13 @@ func get_asset_path(content_data: Dictionary, asset_key: String) -> String:
 ```gdscript
 # PlayerState.gd — autoload
 
-var active_ship: CharacterBody3D = null
+var active_ship: RigidBody3D = null
 
-func set_active_ship(ship: CharacterBody3D) -> void:
+func set_active_ship(ship: RigidBody3D) -> void:
     active_ship = ship
     GameEventBus.emit_signal("player_ship_changed", ship)
 
-func get_active_ship() -> CharacterBody3D:
+func get_active_ship() -> RigidBody3D:
     return active_ship
 ```
 
@@ -1080,10 +1074,9 @@ PerformanceMonitor.end("ShipFactory.assemble")
 
 # Ship._physics_process():
 PerformanceMonitor.begin("Physics.thruster_allocation")
+# _allocate_thrust() + _apply_alignment_drag()
 PerformanceMonitor.end("Physics.thruster_allocation")
-PerformanceMonitor.begin("Physics.move_and_slide")
-move_and_slide()
-PerformanceMonitor.end("Physics.move_and_slide")
+# Jolt integrates — no move_and_slide()
 
 # Scene manager, once per frame:
 PerformanceMonitor.set_count("Ships.active_count", active_ships.size())
@@ -1106,7 +1099,6 @@ Performance.add_custom_monitor("AllSpace/content_load_ms",
 | Ship assembly | `ShipFactory.assemble` |
 | Content registry scan | `ContentRegistry.load` |
 | Active ships | `Ships.active_count` |
-| Physics move_and_slide | `Physics.move_and_slide` |
 | Thruster allocation | `Physics.thruster_allocation` |
 
 ---
@@ -1118,7 +1110,7 @@ Performance.add_custom_monitor("AllSpace/content_load_ms",
     ContentRegistry.gd
     PlayerState.gd
 /gameplay/entities/
-    Ship.tscn               ← CharacterBody3D — shared for all ship types
+    Ship.tscn               ← RigidBody3D — shared for all ship types
     Ship.gd
     ShipFactory.gd
 /gameplay/weapons/
@@ -1199,4 +1191,4 @@ Performance.add_custom_monitor("AllSpace/content_load_ms",
 - [ ] Fighter and Destroyer feel meaningfully different — angular inertia difference is palpable
 - [ ] All ship stats flow from JSON — no hardcoded values in GDScript
 - [ ] 20 simultaneously assembled ships run within frame budget at 60fps
-- [ ] `ShipFactory.assemble`, `ContentRegistry.load`, and `Physics.move_and_slide` visible in F3 overlay
+- [ ] `ShipFactory.assemble`, `ContentRegistry.load`, and `Physics.thruster_allocation` visible in F3 overlay

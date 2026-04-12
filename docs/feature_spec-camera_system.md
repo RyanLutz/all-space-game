@@ -47,7 +47,7 @@ The tunable angle remains fixed during zoom; only height changes.
 ```
 Main Scene
     ├── GameWorld
-    │       ├── Player Ship (CharacterBody3D)
+    │       ├── Player Ship (RigidBody3D)
     │       ├── AI Ships
     │       └── ...
     ├── GameCamera (Camera3D)         ← NOT a child of any ship

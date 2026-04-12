@@ -131,7 +131,7 @@ never becomes obsolete.
 | Primary language | GDScript | All game systems except where noted |
 | Performance-critical | C# | ProjectileManager only at MVP |
 | Physics backend | Jolt (Godot 4.6 default) | Full 3D physics; applies natively to all 3D nodes |
-| Ship physics node | `CharacterBody3D` | Manual velocity control on XZ plane; no gravity |
+| Ship physics node | `RigidBody3D` | Force/torque applied each frame; Jolt integrates; Y-translation and X/Z-rotation axis-locked |
 | Play plane | XZ (Y = 0) | All ships, projectiles, and gameplay at Y = 0 |
 | Camera | `Camera3D`, orthographic | Top-down, fixed elevation above XZ plane |
 | Data / modding | JSON | All tunable values; no recompile for balance passes |
@@ -276,10 +276,9 @@ They are non-negotiable.
 ## 9. Entity Overview
 
 All moving entities in the world follow a common physics interface defined in
-`SpaceBody.gd`. This is a logical interface, not a Godot base node class, because
-ships use `CharacterBody3D` (manual velocity) while asteroids use `RigidBody3D`
-(Jolt handles their collision response). Both implement the same property and method
-contract.
+`SpaceBody.gd`. This is a logical interface, not a Godot base node class. Both ships
+and asteroids use `RigidBody3D`; ships have axis locks enforcing the XZ plane while
+asteroids tumble freely. Both implement the same property and method contract.
 
 ### SpaceBody Contract
 
@@ -305,12 +304,13 @@ func apply_impulse(impulse: Vector3) -> void  # explosions, collisions
 ### Entity Types
 
 ```
-CharacterBody3D
-    └── Ship.gd             Player and AI ships. Manual velocity, thruster budget,
+RigidBody3D (axis-locked to XZ plane)
+    └── Ship.gd             Player and AI ships. Forces/torques applied in
+                            _integrate_forces(); Jolt integrates. Thruster budget,
                             assisted steering, hardpoints, weapon fire groups,
                             module slots. Controlled via unified input interface.
 
-RigidBody3D
+RigidBody3D (free tumble)
     └── Asteroid.gd         World objects. Jolt handles collision response and tumbling.
                             Has HP, size tier, loot table. Spawned and freed by
                             ChunkStreamer. Can be mined or destroyed.
@@ -351,7 +351,6 @@ implementation begins.
 | Projectile collision checks | `ProjectileManager.collision_checks` |
 | AI state machine updates | `AIController.state_updates` |
 | Navigation controller update | `Navigation.update` |
-| Physics body move_and_slide | `Physics.move_and_slide` |
 | Ship thruster allocation | `Physics.thruster_allocation` |
 | Hit detection / component resolve | `HitDetection.component_resolve` |
 | Chunk load | `ChunkStreamer.load` |
@@ -471,8 +470,8 @@ Vertex color channels drive a colorization shader (primary, trim, accent, glow).
 
 Full detail in `Physics_Movement_Spec.md`. Key decisions recorded here.
 
-- `CharacterBody3D` with manual velocity — no gravity, ships do not use `RigidBody3D`
-- Ships move in XZ; Y is always 0 — enforced explicitly after every physics update
+- `RigidBody3D` with Jolt; forces/torques applied in `_integrate_forces()`; Jolt integrates — ships do not use `CharacterBody3D`
+- Y-translation and X/Z-rotation axis-locked in Jolt; Y enforced explicitly as a backstop after every physics update
 - **Assisted steering** — auto counter-torque prevents rotation overshoot. Ships track
   the aim point smoothly without oscillation.
 - **Shared thruster budget** — turning takes priority; translation gets the remainder
@@ -514,7 +513,7 @@ Full detail in `AI_Patrol_Behavior_Spec.md`. Key decisions recorded here.
 
 - State machine: IDLE (wander) → PURSUE → ENGAGE → (future: FLEE, REGROUP, SEARCH)
 - JSON behavior profiles — MVP uses one "default" profile; architecture supports N profiles
-- AI ships use the same `CharacterBody3D` physics as the player — no cheating on thrust
+- AI ships use the same `RigidBody3D` physics as the player — no cheating on thrust
   or turning
 - AI routes all movement through `NavigationController` — the same flight computer used
   by Tactical mode orders

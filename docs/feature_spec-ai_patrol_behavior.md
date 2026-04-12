@@ -12,7 +12,7 @@ variants, and advanced behaviors (flee, coordinate, use cover) without refactori
 **Design Goals:**
 - AI ships feel alive — they move with purpose, react to the player, and fight convincingly
 - One behavior profile for MVP, but the architecture supports N profiles via JSON
-- AI ships use the same `CharacterBody3D` physics as the player — no cheating on thrust,
+- AI ships use the same `RigidBody3D` physics as the player — no cheating on thrust,
   turning, or speed
 - All movement is routed through `NavigationController.gd` — the same flight computer
   used for Tactical mode player ship orders
@@ -20,16 +20,12 @@ variants, and advanced behaviors (flee, coordinate, use cover) without refactori
 - State machine is clean enough to extend with new states post-MVP without rewriting
   existing ones
 
-> **Architecture note:** The ship physics node is `CharacterBody3D` with manual velocity
-> on the XZ plane (Y = 0). `RigidBody3D` is used for asteroids only. See Core Spec
-> Section 5 and 6 for the authoritative ruling.
-
 ---
 
 ## Architecture
 
 ```
-AI Ship (CharacterBody3D)
+AI Ship (RigidBody3D)
     ├── Ship.gd                   — physics, modules, weapon fire groups (shared with player)
     ├── AIController.gd           — state machine, high-level decisions
     ├── NavigationController.gd   — flight computer: destination → thrust inputs
@@ -609,7 +605,7 @@ Performance.add_custom_monitor("AllSpace/ai_ms",
 - [ ] AI ship leads shots using aim prediction — hits are frequent but not perfect
 - [ ] AI ship fires only when facing approximately toward the predicted player position
 - [ ] AI ship returns to IDLE wander when player moves beyond leash range
-- [ ] AI ship uses `CharacterBody3D` physics — no teleporting, no instant turns
+- [ ] AI ship uses `RigidBody3D` physics — no teleporting, no instant turns
 - [ ] All positions and velocities remain at Y = 0 throughout all state transitions
 - [ ] AI state transitions are visible in the PerformanceMonitor debug overlay (F3)
 - [ ] 15+ simultaneous AI ships run within frame budget at 60fps

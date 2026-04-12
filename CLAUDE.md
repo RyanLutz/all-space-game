@@ -7,9 +7,8 @@
 
 ## Stack
 Godot 4.6 · GDScript primary · C# for ProjectileManager only
-2.5D rendering: 3D ship models rendered over 2D gameplay plane
-Physics: `CharacterBody2D` with manual velocity — all gameplay is 2D
-Jolt physics available for 3D visual debris only — does NOT apply to `CharacterBody2D`
+3D on XZ plane: all gameplay is 3D at Y = 0; `Camera3D` perspective, top-down angle
+Physics: `RigidBody3D` with Jolt — forces/torques applied in `_integrate_forces()`; Jolt integrates
 Forward Plus renderer
 
 ## Running the Project
@@ -79,7 +78,7 @@ GameBootstrap.gd                   # at project root (see project.godot autoload
 | `PerformanceMonitor_Spec.md` | Observability service, canonical metric names, F3 overlay |
 | `Physics_Movement_Spec.md` | SpaceBody, Ship movement, thruster budget, assisted steering |
 | `Weapons_Projectiles_Spec.md` | Archetypes, hardpoints, heat/power, damage pipeline |
-| `Camera_System_Spec.md` | Independent Camera2D, spring smoothing, cursor offset |
+| `Camera_System_Spec.md` | Camera3D perspective, height-zoom, cursor offset |
 | `AI_Patrol_Behavior_Spec.md` | State machine, aim prediction, behavior profiles |
 | `Ship_Content_Data_Architecture_Spec.md` | Folder-per-item, ContentRegistry, ShipFactory |
 
@@ -91,7 +90,8 @@ GameBootstrap.gd                   # at project root (see project.godot autoload
 - Cross-system calls go through GameEventBus, not direct references
 - One system per Claude Code session
 - C# is used **only** for `ProjectileManager.cs`; everything else is GDScript
-- Ships are `CharacterBody2D` — do not use CharacterBody3D for ships
+- Ships are `RigidBody3D` — apply forces and torques; never write to `linear_velocity` directly; Jolt integrates
+- `Vector2` is banned for world-space positions and velocities; use `Vector3` with Y = 0
 - Read the spec fully before implementing — it contains the algorithm, not just the shape
 
 ### Content & Data
@@ -119,13 +119,13 @@ GameBootstrap.gd                   # at project root (see project.godot autoload
 Rolling 60-frame average using `Time.get_ticks_usec()`. API: `begin(metric)` / `end(metric)` / `set_count(metric, value)`. Registers with Godot's built-in debugger via `Performance.add_custom_monitor()`. F3 toggles in-game overlay. Every other system wraps its hot paths with these calls using the canonical metric names defined in the spec.
 
 ### Physics & Movement (`docs/Physics_Movement_Spec.md`)
-`SpaceBody.gd` extends `CharacterBody2D` with manual `Vector2` velocity. Physics loop order: apply thruster forces → partial alignment drag → linear drag (`velocity *= 1.0 - linear_drag * delta`) → angular drag → `move_and_slide()`. Single `thruster_force` stat shared across thrust/strafe/torque — torque deducted first ("turning wins"). Assisted steering uses stopping-distance calculation to prevent overshoot. Projectiles inherit firing ship's velocity. Rotation is a 2D `rotation` float.
+`SpaceBody.gd` logical interface on `RigidBody3D`. Ship logic applies forces/torques in `_integrate_forces()`; Jolt integrates. Y-translation and X/Z-rotation axis-locked. Single `thruster_force` budget shared across thrust, strafe, and torque — torque deducted first ("turning wins"). Alignment drag bleeds lateral velocity during hard turns. Assisted steering uses stopping-distance calculation to prevent overshoot. Projectiles inherit the firing ship's `linear_velocity` at spawn. Yaw is `rotation.y`; heading is `-transform.basis.z`.
 
 ### Weapons & Projectiles (`docs/Weapons_Projectiles_Spec.md`)
 Five archetypes: `ballistic`, `energy_beam` (hitscan held), `energy_pulse` (hitscan burst), `missile_dumb`, `missile_guided`. All stats in per-weapon JSON under `/content/weapons/`. `ProjectileManager.cs` manages a pre-allocated `DumbProjectile` struct array; raycast collision per frame. Heat system is per-hardpoint; power is a per-ship shared pool. Damage pipeline: hit point → HitDetection region → shield absorption → hull damage with type multiplier from `data/damage_types.json` → hardpoint split → state threshold check.
 
 ### Camera System (`docs/Camera_System_Spec.md`)
-`Camera2D` — sibling of the game world, never a child of any ship. Follows target with cursor-direction offset and critically damped spring smoothing. Zoom via scroll wheel. Retargeting is a single `follow(target)` call. All code uses `Vector2` / `Node2D`.
+`Camera3D` perspective — sibling of the game world, never a child of any ship. Follows target from above at a configurable angle with cursor-direction offset and critically damped spring smoothing. Zoom by adjusting camera height (Y position); angle stays constant. Mouse-to-world via ray-plane intersection against Y = 0. Retargeting is a single `follow(target)` call.
 
 ### Ship & Content Data Architecture (`docs/Ship_Content_Data_Architecture_Spec.md`)
 Folder-per-item under `/content/`. Each ship/weapon/module is a folder with a JSON definition + assets. `ContentRegistry.gd` scans on startup. One `Ship.tscn` configured at spawn time from data — no per-ship-class scenes. `ShipFactory.spawn_ship(id, pos)` is the only way to create ships. `PlayerState.gd` tracks the active player ship.
@@ -135,13 +135,14 @@ State machine: IDLE (wander) → PURSUE → ENGAGE → IDLE. `AIController.gd` a
 
 ## PerformanceMonitor Metric Names (canonical — use exactly these)
 ```
-Physics.move_and_slide · Physics.thruster_allocation · Physics.active_bodies
+Physics.thruster_allocation · Physics.active_bodies
 ProjectileManager.dumb_update · ProjectileManager.guided_update
 ProjectileManager.collision_checks · ProjectileManager.active_count
 AIController.state_updates · AIController.active_count
 HitDetection.component_resolve
 ChunkStreamer.load · ChunkStreamer.unload · ChunkStreamer.loaded_chunks
-ContentRegistry.load
+ContentRegistry.load · ShipFactory.assemble · Ships.active_count
+Navigation.update · Camera.update
 ```
 
 ## Build Order
@@ -159,18 +160,18 @@ ContentRegistry.load
 
 ## Godot 4.6 Notes
 
-- `move_and_slide()` takes no arguments — set `velocity` before calling it
+- Ships use `RigidBody3D` — apply forces/torques in `_integrate_forces(state)`; do not write `linear_velocity` directly
 - `angle_difference()` is a built-in — no need to hand-roll angle math
 - `Time.get_ticks_usec()` is correct for PerformanceMonitor (not `OS.get_ticks_usec()` — deprecated)
 - `Performance.add_custom_monitor()` takes a `Callable` as second argument — lambda syntax works fine
 - C# in Godot 4.6 uses .NET 8 — use `GodotObject`, not `Godot.Object`
-- Jolt is 3D-only — ship physics (`CharacterBody2D`) are unaffected by Jolt
+- Mouse-to-world: use `Plane(Vector3.UP, 0.0).intersects_ray(ray_origin, ray_dir)` — `get_global_mouse_position()` does not exist in 3D
 
 ## Key Design Decisions
 
 | Decision | What It Is |
 |---|---|
-| 2.5D | All physics/gameplay is 2D (`CharacterBody2D`, `Vector2`); 3D assets are a rendering concern only |
+| 3D on XZ plane | All physics is 3D (`RigidBody3D`, `Vector3`) constrained to Y = 0; `Camera3D` observes from above |
 | Thruster budget | Single `thruster_force` shared between thrust, strafe, and torque — turning wins |
 | Partial alignment drag | Only lateral velocity bleeds on hard turns, not forward momentum |
 | Projectile inheritance | All projectiles inherit the firing ship's velocity at spawn |

@@ -28,7 +28,7 @@ spawn. Detection and trigger volumes use `Area3D`.
 ## 2. Architecture
 
 ```
-Ship (CharacterBody3D)
+Ship (RigidBody3D)
     └── ShipVisual (Node3D)
             └── Hull_MeshInstance3D
                     └── HardpointEmpty_hp_nose_small (Node3D)   ← baked into mesh

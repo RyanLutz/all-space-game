@@ -5,9 +5,9 @@
 
 ## What Is This Game?
 
-All Space is a top-down 2D space simulation with 3D visuals where players begin as a
-lone pilot in a single ship and, over time, grow into a fleet commander, infrastructure
-builder, and eventually a galactic power. The game is built around a single continuous
+All Space is a top-down 3D space simulation constrained to the XZ plane where players
+begin as a lone pilot in a single ship and, over time, grow into a fleet commander,
+infrastructure builder, and eventually a galactic power. The game is built around a single continuous
 streaming map — no loading screens, no sector transitions — and a core philosophy of
 seamless scale.
 
@@ -146,10 +146,10 @@ simplicity, and never caps the ceiling for a player who wants to go deep.
 | Concern | Approach |
 |---|---|
 | Engine | Godot 4.6 |
-| Rendering | 2.5D — 3D assets on a 2D gameplay plane, top-down camera |
+| Rendering | Full 3D on XZ plane; `Camera3D` perspective, top-down angle |
 | Primary language | GDScript |
 | Performance-critical | C# (projectile management) |
-| Physics | CharacterBody2D with manual velocity for ships; Jolt available for debris |
+| Physics | `RigidBody3D` with Jolt for ships and asteroids; axis-locked to XZ plane (Y = 0) |
 | Data | JSON configuration for all game data |
 | Inter-system comms | Event bus — no direct cross-system references |
 | Development method | Spec-first; one system per agent session; PerformanceMonitor built first |
