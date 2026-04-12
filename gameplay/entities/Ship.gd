@@ -48,6 +48,14 @@ var _content_registry_ref: Node = null
 # Guard flag to avoid emitting hull_critical every frame once below threshold.
 var _hull_critical_emitted: bool = false
 
+# 3D visual rendering — model is loaded from ship content and synced to 2D physics position.
+# PIXELS_PER_UNIT must match hull.marker_scale in ship.json for all ships.
+const PIXELS_PER_UNIT := 2.8
+var _visual_model: Node3D = null
+## Set by the scene after spawning to enable perspective mouse-aim raycast.
+## When null, falls back to Camera2D-compatible get_global_mouse_position().
+var aim_camera: Camera3D = null
+
 @onready var _event_bus: Node = ServiceLocator.GetService("GameEventBus") as Node
 
 
@@ -83,11 +91,19 @@ func _ready() -> void:
 	# Wire up weapon loadout from content data now that WeaponComponent exists.
 	if not _pending_ship_data.is_empty() and _weapon_component != null:
 		if _content_registry_ref != null:
+			var marker_scale: float = float(_pending_ship_data.get("hull", {}).get("marker_scale", 1.0))
+			var model_node: Node = _load_model_markers(_pending_ship_data)
 			_weapon_component.initialize_from_ship_data(
 				_pending_ship_data.get("hardpoints", []),
 				_pending_loadout.get("weapons", {}),
-				_content_registry_ref
+				_content_registry_ref,
+				model_node,
+				marker_scale
 			)
+			# Keep the model alive as the visual representation instead of freeing it.
+			_visual_model = model_node as Node3D
+			if _visual_model != null:
+				call_deferred("_attach_visual_model")
 
 	# Initialize module tracking and apply initial module bonuses.
 	_active_modules = _pending_loadout.get("modules", {}).duplicate()
@@ -209,10 +225,31 @@ func _load_damage_types() -> void:
 	_hardpoint_radius_hp_scale = float(hp_scale_val)
 
 
+## Deferred from _ready() — adds the visual model to the parent scene after the
+## ship itself is fully in the scene tree so get_parent() is valid.
+func _attach_visual_model() -> void:
+	if _visual_model == null:
+		return
+	var p := get_parent()
+	if p == null:
+		_visual_model.queue_free()
+		_visual_model = null
+		return
+	p.add_child(_visual_model)
+	_sync_visual_model()
+
+
+func _exit_tree() -> void:
+	if _visual_model != null and is_instance_valid(_visual_model):
+		_visual_model.queue_free()
+		_visual_model = null
+
+
 func _physics_process(delta: float) -> void:
 	super._physics_process(delta)
 	_update_resource_regen(delta)
 	_time_since_last_hit += delta
+	_sync_visual_model()
 
 
 func _update_resource_regen(delta: float) -> void:
@@ -370,6 +407,53 @@ func apply_module_stats(refill: bool = false) -> void:
 		hull_hp = minf(hull_hp, hull_max)
 
 
+## Load the ship's 3D model scene and return its root node (not in the scene tree).
+## The caller is responsible for calling .free() on the returned node when done.
+## Returns null if no model is defined, the path is invalid, or loading fails.
+func _load_model_markers(ship_data: Dictionary) -> Node:
+	var base_path: String = ship_data.get("_base_path", "")
+	var assets: Dictionary = ship_data.get("assets", {})
+	var model_file: String = assets.get("model", "")
+	if base_path.is_empty() or model_file.is_empty():
+		return null
+
+	var model_path: String = "%s/%s" % [base_path, model_file]
+	if not ResourceLoader.exists(model_path):
+		return null
+
+	var packed: PackedScene = load(model_path) as PackedScene
+	if packed == null:
+		push_warning("Ship: failed to load model scene '%s' for marker extraction" % model_path)
+		return null
+
+	return packed.instantiate()
+
+
+## Sync the 3D visual model position and rotation to match the 2D physics body.
+## Convention: 2D(x,y) → 3D(x, 0, -y) / PIXELS_PER_UNIT; model nose faces local +Z.
+func _sync_visual_model() -> void:
+	if _visual_model == null or not is_instance_valid(_visual_model):
+		return
+	_visual_model.position = Vector3(global_position.x, 0.0, -global_position.y) / PIXELS_PER_UNIT
+	_visual_model.rotation.y = -rotation - PI * 0.5
+
+
+## Return the 2D world position the mouse is pointing at.
+## With aim_camera set: raycasts onto the Y=0 plane for perspective-correct aiming.
+## Without aim_camera: falls back to Camera2D-compatible get_global_mouse_position().
+func _get_mouse_world_pos() -> Vector2:
+	if aim_camera == null or not is_instance_valid(aim_camera):
+		return get_global_mouse_position()
+	var mouse := get_viewport().get_mouse_position()
+	var from := aim_camera.project_ray_origin(mouse)
+	var dir  := aim_camera.project_ray_normal(mouse)
+	if absf(dir.y) < 0.001:
+		return global_position
+	var t := -from.y / dir.y
+	var hit := from + dir * t
+	return Vector2(hit.x, -hit.z) * PIXELS_PER_UNIT
+
+
 func consume_power(amount: float) -> bool:
 	if power_current >= amount:
 		power_current -= amount
@@ -386,7 +470,7 @@ func apply_thrust_forces(delta: float) -> void:
 	var strafe_input := 0.0
 
 	if is_player_controlled:
-		var mouse_pos := get_global_mouse_position()
+		var mouse_pos := _get_mouse_world_pos()
 		target_angle = position.direction_to(mouse_pos).angle()
 		forward_input = (Input.get_action_strength("thrust_forward")
 				- Input.get_action_strength("thrust_reverse"))

@@ -236,6 +236,15 @@ func _update_damage_state() -> void:
 		damage_state = "nominal"
 
 
+## Returns true if weapon_data is compatible with this hardpoint.
+## Compatibility rule: weapon size must match hardpoint size exactly.
+## Archetype and fire group are not restrictions — any weapon type fits any slot of the right size.
+func can_accept_weapon(weapon_data_to_check: Dictionary) -> bool:
+	if weapon_data_to_check.is_empty():
+		return false
+	return weapon_data_to_check.get("size", "") == size
+
+
 func set_weapon(weapon_id: String, all_weapons: Dictionary) -> void:
 	if all_weapons.has(weapon_id):
 		weapon_data = all_weapons[weapon_id]

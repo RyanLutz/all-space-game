@@ -1,0 +1,104 @@
+{
+  "_comment": "Axum Fighter 1 hull definition. See docs/Ship_Content_Data_Architecture_Spec.md.",
+  "display_name": "Axum Fighter I",
+  "class": "fighter",
+  "faction": "axum",
+  "description": "A fast Axum-faction interceptor. Favours forward firepower over versatility.",
+
+  "hull": {
+    "hp": 220,
+    "mass": 850,
+    "max_speed": 480,
+    "linear_drag": 0.45,
+    "alignment_drag": 0.18,
+    "thruster_force": 16000,
+    "torque_thrust_ratio": 0.38,
+    "power_capacity": 110,
+    "power_regen": 18,
+    "shield_max": 90,
+    "regen_rate": 18,
+    "regen_delay": 3.5,
+    "regen_power_draw": 12,
+
+    "_comment_marker_scale": "Pixels per 3D unit. Derived from nose marker Z=11.49 units targeting ~32px forward. Tune after first in-game test.",
+    "marker_scale": 2.8
+  },
+
+  "_comment_hardpoints": "offset is intentionally omitted — positions are read at runtime from Node3D markers in model.glb. Each id must match an Empty object name in the .blend file.",
+  "hardpoints": [
+    {
+      "id": "hp_nose",
+      "facing": 0,
+      "type": "gimbal",
+      "size": "medium",
+      "groups": ["primary"]
+    },
+    {
+      "id": "hp_port_wing",
+      "facing": 270,
+      "type": "partial_turret",
+      "size": "small",
+      "groups": ["secondary"]
+    },
+    {
+      "id": "hp_stbd_wing",
+      "facing": 90,
+      "type": "partial_turret",
+      "size": "small",
+      "groups": ["secondary"]
+    },
+    {
+      "id": "hp_missile",
+      "facing": 0,
+      "type": "gimbal",
+      "size": "small",
+      "groups": ["missile"]
+    }
+  ],
+
+  "_comment_thrusters": "Thruster emission points for VFX (engine glow, exhaust particles). offset read from model markers like hardpoints. size hints at particle scale. facing is degrees — 180 = exhaust faces backward. No runtime system reads this yet; authored now for when ThrusterVFX is built.",
+  "thrusters": [
+    {
+      "id": "thruster_main",
+      "facing": 180,
+      "size": "large"
+    },
+    {
+      "id": "thruster_port",
+      "facing": 180,
+      "size": "small"
+    },
+    {
+      "id": "thruster_stbd",
+      "facing": 180,
+      "size": "small"
+    }
+  ],
+
+  "module_slots": [
+    { "id": "slot_shield",  "type": "shield",      "size": "small" },
+    { "id": "slot_engine",  "type": "engine",       "size": "small" },
+    { "id": "slot_power",   "type": "powerplant",   "size": "small" },
+    { "id": "slot_armor",   "type": "armor",        "size": "small" }
+  ],
+
+  "default_loadout": {
+    "weapons": {
+      "hp_nose":       "beam_laser",
+      "hp_port_wing":  "pulse_laser",
+      "hp_stbd_wing":  "pulse_laser",
+      "hp_missile":    "rocket_dumb"
+    },
+    "modules": {
+      "slot_shield": "shield_standard",
+      "slot_engine": "engine_fast",
+      "slot_power":  "powerplant_heavy",
+      "slot_armor":  "armor_reinforced"
+    }
+  },
+
+  "assets": {
+    "model": "model.glb",
+    "icon":  "icon.png"
+  }
+}

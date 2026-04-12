@@ -65,10 +65,10 @@
 
   "default_loadout": {
     "weapons": {
-      "hp_nose":    "autocannon_light",
-      "hp_port":    "pulse_laser",
-      "hp_stbd":    "pulse_laser",
-      "hp_missile": "rocket_dumb"
+      "hp_nose":    "mass_driver",
+      "hp_port":    "beam_laser",
+      "hp_stbd":    "beam_laser",
+      "hp_missile": "missile_heat"
     },
     "modules": {
       "slot_shield": "shield_standard",

@@ -219,10 +219,17 @@ func get_all_hardpoints() -> Array:
 ## Data-driven initialization from ship.json and ContentRegistry.
 ## Replaces the default hardpoints spawned by _spawn_hardpoints().
 ## Called by Ship._ready() when the ship was created via ShipFactory.
+##
+## model_node: optional root of the instantiated 3D model scene. When provided,
+## any hardpoint def that omits "offset" (or sets it to null) will have its
+## 2D offset read from a Node3D child named after the hardpoint id.
+## marker_scale: pixels-per-3D-unit factor, read from hull.marker_scale in ship.json.
 func initialize_from_ship_data(
 		hardpoint_defs: Array,
 		weapon_assignments: Dictionary,
-		content_registry: Node) -> void:
+		content_registry: Node,
+		model_node: Node = null,
+		marker_scale: float = 1.0) -> void:
 	# Remove hardpoints already spawned by the default _spawn_hardpoints() path.
 	for child in get_children():
 		if child is HardpointComponent:
@@ -258,8 +265,14 @@ func initialize_from_ship_data(
 		hp.hardpoint_id   = def.get("id", "")
 		hp.hardpoint_index = i
 
-		var off: Array = def.get("offset", [0, 0])
-		hp.offset = Vector2(float(off[0]), float(off[1]))
+		# Resolve offset: explicit [x,y] wins; absent/null triggers model marker lookup.
+		var raw_offset = def.get("offset", null)
+		if raw_offset != null and typeof(raw_offset) == TYPE_ARRAY:
+			var off: Array = raw_offset
+			hp.offset = Vector2(float(off[0]), float(off[1]))
+		else:
+			hp.offset = _offset_from_model(model_node, hp.hardpoint_id, marker_scale)
+
 		hp.facing = float(def.get("facing", 0.0))
 		hp.size   = def.get("size", "small")
 
@@ -270,7 +283,15 @@ func initialize_from_ship_data(
 
 		var weapon_id: String = weapon_assignments.get(hp.hardpoint_id, "")
 		if not weapon_id.is_empty() and weapons_data.has(weapon_id):
-			hp.set_weapon(weapon_id, weapons_data)
+			var w_data: Dictionary = weapons_data[weapon_id]
+			if hp.can_accept_weapon(w_data):
+				hp.set_weapon(weapon_id, weapons_data)
+			else:
+				push_warning(
+					"WeaponComponent: size mismatch — weapon '%s' (%s) cannot mount on hardpoint '%s' (%s); slot left empty" % [
+						weapon_id, w_data.get("size", "?"), hp.hardpoint_id, hp.size
+					]
+				)
 
 		add_child(hp)
 
@@ -279,6 +300,32 @@ func initialize_from_ship_data(
 				"primary":   _primary_hardpoints.append(hp)
 				"secondary": _secondary_hardpoints.append(hp)
 				"missile":   _missile_hardpoints.append(hp)
+
+
+## Resolve a 2D hardpoint offset from a named Node3D marker in the ship's 3D model.
+##
+## Coordinate convention (GLTF/Godot 3D → top-down 2D):
+##   Model forward = 3D +Z  →  2D +X  (ship faces right on screen)
+##   Model port    = 3D +X  →  2D -Y  (port = up on screen)
+##   Formula: Vector2(pos3.z, -pos3.x) * marker_scale
+##
+## Falls back to Vector2.ZERO and logs a warning when the marker node is not found.
+func _offset_from_model(model_node: Node, hp_id: String, marker_scale: float) -> Vector2:
+	if model_node == null:
+		push_warning("WeaponComponent: no model_node provided; offset for '%s' defaults to zero" % hp_id)
+		return Vector2.ZERO
+
+	var marker: Node = model_node.find_child(hp_id, true, false)
+	if marker == null:
+		push_warning("WeaponComponent: marker node '%s' not found in model; offset defaults to zero" % hp_id)
+		return Vector2.ZERO
+
+	if not marker is Node3D:
+		push_warning("WeaponComponent: marker '%s' is not a Node3D; offset defaults to zero" % hp_id)
+		return Vector2.ZERO
+
+	var pos3: Vector3 = (marker as Node3D).position
+	return Vector2(pos3.z, -pos3.x) * marker_scale
 
 
 ## Fire all primary hardpoints toward target_pos. Used by AIController.
@@ -297,11 +344,24 @@ func fire_secondary_at(target_pos: Vector2) -> void:
 
 ## Swap the weapon on a specific hardpoint. Called by LoadoutUI at dock time.
 ## weapon_data must be a full weapon dictionary from ContentRegistry.
-func set_hardpoint_weapon(hardpoint_id: String, weapon_data: Dictionary) -> void:
+## Returns true on success, false if the hardpoint is not found or the weapon size does not match.
+func set_hardpoint_weapon(hardpoint_id: String, weapon_data: Dictionary) -> bool:
 	var hp := get_hardpoint(hardpoint_id)
 	if hp == null:
 		push_error("WeaponComponent: hardpoint '%s' not found" % hardpoint_id)
-		return
+		return false
+
+	if not hp.can_accept_weapon(weapon_data):
+		push_warning(
+			"WeaponComponent: size mismatch — weapon '%s' (%s) cannot mount on hardpoint '%s' (%s)" % [
+				weapon_data.get("display_name", weapon_data.get("_id", "?")),
+				weapon_data.get("size", "?"),
+				hardpoint_id,
+				hp.size
+			]
+		)
+		return false
+
 	# Stop any continuous fire on this hardpoint before swapping.
 	_active_beams.erase(hp)
 	var weapon_id: String = weapon_data.get("id", weapon_data.get("_id", ""))
@@ -310,3 +370,4 @@ func set_hardpoint_weapon(hardpoint_id: String, weapon_data: Dictionary) -> void
 		hp.set_weapon(weapon_id, _weapons_data)
 	else:
 		hp.weapon_data = {}
+	return true

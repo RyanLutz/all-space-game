@@ -12,7 +12,7 @@ extends Node2D
 #   Scroll     — zoom camera
 #   F3         — performance overlay
 
-const _PLAYER_SHIP_ID := "fighter_light"
+const _PLAYER_SHIP_ID := "axum-fighter-1"
 const _AI_SHIP_ID     := "corvette_patrol"
 
 const _AI_SPAWNS: Array = [
@@ -57,11 +57,31 @@ func _ready() -> void:
 
 
 func _setup_background() -> void:
-	var bg := ColorRect.new()
-	bg.color = Color(0.04, 0.04, 0.08)
-	bg.size = Vector2(16000.0, 16000.0)
-	bg.position = Vector2(-8000.0, -8000.0)
-	add_child(bg)
+	# 3D environment — fills the render behind all 2D canvas content.
+	var environment := Environment.new()
+	environment.background_mode = Environment.BG_COLOR
+	environment.background_color = Color(0.02, 0.02, 0.05)   # deep space
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	environment.ambient_light_color = Color(0.05, 0.06, 0.12)
+	environment.ambient_light_energy = 0.4
+
+	var world_env := WorldEnvironment.new()
+	world_env.environment = environment
+	add_child(world_env)
+
+	# Key light — warm star light from upper-right.
+	var key_light := DirectionalLight3D.new()
+	key_light.light_color = Color(1.0, 0.92, 0.80)
+	key_light.light_energy = 2.5
+	key_light.rotation_degrees = Vector3(-50.0, 35.0, 0.0)
+	add_child(key_light)
+
+	# Fill light — cool light from the opposite side to soften shadows.
+	var fill_light := DirectionalLight3D.new()
+	fill_light.light_color = Color(0.45, 0.55, 0.9)
+	fill_light.light_energy = 0.5
+	fill_light.rotation_degrees = Vector3(-20.0, 215.0, 0.0)
+	add_child(fill_light)
 
 
 func _setup_station() -> void:
@@ -82,7 +102,7 @@ func _setup_player() -> void:
 		push_error("IntegrationScene: failed to spawn player ship")
 		return
 	add_child(_player_ship)
-	_add_ship_visual(_player_ship, Color.CYAN)
+	# No Polygon2D placeholder — Ship.gd loads and syncs the 3D model automatically.
 
 	var renderer: Node = load("res://gameplay/weapons/ProjectileRenderer.gd").new()
 	renderer.name = "ProjectileRenderer"
@@ -90,6 +110,7 @@ func _setup_player() -> void:
 
 
 func _setup_camera() -> void:
+	# Camera2D — follows player in 2D canvas space (AI polygons, projectile sprites, HUD).
 	var cam_scene := load("res://gameplay/camera/GameCamera.tscn")
 	if cam_scene == null:
 		push_error("IntegrationScene: GameCamera.tscn not found")
@@ -98,6 +119,14 @@ func _setup_camera() -> void:
 	cam.default_zoom = 0.6
 	cam.min_zoom = 0.25
 	add_child(cam)
+
+	# Camera3D — renders the 3D ship models with perspective projection.
+	var cam3d := GameCamera3D.new()
+	cam3d.name = "GameCamera3D"
+	add_child(cam3d)
+	# Provide the camera reference so Ship._get_mouse_world_pos() can raycast correctly.
+	if _player_ship != null:
+		_player_ship.aim_camera = cam3d
 
 
 func _setup_chunk_streamer() -> void:

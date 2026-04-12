@@ -134,6 +134,14 @@ Each row is one atomic session. Do them in order. Check them off as you go.
 | 25 | Loadout UI — swap weapons/modules on ship | `docs/Station_Loadout_UI_Spec.md` | ✅ |
 | 26 | MVP integration scene — full loop: fly, fight, dock, customize | — | ✅ |
 
+### Visual Layer (Post-MVP)
+| # | Task | Spec | Status |
+|---|---|---|---|
+| 27 | Write Thruster VFX spec | `docs/ThrusterVFX_Spec.md` | ⬜ |
+| 28 | ThrusterVFX system — read `thrusters` array from ship data, spawn GPUParticles2D at each marker position, scale intensity with thrust input | `docs/ThrusterVFX_Spec.md` | ⬜ |
+| 29 | Weapon muzzle flash VFX — spawn flash particle at hardpoint world position on `weapon_fired` signal | — | ⬜ |
+| 30 | Ship destruction VFX — debris scatter + explosion on `ship_destroyed` signal | — | ⬜ |
+
 ---
 
 ## Prompt Templates
