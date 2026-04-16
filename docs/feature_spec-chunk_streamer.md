@@ -83,7 +83,8 @@ keeps them on the XZ play plane.
 | `hull_hp` | `float` | Current HP |
 | `hull_max` | `float` | Max HP — set from `world_config.json` by size tier |
 | `size_tier` | `String` | `"small"`, `"medium"`, or `"large"` |
-| `_debris_count_range` | `Vector2i` | Min/max debris fragments on destruction (e.g. `Vector2i(2, 5)`) |
+| `_debris_count_min` | `int` | Minimum debris fragments on destruction |
+| `_debris_count_max` | `int` | Maximum debris fragments on destruction |
 
 **apply_damage signature** — identical to `Ship.apply_damage` so the projectile hit
 pipeline can call either without branching:
@@ -114,10 +115,16 @@ func _process(delta: float) -> void:
     position += velocity * delta
     _elapsed += delta
     var t := _elapsed / lifetime
-    modulate.a = 1.0 - t
+    # Node3D has no modulate property — fade by setting alpha on the mesh material.
+    # Debris.tscn uses a StandardMaterial3D with transparency enabled on its MeshInstance3D.
+    _mesh.get_active_material(0).albedo_color.a = 1.0 - t
     if _elapsed >= lifetime:
         queue_free()
 ```
+
+`_mesh` is an `@onready var _mesh: MeshInstance3D` pointing to the child mesh node.
+The material must have `transparency` set to `TRANSPARENCY_ALPHA` (or `ALPHA_SCISSOR`)
+in `Debris.tscn` — opacity only works if the material's transparency mode supports it.
 
 ### SpawnPoint Marker
 
