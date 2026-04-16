@@ -198,9 +198,12 @@ cursor offset, already built into desired position):
 ```gdscript
 func _update_orientation() -> void:
     if _follow_target != null:
-        camera.look_at(_follow_target.global_position, Vector3.UP)
+        look_at(_follow_target.global_position, Vector3.UP)
     # If no target: hold current orientation
 ```
+
+`GameCamera.gd` is attached directly to the `Camera3D` node — `self` is the camera.
+There is no child `camera` reference. Call `look_at()` on self.
 
 ### Zoom (Height Interpolation)
 
@@ -269,8 +272,8 @@ func _ready() -> void:
     # Listen for player ship changes (e.g. respawn, ship swap post-MVP)
     GameEventBus.connect("player_ship_changed", _on_player_ship_changed)
 
-func _on_player_ship_changed(data: Dictionary) -> void:
-    follow(data["ship"])
+func _on_player_ship_changed(ship: Node) -> void:
+    follow(ship)
 ```
 
 ---
@@ -293,7 +296,7 @@ ship it is following. If different ships want different camera feel, that's a po
 
 | Feature | How It Fits |
 |---|---|
-| **Free-pan (Tactical mode)** | `release()`, then handle WASD/edge-scroll input to move `_target_position` manually |
+| **Free-pan (Tactical mode)** | `release()`, then handle WASD/edge-scroll input each frame to move `global_position` directly (no follow target; spring is idle) |
 | **Snap back to ship** | `follow(player_ship)` — spring pulls camera back smoothly |
 | **Switch followed ship** | `follow(other_ship)` — spring transitions to new target |
 | **Camera shake** | Add a shake offset (sum of decaying sinusoids) to the final position after spring calculation |
