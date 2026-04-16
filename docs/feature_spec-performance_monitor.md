@@ -34,12 +34,15 @@ All metric names use the format `"System.method"`. Use these exact names — con
 | Guided projectile pool update | `ProjectileManager.guided_update` |
 | Projectile collision checks | `ProjectileManager.collision_checks` |
 | AI state machine updates | `AIController.state_updates` |
+| Navigation controller update | `Navigation.update` |
 | Ship thruster allocation (integrate_forces) | `Physics.thruster_allocation` |
 | Hit detection / component resolve | `HitDetection.component_resolve` |
 | Chunk load | `ChunkStreamer.load` |
 | Chunk unload | `ChunkStreamer.unload` |
 | Active projectiles (count) | `ProjectileManager.active_count` |
 | Active AI ships (count) | `AIController.active_count` |
+| Active physics bodies (count) | `Physics.active_bodies` |
+| Active ships (count) | `Ships.active_count` |
 | Loaded chunks (count) | `ChunkStreamer.loaded_chunks` |
 | Content registry startup scan | `ContentRegistry.load` |
 
@@ -141,7 +144,7 @@ func _ready() -> void:
     Performance.add_custom_monitor("AllSpace/ai_ms",
         func(): return get_avg_ms("AIController.state_updates"))
     Performance.add_custom_monitor("AllSpace/physics_ms",
-        func(): return get_avg_ms("Physics.move_and_slide"))
+        func(): return get_avg_ms("Physics.thruster_allocation"))
 ```
 
 ---
