@@ -216,18 +216,26 @@ They are non-negotiable.
 
 ```
 /all_space/
-    CLAUDE.md                          ← agent context file (always up to date)
+    CLAUDE.md                          ← Claude Code entry point; points to agent_brief.md
     /docs/
-        core_spec.md         ← this file
+        core_spec.md                   ← this file
+        agent_brief.md                 ← universal agent brief: build status, rules, deviation protocol
+        decisions_log.md               ← append-only decision and session history
         feature_spec-performance_monitor.md
         feature_spec-physics_and_movement.md
         feature_spec-ship_system.md
         feature_spec-weapons_and_projectiles.md
         feature_spec-camera_system.md
         feature_spec-ai_patrol_behavior.md
+        feature_spec-navigation_controller.md
         feature_spec-chunk_streamer.md
         feature_spec-fleet_command.md
         feature_spec-game_event_bus_signals.md
+    /.claude/
+        /commands/
+            new-ship.md                ← skill: generate ship class folder + ship.json
+            new-weapon.md              ← skill: generate weapon folder + weapon.json
+            session-end.md             ← skill: enforce session close discipline
     /core/
         /services/
             ServiceLocator.gd
@@ -599,24 +607,7 @@ Systems are sequenced by dependency. Build in this order.
 
 ---
 
-## 20. Feature Spec Status
-
-| Spec | File | Status |
-|---|---|---|
-| PerformanceMonitor | `PerformanceMonitor_Spec.md` | ⚠️ Minor 3D audit needed |
-| Physics & Movement | `Physics_Movement_Spec.md` | 🔄 Needs full 3D rewrite |
-| Ship System | `Ship_System_Spec.md` | 🔄 Needs 3D migration + fire groups |
-| Weapons & Projectiles | `Weapons_Projectiles_Spec.md` | 🔄 Needs 3D migration |
-| Camera System | `Camera_System_Spec.md` | 🔄 Needs full 3D rewrite (Camera3D, perspective) |
-| AI & Patrol Behavior | `AI_Patrol_Behavior_Spec.md` | 🔄 Needs 3D migration + nav controller |
-| Chunk Streaming | `ChunkStreamer_Spec.md` | 🔄 Needs 3D migration |
-| Fleet Command & Control | `Fleet_Command_Spec.md` | 🔄 Needs Tactical mode refinement |
-| GameEventBus Signals | `GameEventBus_Signals.md` | 🔄 Vector3 migration |
-| Station & Loadout UI | — | 🔲 Not started |
-
----
-
-## 21. What the MVP Establishes
+## 20. What the MVP Establishes
 
 The MVP is a tight, testable loop: **fly → fight → dock → customize → repeat.**
 
