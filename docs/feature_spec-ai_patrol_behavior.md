@@ -284,9 +284,10 @@ func _engage_process(_delta: float) -> void:
     else:
         # Sweet spot — orbit via strafe
         nav_controller.set_destination(global_position)    # hold position
-        var right := -transform.basis.z.cross(Vector3.UP).normalized()
-        var strafe_input := right * _circle_direction * profile.strafe_thrust_fraction
-        owner.input_strafe = strafe_input.x   # project onto ship's right axis
+        # input_strafe is a local-space scalar: +1.0 = ship's right, -1.0 = ship's left.
+        # Ship.gd's physics layer multiplies this by transform.basis.x to produce force.
+        # The AI just decides direction and magnitude; no world-space projection needed.
+        owner.input_strafe = _circle_direction * profile.strafe_thrust_fraction
 
     _apply_nav_inputs()
 
