@@ -1,6 +1,0 @@
-{
-  "_comment": "Projectile pool and collision — see docs/feature_spec-weapons_and_projectiles.md",
-  "dumb_pool_size": 4096,
-  "collision_mask_world": 4294967295,
-  "ray_margin": 0.08
-}
