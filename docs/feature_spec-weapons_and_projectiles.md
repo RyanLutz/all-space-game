@@ -143,6 +143,51 @@ spec. On heavy ships, gimballed weapons can maintain fire on a target even when 
 ship's heading has not fully caught up. AI ships benefit from this identically to the
 player.
 
+### Aim Direction Algorithm
+
+`HardpointComponent.gd` implements `_get_aim_direction()`, which returns the normalized
+fire direction (`Vector3`, y = 0) each time the hardpoint fires. The hardpoint empty
+node (`get_parent()`) defines the base forward axis; `owner_ship.input_aim_target` is
+the world-space XZ point the ship is currently aiming at (set by player or AI).
+
+```gdscript
+func _get_aim_direction() -> Vector3:
+    var muzzle: Marker3D = _weapon_model.get_node("Muzzle")
+
+    # Hardpoint empty's base forward — the muzzle direction with no tracking applied
+    var hardpoint_fwd := -get_parent().global_transform.basis.z
+    hardpoint_fwd.y = 0.0
+    hardpoint_fwd = hardpoint_fwd.normalized()
+
+    # Fixed hardpoints do not track — fire straight along the hardpoint's baked axis
+    if hardpoint_type == "fixed":
+        return hardpoint_fwd
+
+    # All tracking types aim toward owner_ship.input_aim_target, clamped to arc
+    var to_target := owner_ship.input_aim_target - muzzle.global_position
+    to_target.y = 0.0
+    if to_target.length_squared() < 0.0001:
+        return hardpoint_fwd    # aim point is at the muzzle — fall back to forward
+
+    var desired_dir := to_target.normalized()
+
+    # Full turret: no arc constraint
+    if hardpoint_type == "full_turret":
+        return desired_dir
+
+    # Gimbal and partial_turret: clamp to fire arc
+    var half_arc := deg_to_rad(fire_arc_degrees * 0.5)
+    var angle_off := hardpoint_fwd.angle_to(desired_dir)
+    if angle_off <= half_arc:
+        return desired_dir
+    # Target is outside the arc — rotate to the arc edge toward the target
+    return hardpoint_fwd.slerp(desired_dir, half_arc / angle_off).normalized()
+```
+
+`get_parent()` is the hardpoint empty node (`HardpointComponent` is added as a child
+of it by `ShipFactory`). Its `-global_transform.basis.z` is the hardpoint's base
+facing direction as baked by the artist in Blender.
+
 ### Fire Groups
 
 Weapons are organized into fire groups. The player fires an entire group simultaneously:
