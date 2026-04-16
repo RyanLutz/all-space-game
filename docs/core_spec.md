@@ -1,4 +1,5 @@
 # All Space — Core Specification
+
 *Single Source of Truth: Philosophy, Architecture, and Cross-Cutting Contracts*
 
 ---
@@ -114,29 +115,31 @@ All systems are designed for extensibility into later phases from day one.
 | Phase | Trigger | What Changes |
 |---|---|---|
 | **1 — Personal Pilot** | Start of game | Single ship, Pilot mode, combat and exploration |
-| **2 — Small Fleet Commander** | Acquiring a second ship | Tactical mode becomes meaningful; fleet orders |
+| **2 — Small Fleet Commander** | Acquiring a second ship | Multi-ship fleet orders and RTS depth unlock (Tactical mode is available from game start; a second ship makes fleet command non-trivial) |
 | **3 — Infrastructure Builder** | Resource accumulation | Construction ships, shipyards, blueprints |
 | **4 — Galactic Power** | Territory control | Faction diplomacy, logistics, multi-system operations |
 
 At any phase, the player can return to direct personal ship control. The personal ship
 never becomes obsolete.
 
+**MVP note:** Pilot and Tactical modes are both reachable from game start (Tab). Phase 2’s “second ship” trigger marks when commanding multiple owned ships becomes the focus—not when Tactical mode first appears.
+
 ---
 
 ## 5. Tech Stack
 
 | Concern | Choice | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Engine | Godot 4.6 | — |
 | Primary language | GDScript | All game systems except where noted |
 | Performance-critical | C# | ProjectileManager only at MVP |
 | Physics backend | Jolt (Godot 4.6 default) | Full 3D physics; applies natively to all 3D nodes |
 | Ship physics node | `RigidBody3D` | Force/torque applied each frame; Jolt integrates; Y-translation and X/Z-rotation axis-locked |
 | Play plane | XZ (Y = 0) | All ships, projectiles, and gameplay at Y = 0 |
-| Camera | `Camera3D`, orthographic | Top-down, fixed elevation above XZ plane |
+| Camera | `Camera3D`, perspective | Top-down, fixed elevation above XZ plane |
 | Data / modding | JSON | All tunable values; no recompile for balance passes |
 | Inter-system comms | `GameEventBus.gd` | No direct cross-system references |
-| Service registry | `ServiceLocator.gd` | Single access point for all singleton services |
+| Service registry | `ServiceLocator` (C# autoload) | Single access point for all singleton services; thin registry only |
 
 ---
 
@@ -155,12 +158,14 @@ Every system must respect it. Violating it corrupts gameplay.
   3D forward. Never use `Vector2.RIGHT.rotated(rotation)`.
 - **Mouse-to-world** requires a ray from the camera intersected with the Y = 0 plane.
   `get_global_mouse_position()` does not exist in 3D. Use:
+
   ```gdscript
   var plane = Plane(Vector3.UP, 0.0)
   var ray_origin = camera.project_ray_origin(mouse_pos)
   var ray_dir = camera.project_ray_normal(mouse_pos)
   var world_pos = plane.intersects_ray(ray_origin, ray_dir)
   ```
+
 - **Distance checks** use `Vector3.distance_to()` — since Y is always 0, this is
   equivalent to 2D distance.
 - Detection and trigger volumes use `Area3D` with `SphereShape3D`.
@@ -195,7 +200,7 @@ They are non-negotiable.
 5. **Specs are authoritative.** If a spec says to do something a particular way, do it
    that way. Flag conflicts rather than silently resolving them.
 
-6. **C# only for ProjectileManager.** All other systems are GDScript.
+6. **C# only for ProjectileManager** and **`ServiceLocator` (bootstrap registry).** All other game systems are GDScript.
 
 7. **No 2D physics nodes.** See Section 6.
 
@@ -285,7 +290,7 @@ asteroids tumble freely. Both implement the same property and method contract.
 Every entity that participates in the physics world exposes:
 
 | Property | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `mass` | float | Affects inertia and response to forces |
 | `velocity` | Vector3 | Current linear velocity; Y is always 0 |
 | `angular_velocity` | float | Current yaw rate (radians/sec); Y axis only |
@@ -325,7 +330,7 @@ ProjectileManager.cs        Pooled dumb projectiles (ballistic, pulse).
 GuidedProjectilePool.gd     GDScript-managed missiles.
 
 # Camera (sibling of game world — never a child of any ship):
-GameCamera (Camera3D)       Orthographic projection. Follows target with
+GameCamera (Camera3D)       Perspective projection. Follows target with
                             cursor-offset in Pilot mode. Zooms out in Tactical mode.
 ```
 
@@ -375,6 +380,7 @@ PerformanceMonitor.set_count("System.metric", value)
 ```
 
 Rules:
+
 - Only instrument operations expected to take > 0.1ms
 - Never instrument inside inner loops — wrap the whole loop
 - `begin()` / `end()` must always be paired
@@ -487,6 +493,7 @@ thrust interface. It calculates when to thrust, when to brake, and what heading 
 face in order to arrive at a target position within the ship's physical constraints.
 
 Used by:
+
 - AI ships navigating to patrol points and chasing targets
 - Player ship in **Tactical mode** when given a move order
 - **Not used** in Pilot mode — player inputs go directly to the thrust interface
@@ -526,12 +533,12 @@ Full detail in `AI_Patrol_Behavior_Spec.md`. Key decisions recorded here.
 
 Full detail in `Camera_System_Spec.md`. Key decisions recorded here.
 
-- `Camera3D`, orthographic projection, fixed Y elevation above the XZ plane
+- `Camera3D`, perspective projection; viewing angle fixed, height above the XZ plane sets zoom
 - Camera is **never** a child of a ship — it is a sibling of the game world
 - Retargeting is a single function call: `follow(target: Node3D)`
 - **Pilot mode:** cursor-offset follow with critically damped spring smoothing
 - **Tactical mode:** zooms out to overview; cursor-offset disabled
-- Zoom is controlled via `camera.size` (orthographic world-space height), not a scale
+- Zoom is controlled by camera height (Y position), not by scaling the scene root or driving FOV as the primary zoom knob
 - Mouse-to-world always uses ray-plane intersection against Y = 0 (see Section 6)
 
 ---
@@ -600,7 +607,7 @@ Systems are sequenced by dependency. Build in this order.
 | Physics & Movement | `Physics_Movement_Spec.md` | 🔄 Needs full 3D rewrite |
 | Ship System | `Ship_System_Spec.md` | 🔄 Needs 3D migration + fire groups |
 | Weapons & Projectiles | `Weapons_Projectiles_Spec.md` | 🔄 Needs 3D migration |
-| Camera System | `Camera_System_Spec.md` | 🔄 Needs full 3D rewrite (Camera3D, orthographic) |
+| Camera System | `Camera_System_Spec.md` | 🔄 Needs full 3D rewrite (Camera3D, perspective) |
 | AI & Patrol Behavior | `AI_Patrol_Behavior_Spec.md` | 🔄 Needs 3D migration + nav controller |
 | Chunk Streaming | `ChunkStreamer_Spec.md` | 🔄 Needs 3D migration |
 | Fleet Command & Control | `Fleet_Command_Spec.md` | 🔄 Needs Tactical mode refinement |

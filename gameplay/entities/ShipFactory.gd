@@ -1,114 +1,64 @@
-extends Node
 class_name ShipFactory
+extends RefCounted
 
-# ShipFactory — the only way to create ships.
-# Spawns Ship.tscn and initializes it from content data.
-# Returns the configured ship node; caller is responsible for adding it to the scene tree.
-
-const _SHIP_SCENE := "res://gameplay/entities/Ship.tscn"
-const _AI_CONTROLLER_SCENE := "res://gameplay/ai/AIController.tscn"
+const SHIP_SCENE := preload("res://gameplay/entities/Ship.tscn")
 
 
-## Spawn a ship from content data.
-##   ship_id          — folder name under /content/ships/ (e.g. "fighter_light")
-##   pos              — world-space spawn position
-##   is_player        — if true, ship is added to "player" group and PlayerState is updated
-##   loadout_override — optional: replaces default_loadout.weapons/modules from ship.json
-##   faction_override — optional: overrides the faction field in ship.json (affects both
-##                      ship.faction and behavior profile selection from factions.json)
-##
-## Returns the Ship node (not yet in the scene tree). The caller must add_child() it.
-func spawn_ship(ship_id: String, pos: Vector2, is_player: bool = false,
-		loadout_override: Dictionary = {}, faction_override: String = "") -> Node:
-	var content_registry := ServiceLocator.GetService("ContentRegistry") as Node
-	if content_registry == null:
-		push_error("ShipFactory: ContentRegistry not registered — cannot spawn '%s'" % ship_id)
+static func spawn_ship(content_id: String) -> Ship:
+	var cr: Node = ServiceLocator.GetService("ContentRegistry") as Node
+	if cr == null:
+		push_error("ShipFactory: ContentRegistry missing")
 		return null
-
-	var ship_data: Dictionary = content_registry.get_ship(ship_id)
-	if ship_data.is_empty():
-		push_error("ShipFactory: unknown ship id '%s'" % ship_id)
+	var data: Dictionary = cr.call("get_ship", content_id) as Dictionary
+	if data.is_empty():
+		push_error("ShipFactory: unknown ship '%s'" % content_id)
 		return null
-
-	if not ResourceLoader.exists(_SHIP_SCENE):
-		push_error("ShipFactory: Ship.tscn not found at '%s'" % _SHIP_SCENE)
-		return null
-
-	var ship: Node = load(_SHIP_SCENE).instantiate()
-	ship.global_position = pos
-	ship.initialize(ship_data, loadout_override)
-
-	if is_player:
-		ship.is_player_controlled = true
-		ship.faction = faction_override if not faction_override.is_empty() \
-			else ship_data.get("faction", "player")
-		ship.add_to_group("player")
-		var player_state := ServiceLocator.GetService("PlayerState") as Node
-		if player_state != null:
-			player_state.set_active_ship(ship)
-	else:
-		var effective_faction: String = faction_override if not faction_override.is_empty() \
-			else ship_data.get("faction", "neutral")
-		ship.is_player_controlled = false
-		ship.faction = effective_faction
-		ship.add_to_group("ships")
-		ship.add_to_group("ai_ships")
-
-		# Attach AI controller if scene exists
-		if ResourceLoader.exists(_AI_CONTROLLER_SCENE):
-			var ai: Node = load(_AI_CONTROLLER_SCENE).instantiate()
-			var behavior_profile: String = ship_data.get("behavior_profile", "")
-			if behavior_profile.is_empty():
-				behavior_profile = _pick_faction_profile(effective_faction)
-			if ai.has_method("set_profile"):
-				ai.set_profile(behavior_profile)
-			ship.add_child(ai)
-
+	var ship: Ship = SHIP_SCENE.instantiate() as Ship
+	ship.configure_from_content(data, content_id)
+	var perf: Node = ServiceLocator.GetService("PerformanceMonitor") as Node
+	if perf != null:
+		perf.begin("ShipFactory.assemble")
+	_assemble_hardpoints(ship, data, cr)
+	if perf != null:
+		perf.end("ShipFactory.assemble")
 	return ship
 
 
-## Select a behavior profile weighted-randomly from the faction's profile_weights array.
-## Falls back to "default" when factions.json is absent or the faction has no weights.
-func _pick_faction_profile(faction_id: String) -> String:
-	var file_path := "res://data/factions.json"
-	var file := FileAccess.open(file_path, FileAccess.READ)
-	if file == null:
-		return "default"
-
-	var text := file.get_as_text()
-	file.close()
-
-	var json := JSON.new()
-	if json.parse(text) != OK:
-		return "default"
-
-	var data = json.get_data()
-	if typeof(data) != TYPE_DICTIONARY or not data.has("factions"):
-		return "default"
-
-	for faction_entry in data["factions"]:
-		if typeof(faction_entry) != TYPE_DICTIONARY:
+static func _assemble_hardpoints(ship: Ship, ship_data: Dictionary, cr: Node) -> void:
+	var visual: Node3D = ship.get_node_or_null("VisualRoot") as Node3D
+	if visual == null:
+		return
+	var hps: Array = ship_data.get("hardpoints", []) as Array
+	var loadout: Dictionary = ship_data.get("default_loadout", {}) as Dictionary
+	var weapons_map: Dictionary = loadout.get("weapons", {}) as Dictionary
+	for hp_entry in hps:
+		if typeof(hp_entry) != TYPE_DICTIONARY:
 			continue
-		if faction_entry.get("id", "") != faction_id:
+		var hp_dict: Dictionary = hp_entry
+		var hid: String = str(hp_dict.get("id", ""))
+		var offset: Array = hp_dict.get("offset", [0, 0]) as Array
+		var ox: float = float(offset[0]) if offset.size() > 0 else 0.0
+		var oz: float = float(offset[1]) if offset.size() > 1 else 0.0
+		var hp_type: String = str(hp_dict.get("type", "gimbal"))
+		var groups: Array = hp_dict.get("groups", []) as Array
+		var marker := Marker3D.new()
+		marker.name = "Hardpoint_%s" % hid
+		marker.position = Vector3(ox, 0.0, oz)
+		visual.add_child(marker)
+		var hpc := HardpointComponent.new()
+		hpc.name = "HardpointComponent"
+		hpc.setup(hid, hp_type, groups)
+		marker.add_child(hpc)
+		ship.register_hardpoint_visual(marker)
+		var wpn_id: String = str(weapons_map.get(hid, ""))
+		if wpn_id.is_empty():
 			continue
-		var weights: Array = faction_entry.get("profile_weights", [])
-		if weights.is_empty():
-			return "default"
-		return _weighted_random_pick(weights)
-
-	return "default"
-
-
-func _weighted_random_pick(weights: Array) -> String:
-	var total := 0.0
-	for entry in weights:
-		total += float(entry.get("weight", 1.0))
-
-	var roll := randf() * total
-	var cumulative := 0.0
-	for entry in weights:
-		cumulative += float(entry.get("weight", 1.0))
-		if roll <= cumulative:
-			return str(entry.get("profile", "default"))
-
-	return str(weights[-1].get("profile", "default"))
+		var wdata: Dictionary = cr.call("get_weapon", wpn_id) as Dictionary
+		if wdata.is_empty():
+			continue
+		wdata["id"] = wpn_id
+		var wpn := WeaponComponent.new()
+		wpn.name = "Weapon_%s" % wpn_id
+		wpn.setup(ship, wdata, hpc)
+		marker.add_child(wpn)
+		ship.add_weapon_component(wpn)

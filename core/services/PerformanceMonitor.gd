@@ -20,7 +20,7 @@ func _ready() -> void:
 	Performance.add_custom_monitor("AllSpace/ai_ms",
 		func(): return get_avg_ms("AIController.state_updates"))
 	Performance.add_custom_monitor("AllSpace/physics_ms",
-		func(): return get_avg_ms("Physics.move_and_slide"))
+		func(): return get_avg_ms("Physics.thruster_allocation"))
 
 
 func begin(metric: String) -> void:

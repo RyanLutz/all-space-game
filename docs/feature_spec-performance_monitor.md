@@ -34,7 +34,7 @@ All metric names use the format `"System.method"`. Use these exact names — con
 | Guided projectile pool update | `ProjectileManager.guided_update` |
 | Projectile collision checks | `ProjectileManager.collision_checks` |
 | AI state machine updates | `AIController.state_updates` |
-| Physics body move_and_slide | `Physics.move_and_slide` |
+| Ship thruster allocation (integrate_forces) | `Physics.thruster_allocation` |
 | Hit detection / component resolve | `HitDetection.component_resolve` |
 | Chunk load | `ChunkStreamer.load` |
 | Chunk unload | `ChunkStreamer.unload` |

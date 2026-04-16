@@ -1,391 +1,237 @@
+#nullable enable
 using Godot;
 using System;
 
+/// <summary>
+/// Pooled dumb ballistic projectiles + hitscan dispatch. C# only (core spec).
+/// </summary>
 public partial class ProjectileManager : Node
 {
-    private struct DumbProjectile
-    {
-        public Vector2 Position;
-        public Vector2 Velocity;
-        public float Lifetime;
-        public int WeaponDataId;
-        public ulong OwnerEntityId;
-        public bool Active;
-    }
+	private struct DumbProjectile
+	{
+		public bool Active;
+		public Vector3 Position;
+		public Vector3 Velocity;
+		public float Lifetime;
+		public int OwnerId;
+		public string WeaponId;
+	}
 
-    [Export] private int _poolSize = 1000;
+	private DumbProjectile[] _pool = Array.Empty<DumbProjectile>();
+	private int _poolSize = 4096;
+	private int _activeCount;
+	private int _collisionChecks;
 
-    private DumbProjectile[] _pool;
-    private int _activeCount = 0;
-    private int _lastFreedIndex = 0;
+	private Node? _eventBus;
+	private Node? _contentRegistry;
+	private Node? _perf;
 
-    private Node _perfMonitor;
-    private Node _eventBus;
-    private Godot.Collections.Dictionary<int, Godot.Collections.Dictionary> _weaponData;
+	public override void _Ready()
+	{
+		var sl = GetNodeOrNull("/root/ServiceLocator");
+		if (sl != null)
+			_perf = sl.Call("GetService", "PerformanceMonitor").As<Node>();
 
-    private uint _collisionMask = 1; // Layer 1 for ships/obstacles
+		LoadPoolConfig();
+		_pool = new DumbProjectile[_poolSize];
+		for (int i = 0; i < _poolSize; i++)
+			_pool[i].Active = false;
 
-    private static float GetWeaponFloat(Godot.Collections.Dictionary weapon, string key, float defaultValue = 0f)
-    {
-        if (weapon == null || !weapon.ContainsKey(key)) return defaultValue;
-        // JSON numbers may arrive as int/long/double; AsDouble() is the most reliable numeric conversion.
-        return (float)weapon[key].AsDouble();
-    }
+		_eventBus = GetNodeOrNull("/root/GameEventBus");
+		_contentRegistry = GetNodeOrNull("/root/ContentRegistry");
+		if (_eventBus != null)
+		{
+			_eventBus.Connect("request_spawn_dumb",
+				new Callable(this, nameof(OnRequestSpawnDumb)));
+			_eventBus.Connect("request_fire_hitscan",
+				new Callable(this, nameof(OnRequestFireHitscan)));
+		}
+	}
 
-    public override void _Ready()
-    {
-        _pool = new DumbProjectile[_poolSize];
-        for (int i = 0; i < _poolSize; i++)
-        {
-            _pool[i].Active = false;
-        }
+	private void LoadPoolConfig()
+	{
+		if (!FileAccess.FileExists("res://data/projectiles_config.json"))
+			return;
+		var json = new Json();
+		var err = json.Parse(FileAccess.GetFileAsString("res://data/projectiles_config.json"));
+		if (err != Error.Ok)
+			return;
+		var dict = json.Data.AsGodotDictionary();
+		if (dict.ContainsKey("dumb_pool_size"))
+			_poolSize = (int)(float)dict["dumb_pool_size"];
+	}
 
-        var locator = GetNodeOrNull<ServiceLocator>("/root/ServiceLocator");
-        if (locator == null)
-        {
-            GD.PushError("ProjectileManager: ServiceLocator autoload missing.");
-            return;
-        }
+	public override void _PhysicsProcess(double delta)
+	{
+		_perf?.Call("begin", "ProjectileManager.dumb_update");
+		float dt = (float)delta;
+		_activeCount = 0;
+		_collisionChecks = 0;
 
-        _perfMonitor = locator.GetService("PerformanceMonitor") as Node;
-        _eventBus = locator.GetService("GameEventBus") as Node;
+		var space = GetWorld3D()?.DirectSpaceState;
+		if (space == null)
+		{
+			_perf?.Call("set_count", "ProjectileManager.active_count", 0);
+			_perf?.Call("set_count", "ProjectileManager.collision_checks", 0);
+			_perf?.Call("end", "ProjectileManager.dumb_update");
+			return;
+		}
 
-        if (_eventBus == null)
-        {
-            GD.PushError("ProjectileManager: GameEventBus not registered with ServiceLocator.");
-            return;
-        }
+		for (int i = 0; i < _pool.Length; i++)
+		{
+			if (!_pool[i].Active)
+				continue;
+			_activeCount++;
+			var p = _pool[i];
+			var prev = p.Position;
+			p.Velocity = new Vector3(p.Velocity.X, 0f, p.Velocity.Z);
+			p.Position += p.Velocity * dt;
+			p.Position = new Vector3(p.Position.X, 0f, p.Position.Z);
+			p.Lifetime -= dt;
+			if (p.Lifetime <= 0f)
+			{
+				p.Active = false;
+				_pool[i] = p;
+				continue;
+			}
 
-        // Weapon requests come through GameEventBus; ProjectileManager performs the actual spawn/fire.
-        _eventBus.Connect("request_spawn_dumb", new Callable(this, nameof(OnRequestSpawnDumb)));
-        _eventBus.Connect("request_fire_hitscan", new Callable(this, nameof(OnRequestFireHitscan)));
+			var rayLen = prev.DistanceTo(p.Position);
+			if (rayLen < 0.001f)
+			{
+				_pool[i] = p;
+				continue;
+			}
 
-        LoadWeaponData();
+			var query = PhysicsRayQueryParameters3D.Create(prev, p.Position);
+			query.CollideWithAreas = false;
+			query.CollideWithBodies = true;
+			query.CollisionMask = 0xFFFFFFFF;
+			_collisionChecks++;
+			var hit = space.IntersectRay(query);
 
-        // Register custom monitors
-        Performance.AddCustomMonitor("AllSpace/projectile_dumb_ms",
-            new Callable(this, nameof(GetDumbUpdateMs)));
-        Performance.AddCustomMonitor("AllSpace/projectile_collision_ms",
-            new Callable(this, nameof(GetCollisionMs)));
-    }
+			if (hit.Count > 0 && hit.ContainsKey("collider"))
+			{
+				var colliderObj = hit["collider"].AsGodotObject();
+				var pos = p.Position;
+				if (hit.ContainsKey("position"))
+					pos = hit["position"].AsVector3();
+				pos = new Vector3(pos.X, 0f, pos.Z);
+				var damage = GetWeaponDamage(p.WeaponId);
+				var dmgType = GetWeaponDamageType(p.WeaponId);
+				var ratio = GetComponentRatio(p.WeaponId);
+				if (colliderObj is Node n && (int)n.GetInstanceId() != p.OwnerId)
+				{
+					_eventBus?.EmitSignal("projectile_hit", n, damage, dmgType, pos, ratio);
+					var wd = GetWeaponDataDict(p.WeaponId);
+					_eventBus?.EmitSignal("projectile_spawned", p.Position, p.Velocity, wd);
+				}
+				p.Active = false;
+			}
+			_pool[i] = p;
+		}
 
-    private void OnRequestSpawnDumb(Vector2 position, Vector2 velocity, float lifetime, string weaponId, int ownerId)
-    {
-        // Convert signal int ownerId into the ulong used by the projectile pool for instance comparisons.
-        _ = SpawnDumb(position, velocity, lifetime, weaponId, (ulong)ownerId);
-    }
+		_perf?.Call("set_count", "ProjectileManager.active_count", _activeCount);
+		_perf?.Call("set_count", "ProjectileManager.collision_checks", _collisionChecks);
+		_perf?.Call("end", "ProjectileManager.dumb_update");
+	}
 
-    private void OnRequestFireHitscan(Vector2 origin, Vector2 direction, float rangeVal, string weaponId, int ownerId)
-    {
-        FireHitscan(origin, direction, rangeVal, weaponId, (ulong)ownerId);
-    }
+	private void OnRequestSpawnDumb(Vector3 position, Vector3 velocity, float lifetime,
+		StringName weaponId, int ownerId)
+	{
+		var wid = weaponId.ToString();
+		for (int i = 0; i < _pool.Length; i++)
+		{
+			if (_pool[i].Active)
+				continue;
+			_pool[i] = new DumbProjectile
+			{
+				Active = true,
+				Position = new Vector3(position.X, 0f, position.Z),
+				Velocity = new Vector3(velocity.X, 0f, velocity.Z),
+				Lifetime = lifetime,
+				OwnerId = ownerId,
+				WeaponId = wid
+			};
+			return;
+		}
+	}
 
-    private void LoadWeaponData()
-    {
-        _weaponData = new Godot.Collections.Dictionary<int, Godot.Collections.Dictionary>();
+	private void OnRequestFireHitscan(Vector3 origin, Vector3 direction, float rangeVal,
+		StringName weaponId, int ownerId)
+	{
+		var space = GetWorld3D()?.DirectSpaceState;
+		if (space == null || _eventBus == null)
+			return;
+		var dir = new Vector3(direction.X, 0f, direction.Z);
+		if (dir.LengthSquared() < 0.0001f)
+			return;
+		dir = dir.Normalized();
+		var to = origin + dir * rangeVal;
+		var query = PhysicsRayQueryParameters3D.Create(origin, to);
+		query.CollideWithBodies = true;
+		query.CollideWithAreas = false;
+		query.CollisionMask = 0xFFFFFFFF;
+		var hit = space.IntersectRay(query);
+		if (hit.Count == 0 || !hit.ContainsKey("collider"))
+			return;
+		var colliderObj = hit["collider"].AsGodotObject();
+		if (colliderObj is not Node n)
+			return;
+		if ((int)n.GetInstanceId() == ownerId)
+			return;
+		var wid = weaponId.ToString();
+		var pos = hit.ContainsKey("position")
+			? hit["position"].AsVector3()
+			: origin;
+		pos = new Vector3(pos.X, 0f, pos.Z);
+		var damage = GetWeaponDamage(wid);
+		var dmgType = GetWeaponDamageType(wid);
+		var ratio = GetComponentRatio(wid);
+		_eventBus.EmitSignal("projectile_hit", n, damage, dmgType, pos, ratio);
+	}
 
-        var locator = GetNodeOrNull<ServiceLocator>("/root/ServiceLocator");
-        if (locator == null)
-        {
-            GD.PushError("ProjectileManager: ServiceLocator not found — weapon data not loaded");
-            return;
-        }
+	private float GetWeaponDamage(string weaponId)
+	{
+		var cr = _contentRegistry;
+		if (cr == null)
+			return 10f;
+		var w = cr.Call("get_weapon", weaponId).AsGodotDictionary();
+		if (w.Count == 0)
+			return 10f;
+		if (w.ContainsKey("damage"))
+			return (float)w["damage"];
+		if (w.ContainsKey("damage_per_second"))
+			return (float)w["damage_per_second"] * 0.03f;
+		return 10f;
+	}
 
-        var contentRegistry = locator.GetService("ContentRegistry") as Node;
-        if (contentRegistry == null)
-        {
-            GD.PushError("ProjectileManager: ContentRegistry not registered — weapon data not loaded");
-            return;
-        }
+	private float GetComponentRatio(string weaponId)
+	{
+		var cr = _contentRegistry;
+		if (cr == null)
+			return 0f;
+		var w = cr.Call("get_weapon", weaponId).AsGodotDictionary();
+		if (w.Count == 0)
+			return 0f;
+		return w.ContainsKey("component_damage_ratio") ? (float)w["component_damage_ratio"] : 0f;
+	}
 
-        var allWeapons = contentRegistry.Get("weapons").As<Godot.Collections.Dictionary>();
-        if (allWeapons == null)
-        {
-            GD.PushError("ProjectileManager: ContentRegistry.weapons is not a Dictionary");
-            return;
-        }
+	private string GetWeaponDamageType(string weaponId)
+	{
+		var cr = _contentRegistry;
+		if (cr == null)
+			return "ballistic";
+		var w = cr.Call("get_weapon", weaponId).AsGodotDictionary();
+		if (w.Count == 0)
+			return "ballistic";
+		return w.ContainsKey("archetype") ? (string)w["archetype"] : "ballistic";
+	}
 
-        int id = 0;
-        foreach (var entry in allWeapons)
-        {
-            var weapon = entry.Value.As<Godot.Collections.Dictionary>();
-            if (weapon == null) continue;
-
-            string weaponId = weapon.ContainsKey("id") ? weapon["id"].AsString() : entry.Key.AsString();
-            if (!weapon.ContainsKey("archetype"))
-            {
-                GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'archetype' — skipping");
-                continue;
-            }
-
-            string archetype = weapon["archetype"].AsString();
-            switch (archetype)
-            {
-                case "ballistic":
-                case "missile_dumb":
-                case "missile_guided":
-                    if (!weapon.ContainsKey("damage"))
-                    {
-                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'damage' — skipping");
-                        continue;
-                    }
-                    break;
-                case "energy_beam":
-                    if (!weapon.ContainsKey("damage_per_second"))
-                    {
-                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'damage_per_second' — skipping");
-                        continue;
-                    }
-                    break;
-                case "energy_pulse":
-                    if (!weapon.ContainsKey("damage"))
-                    {
-                        GD.PushError($"ProjectileManager: Weapon '{weaponId}' missing 'damage' — skipping");
-                        continue;
-                    }
-                    break;
-                default:
-                    GD.PushError($"ProjectileManager: Weapon '{weaponId}' has unknown archetype '{archetype}' — skipping");
-                    continue;
-            }
-
-            _weaponData[id] = weapon;
-            id++;
-        }
-    }
-
-    public double GetDumbUpdateMs()
-    {
-        if (_perfMonitor == null) return 0.0;
-        return _perfMonitor.Call("get_avg_ms", "ProjectileManager.dumb_update").AsDouble();
-    }
-
-    public double GetCollisionMs()
-    {
-        if (_perfMonitor == null) return 0.0;
-        return _perfMonitor.Call("get_avg_ms", "ProjectileManager.collision_checks").AsDouble();
-    }
-
-    public int SpawnDumb(Vector2 position, Vector2 velocity, float lifetime, string weaponId, ulong ownerId)
-    {
-        int weaponDataId = -1;
-        foreach (var kvp in _weaponData)
-        {
-            var weapon = kvp.Value;
-            if (weapon.ContainsKey("id") && weapon["id"].AsString() == weaponId)
-            {
-                weaponDataId = kvp.Key;
-                break;
-            }
-        }
-
-        if (weaponDataId < 0) return -1;
-
-        // Find free slot starting from last freed index
-        int startIndex = _lastFreedIndex;
-        int index = -1;
-
-        for (int i = 0; i < _poolSize; i++)
-        {
-            int checkIndex = (startIndex + i) % _poolSize;
-            if (!_pool[checkIndex].Active)
-            {
-                index = checkIndex;
-                break;
-            }
-        }
-
-        if (index < 0) return -1; // Pool full
-
-        _pool[index] = new DumbProjectile
-        {
-            Position = position,
-            Velocity = velocity,
-            Lifetime = lifetime,
-            WeaponDataId = weaponDataId,
-            OwnerEntityId = ownerId,
-            Active = true
-        };
-
-        _activeCount++;
-
-        // Debug/VFX hook: emit spawned projectile snapshot via the event bus.
-        // Contract: projectile_spawned(position, velocity, weapon_data)
-        if (_eventBus != null && _weaponData.TryGetValue(weaponDataId, out var weaponData) && weaponData != null)
-            _eventBus.EmitSignal("projectile_spawned", position, velocity, weaponData);
-
-        return index;
-    }
-
-    public override void _PhysicsProcess(double delta)
-    {
-        float deltaF = (float)delta;
-
-        // Dumb pool update
-        _perfMonitor?.Call("begin", "ProjectileManager.dumb_update");
-
-        int newActiveCount = 0;
-
-        for (int i = 0; i < _poolSize; i++)
-        {
-            if (!_pool[i].Active) continue;
-
-            Vector2 oldPos = _pool[i].Position;
-            _pool[i].Position += _pool[i].Velocity * deltaF;
-            _pool[i].Lifetime -= deltaF;
-
-            // Lifetime check
-            if (_pool[i].Lifetime <= 0)
-            {
-                _pool[i].Active = false;
-                _lastFreedIndex = i;
-                continue;
-            }
-
-            newActiveCount++;
-        }
-
-        _perfMonitor?.Call("end", "ProjectileManager.dumb_update");
-
-        // Collision checks (separate timing)
-        _perfMonitor?.Call("begin", "ProjectileManager.collision_checks");
-        ProcessCollisions(deltaF);
-        _perfMonitor?.Call("end", "ProjectileManager.collision_checks");
-
-        _activeCount = newActiveCount;
-        _perfMonitor?.Call("set_count", "ProjectileManager.active_count", _activeCount);
-    }
-
-    private void ProcessCollisions(float delta)
-    {
-        for (int i = 0; i < _poolSize; i++)
-        {
-            if (!_pool[i].Active) continue;
-
-            Vector2 pos = _pool[i].Position;
-            Vector2 vel = _pool[i].Velocity;
-            Vector2 motion = vel * delta;
-
-            var query = PhysicsRayQueryParameters2D.Create(pos - motion, pos, _collisionMask);
-            query.CollideWithBodies = true;
-            query.CollideWithAreas = false;
-
-            var result = GetViewport().GetWorld2D().DirectSpaceState.IntersectRay(query);
-
-            if (result.Count > 0)
-            {
-                var collider = result["collider"].As<Node>();
-                if (collider != null && collider.GetInstanceId() != _pool[i].OwnerEntityId)
-                {
-                    // Hit!
-                    Vector2 hitPoint = result["position"].AsVector2();
-                    _weaponData.TryGetValue(_pool[i].WeaponDataId, out var weapon);
-
-                    if (weapon != null && collider.HasMethod("apply_damage"))
-                    {
-                        float damage = GetWeaponFloat(weapon, "damage", 0f);
-                        float componentDamageRatio = GetWeaponFloat(weapon, "component_damage_ratio", 0f);
-                        string archetype = weapon["archetype"].AsString();
-                        string damageType = archetype == "ballistic" ? "ballistic" : "missile";
-
-                        collider.Call("apply_damage", damage, damageType, hitPoint, componentDamageRatio);
-
-                        // Emit hit signal (GameEventBus contract: projectile_hit(target, damage, type, position))
-                        var target2D = collider as Node2D;
-                        _eventBus?.EmitSignal("projectile_hit", target2D, damage, damageType, hitPoint);
-                    }
-
-                    _pool[i].Active = false;
-                    _lastFreedIndex = i;
-                }
-            }
-        }
-    }
-
-    public void FireHitscan(Vector2 origin, Vector2 direction, float range, string weaponId, ulong ownerId)
-    {
-        Godot.Collections.Dictionary weapon = null;
-        foreach (var kvp in _weaponData)
-        {
-            var w = kvp.Value;
-            if (w.ContainsKey("id") && w["id"].AsString() == weaponId)
-            {
-                weapon = w;
-                break;
-            }
-        }
-
-        if (weapon == null)
-        {
-            GD.PushError($"ProjectileManager: Unknown weapon id '{weaponId}' in request_fire_hitscan");
-            return;
-        }
-
-        Vector2 end = origin + direction.Normalized() * range;
-        var query = PhysicsRayQueryParameters2D.Create(origin, end, _collisionMask);
-        query.CollideWithBodies = true;
-        query.CollideWithAreas = false;
-
-        var result = GetViewport().GetWorld2D().DirectSpaceState.IntersectRay(query);
-
-        Vector2 hitPoint = end;
-        if (result.Count > 0)
-        {
-            var collider = result["collider"].As<Node>();
-            hitPoint = result["position"].AsVector2();
-
-            if (collider != null && collider.GetInstanceId() != ownerId && collider.HasMethod("apply_damage"))
-            {
-                string archetype = weapon["archetype"].AsString();
-                float damage;
-                string damageType;
-
-                if (archetype == "energy_beam")
-                {
-                    damageType = "energy_beam";
-                    float delta = Engine.PhysicsTicksPerSecond > 0 ? (1.0f / Engine.PhysicsTicksPerSecond) : 0f;
-                    damage = GetWeaponFloat(weapon, "damage_per_second", 0f) * delta;
-                }
-                else if (archetype == "energy_pulse")
-                {
-                    damageType = "energy_pulse";
-                    damage = GetWeaponFloat(weapon, "damage", 0f);
-                }
-                else
-                {
-                    GD.PushError($"ProjectileManager: Unsupported hitscan archetype '{archetype}' for weapon '{weaponId}'");
-                    return;
-                }
-
-                float componentDamageRatioHs = GetWeaponFloat(weapon, "component_damage_ratio", 0f);
-                collider.Call("apply_damage", damage, damageType, hitPoint, componentDamageRatioHs);
-            }
-        }
-
-        // Emit beam fired signal for VFX
-        _eventBus?.EmitSignal("beam_fired", origin, hitPoint, weapon, ownerId);
-    }
-
-    public int GetActiveCount() => _activeCount;
-
-    public Godot.Collections.Array<Godot.Collections.Dictionary> GetActiveProjectileData()
-    {
-        var result = new Godot.Collections.Array<Godot.Collections.Dictionary>();
-        for (int i = 0; i < _poolSize; i++)
-        {
-            if (!_pool[i].Active) continue;
-            Godot.Collections.Dictionary weapon = null;
-            if (_weaponData.ContainsKey(_pool[i].WeaponDataId))
-                weapon = _weaponData[_pool[i].WeaponDataId];
-            var entry = new Godot.Collections.Dictionary();
-            entry["position"] = _pool[i].Position;
-            entry["velocity"] = _pool[i].Velocity;
-            if (weapon != null && weapon.ContainsKey("archetype"))
-                entry["archetype"] = weapon["archetype"].AsString();
-            else
-                entry["archetype"] = "unknown";
-            result.Add(entry);
-        }
-        return result;
-    }
+	private Godot.Collections.Dictionary GetWeaponDataDict(string weaponId)
+	{
+		var cr = _contentRegistry;
+		if (cr == null)
+			return new Godot.Collections.Dictionary();
+		return cr.Call("get_weapon", weaponId).AsGodotDictionary();
+	}
 }

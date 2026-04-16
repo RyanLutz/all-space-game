@@ -55,7 +55,7 @@ func _build_text() -> String:
 
 	var hit_ms : float = _pm.get_avg_ms("HitDetection.component_resolve")
 
-	var physics_ms  : float = _pm.get_avg_ms("Physics.move_and_slide")
+	var physics_ms  : float = _pm.get_avg_ms("Physics.thruster_allocation")
 	var physics_cnt : int   = _pm.get_count("Physics.active_bodies")
 
 	var chunk_load_ms   : float = _pm.get_avg_ms("ChunkStreamer.load")

@@ -1,16 +1,27 @@
-[gd_scene format=3]
+[gd_scene load_steps=5 format=3 uid="uid://ship_scene_all_space"]
 
 [ext_resource type="Script" path="res://gameplay/entities/Ship.gd" id="1_ship"]
-[ext_resource type="Script" path="res://gameplay/weapons/WeaponComponent.gd" id="2_weapon"]
 
-[sub_resource type="CircleShape2D" id="Shape2D_hull"]
-radius = 15.0
+[sub_resource type="BoxShape3D" id="BoxShape3D_ship"]
+size = Vector3(12, 4, 18)
 
-[node name="Ship" type="CharacterBody2D"]
+[sub_resource type="BoxMesh" id="BoxMesh_vis"]
+size = Vector3(12, 4, 18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ship"]
+albedo_color = Color(0.45, 0.55, 0.65, 1)
+
+[node name="Ship" type="RigidBody3D"]
+collision_layer = 1
+collision_mask = 7
 script = ExtResource("1_ship")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("Shape2D_hull")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("BoxShape3D_ship")
 
-[node name="WeaponComponent" type="Node" parent="."]
-script = ExtResource("2_weapon")
+[node name="VisualRoot" type="Node3D" parent="."]
+
+[node name="MeshPlaceholder" type="MeshInstance3D" parent="VisualRoot"]
+mesh = SubResource("BoxMesh_vis")
+surface_material_override/0 = SubResource("StandardMaterial3D_ship")

@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://dvrv83wgdcv5m"]
-
-[ext_resource type="Script" path="res://test/AxumFighterTestScene.gd" id="1_script"]
-
-[node name="AxumFighterTestScene" type="Node2D" unique_id=9547614]
-script = ExtResource("1_script")

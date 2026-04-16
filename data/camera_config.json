@@ -1,0 +1,12 @@
+{
+  "_comment": "GameCamera tuning — see docs/feature_spec-camera_system.md",
+  "camera_angle_deg": 26.0,
+  "smoothing_speed": 12.0,
+  "max_cursor_offset": 140.0,
+  "height_min": 280.0,
+  "height_max": 1400.0,
+  "height_default_pilot": 520.0,
+  "height_default_tactical": 900.0,
+  "zoom_step": 55.0,
+  "zoom_smoothing": 12.0
+}

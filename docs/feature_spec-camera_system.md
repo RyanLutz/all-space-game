@@ -1,14 +1,6 @@
 # Camera System Specification
 *All Space Combat MVP — Perspective Camera with Cursor-Offset Follow*
 
-> **⚠️ Deviation from Core Spec (Section 16):** The Core Spec lists orthographic projection for
-> the camera. This spec implements **perspective projection** with a tunable downward angle instead.
-> Perspective is preferred for visual depth and the sense of a physical world — orthographic will
-> look flat and sterile at shallow angles. Before implementing, confirm this decision and update
-> `All_Space_Core_Spec.md` Section 3, 16 accordingly.
-
----
-
 ## Overview
 
 An independent camera system that follows a target (typically the player ship) from above and
@@ -27,12 +19,10 @@ viewing angle constant — the world simply gets farther away without any FOV di
 
 ---
 
-## Why Perspective + Height Zoom (Not FOV, Not Orthographic)
+## Why Perspective + Height Zoom (Not FOV)
 
-**Perspective vs orthographic:** At a shallow viewing angle, orthographic looks unconvincing —
-ships appear to float on a flat canvas with no spatial relationship. Perspective gives ships
-visual weight, makes the play surface feel like a physical space, and makes the shallow angle
-worthwhile.
+**Shallow perspective:** A modest downward angle gives ships visual weight, makes the play
+surface feel like a physical space, and preserves forward visibility without flattening the scene.
 
 **Height zoom vs FOV zoom:** Adjusting FOV to zoom changes the perspective distortion of the
 scene — a very narrow FOV makes everything look flat (telephoto), a very wide FOV warps edges.

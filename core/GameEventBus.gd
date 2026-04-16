@@ -1,96 +1,58 @@
 extends Node
 
-# GameEventBus - Global signal bus for cross-system communication
-# No gameplay logic — only signals; self-registers with ServiceLocator in _ready().
+# GameEventBus — global signal bus for cross-system communication.
+# No gameplay logic; signals only. See docs/feature_spec-game_event_bus_signals.md.
+# Self-registers with ServiceLocator in _ready().
 
-# Projectile / Weapon Events
-@warning_ignore("unused_signal")
-signal request_spawn_dumb(position: Vector2, velocity: Vector2, lifetime: float, weapon_id: String, owner_id: int)
+# ─── Combat ────────────────────────────────────────────────────────────────────
+signal projectile_hit(target: Node, damage: float, damage_type: String,
+		position: Vector3, component_ratio: float)
+signal ship_destroyed(ship: Node, position: Vector3, faction: String)
+signal weapon_fired(ship: Node, weapon_id: String, position: Vector3)
+signal hardpoint_state_changed(ship: Node, hardpoint_id: String, new_state: String)
+signal projectile_spawned(position: Vector3, velocity: Vector3, weapon_data: Dictionary)
 
-@warning_ignore("unused_signal")
-signal request_fire_hitscan(origin: Vector2, direction: Vector2, range_val: float, weapon_id: String, owner_id: int)
+# ─── Requests ──────────────────────────────────────────────────────────────────
+signal request_spawn_dumb(position: Vector3, velocity: Vector3, lifetime: float,
+		weapon_id: String, owner_id: int)
+signal request_fire_hitscan(origin: Vector3, direction: Vector3, range_val: float,
+		weapon_id: String, owner_id: int)
+signal request_spawn_guided(position: Vector3, velocity: Vector3,
+		guidance_mode: String, weapon_data: Dictionary, owner_id: int)
 
-@warning_ignore("unused_signal")
-signal request_spawn_guided(position: Vector2, velocity: Vector2, guidance_mode: String, weapon_data: Dictionary, owner_id: int)
-
-@warning_ignore("unused_signal")
-signal projectile_hit(target: Node2D, damage: float, type: String, position: Vector2)
-
-@warning_ignore("unused_signal")
-signal beam_fired(start_pos: Vector2, end_pos: Vector2, weapon_data: Dictionary, owner_id: int)
-
-@warning_ignore("unused_signal")
-signal weapon_fired(ship: Node2D, weapon_id: String, position: Vector2)
-
-@warning_ignore("unused_signal")
-signal missile_launched(missile_type: String, position: Vector2, target, owner_id: int)
-
-# Ship / Damage Events
-@warning_ignore("unused_signal")
-signal ship_destroyed(ship: Node2D, position: Vector2, faction: String)
-
-@warning_ignore("unused_signal")
-signal ship_damaged(ship: Node, amount: float, damage_type: String, hit_position: Vector2)
-
-@warning_ignore("unused_signal")
+# ─── Ship State ─────────────────────────────────────────────────────────────────
 signal shield_depleted(ship: Node)
+signal hull_critical(ship: Node, percent: float)
+signal power_depleted(ship: Node)
 
-@warning_ignore("unused_signal")
-signal shield_regenerated(ship: Node)
+# ─── AI ────────────────────────────────────────────────────────────────────────
+signal ai_state_changed(ship_id: int, old_state: String, new_state: String)
+signal ai_target_acquired(ship_id: int, target_id: int)
+signal ai_target_lost(ship_id: int)
 
-@warning_ignore("unused_signal")
-signal hardpoint_destroyed(ship: Node2D, hardpoint_index: int)
-
-# VFX / Audio Events (for future VFX system)
-@warning_ignore("unused_signal")
-signal projectile_spawned(position: Vector2, velocity: Vector2, weapon_data: Dictionary)
-
-@warning_ignore("unused_signal")
-signal explosion_triggered(position: Vector2, radius: float, intensity: float)
-
-@warning_ignore("unused_signal")
-signal overheat_warning(hardpoint_id: String, heat_percent: float)
-
-# Ship State Signals
-@warning_ignore("unused_signal")
-signal hull_critical(ship: Node2D, percent: float)
-
-@warning_ignore("unused_signal")
-signal power_depleted(ship: Node2D)
-
-# AI Signals
-@warning_ignore("unused_signal")
-signal ai_state_changed(payload: Dictionary)
-
-@warning_ignore("unused_signal")
-signal ai_target_acquired(payload: Dictionary)
-
-@warning_ignore("unused_signal")
-signal ai_target_lost(payload: Dictionary)
-
-# World Signals
-@warning_ignore("unused_signal")
+# ─── World ─────────────────────────────────────────────────────────────────────
 signal chunk_loaded(chunk_coords: Vector2i)
-
-@warning_ignore("unused_signal")
 signal chunk_unloaded(chunk_coords: Vector2i)
+signal explosion_triggered(position: Vector3, radius: float, intensity: float)
 
-# Station Signals
-@warning_ignore("unused_signal")
-signal dock_requested(ship: Node2D, station: Node2D)
+# ─── Game Mode ─────────────────────────────────────────────────────────────────
+signal game_mode_changed(old_mode: String, new_mode: String)
 
-@warning_ignore("unused_signal")
-signal dock_complete(ship: Node2D, station: Node2D)
+# ─── Tactical Orders ───────────────────────────────────────────────────────────
+signal request_tactical_move(ship_ids: Array, destination: Vector3)
+signal request_tactical_attack(ship_ids: Array, target_id: int)
+signal request_tactical_mine(ship_ids: Array, asteroid_id: int)
+signal request_tactical_dock(ship_ids: Array, station_id: int)
+signal tactical_selection_changed(ship_ids: Array)
 
-@warning_ignore("unused_signal")
-signal undock_requested(ship: Node2D)
+# ─── Station ───────────────────────────────────────────────────────────────────
+signal dock_requested(ship: Node, station: Node)
+signal dock_complete(ship: Node, station: Node)
+signal undock_requested(ship: Node)
+signal loadout_changed(ship: Node, slot_id: String, item_id: String)
 
-@warning_ignore("unused_signal")
-signal loadout_changed(ship: Node2D, slot_id: String, item_id: String)
-
-# Player State Signals
-@warning_ignore("unused_signal")
-signal player_ship_changed(ship: Node2D)
+# ─── Player State ──────────────────────────────────────────────────────────────
+signal player_ship_changed(ship: Node)
 
 
 func _ready() -> void:
