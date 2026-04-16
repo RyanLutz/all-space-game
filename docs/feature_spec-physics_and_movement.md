@@ -26,34 +26,59 @@ X/Z rotation axes in Jolt. Ship heading is yaw (rotation around Y). Forward is
 
 ## Three Layers
 
+Jolt does the heavy lifting. Ship.gd is a translator, not a physics engine.
+
 ```
-┌─────────────────────────────────────────┐
-│ 1. Input Layer                          │
-│    Player / AI / NavigationController   │
-│    → populates Ship unified input vars  │
-└────────────────┬────────────────────────┘
-                 │  input_forward, input_strafe,
-                 │  input_aim_target, input_fire[]
-                 ▼
-┌─────────────────────────────────────────┐
-│ 2. Ship Logic Layer                     │
-│    - Thruster budget allocation         │
-│    - Assisted steering (target torque)  │
-│    - Alignment drag (lateral bleed)     │
-│    → calls apply_central_force / torque │
-└────────────────┬────────────────────────┘
-                 │  forces, torques
-                 ▼
-┌─────────────────────────────────────────┐
-│ 3. Jolt Physics Integration             │
-│    RigidBody3D integrates F and τ       │
-│    Axis locks enforce XZ plane          │
-│    Linear/angular damping applied       │
-└─────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│ 1. INPUT LAYER                                           │
+│    Player keyboard/mouse  ─OR─  AI/NavigationController  │
+│                                                          │
+│    Writes each frame:                                    │
+│      input_forward:    float   (-1.0 to 1.0)            │
+│      input_strafe:     float   (-1.0 to 1.0)            │
+│      input_aim_target: Vector3 (world XZ point, Y = 0)  │
+│      input_fire:       Array[bool]                       │
+│                                                          │
+│    Does NOT know anything about physics.                 │
+│    Does NOT write forces, velocities, or positions.      │
+└────────────────────────┬─────────────────────────────────┘
+                         │
+                         ▼
+┌──────────────────────────────────────────────────────────┐
+│ 2. SHIP LOGIC LAYER  (Ship.gd — _physics_process)       │
+│                                                          │
+│    Reads the input interface and translates it into      │
+│    force and torque commands:                            │
+│      • Thruster budget: how much to spend on turning     │
+│        vs translation (turning takes priority)           │
+│      • Assisted steering: corrective counter-torque      │
+│        to stop rotation before it overshoots the target  │
+│      • Alignment drag: corrective lateral force to       │
+│        bleed sideways velocity when active               │
+│                                                          │
+│    Calls apply_central_force() and apply_torque().       │
+│    That is ALL it does. Jolt owns everything after that. │
+│                                                          │
+│    NEVER writes to: linear_velocity, angular_velocity,   │
+│    position, or rotation to produce motion.              │
+└────────────────────────┬─────────────────────────────────┘
+                         │  queued forces and torques
+                         ▼
+┌──────────────────────────────────────────────────────────┐
+│ 3. JOLT PHYSICS INTEGRATION                              │
+│                                                          │
+│    Integrates queued forces and torques against mass     │
+│    and moment of inertia → produces velocity and         │
+│    position for the next frame.                          │
+│    Applies axis locks (Y translation, X/Z rotation).     │
+│    Applies linear and angular damping from ship JSON.    │
+│    Ship.gd has no involvement in this step.              │
+└──────────────────────────────────────────────────────────┘
 ```
 
-The ship logic layer never writes directly to `linear_velocity` or `angular_velocity`.
-It expresses its intent as forces and torques; Jolt does the integration.
+**The only exception** to "never write velocity directly" is the Y = 0 backstop: if a
+collision somehow pushes `position.y` off the play plane before Jolt's axis lock clamps
+it, Ship.gd zeroes `position.y` explicitly. This is defensive, not motion control.
 
 ---
 
@@ -207,15 +232,18 @@ func apply_thrust_forces() -> void:
     var remaining := maxf(0.0, thruster_force - torque_cost)
 
     # 2. Translation gets whatever is left
-    var forward_dir := get_heading()
+    var forward_dir := get_heading()   # -transform.basis.z
     var right_dir := transform.basis.x
-    var input_vec := Vector2(input_strafe, -input_forward)
-    if input_vec.length() > 1.0:
-        input_vec = input_vec.normalized()
+    var fwd := -input_forward          # positive = thrust forward
+    var str := input_strafe
+    # Clamp diagonal input to unit magnitude — no extra thrust for holding W+D
+    var input_len_sq := fwd * fwd + str * str
+    if input_len_sq > 1.0:
+        var inv_len := 1.0 / sqrt(input_len_sq)
+        fwd *= inv_len
+        str *= inv_len
 
-    var translation_force :=
-        forward_dir * (-input_vec.y) * remaining +
-        right_dir   *   input_vec.x  * remaining
+    var translation_force := (forward_dir * fwd + right_dir * str) * remaining
 
     # 3. Hand off to Jolt
     apply_central_force(translation_force)

@@ -72,11 +72,30 @@ Ships live on the **XZ plane (Y = 0)**. Enforced explicitly at every physics ste
 
 - All positions: `Vector3` with `position.y = 0` at all times
 - All velocities: `Vector3` with `linear_velocity.y = 0` at all times — enforced
-  explicitly as a backstop after every `_integrate_forces()` call
-- Rotation: **Y axis only (yaw)**. `rotation.x = 0`, `rotation.z = 0` always.
-  Angular velocity is a `float` applied to `rotation.y`.
+  explicitly as a backstop each physics step
+- Rotation: **Y axis only (yaw)**. Jolt axis locks prevent pitch and roll.
+  `RigidBody3D.angular_velocity` is a `Vector3`; only the Y component (`.y`) is ever
+  non-zero. Ship.gd reads yaw rate as `angular_velocity.y`. It never writes to
+  `rotation.y` directly to produce motion — torques are applied and Jolt integrates.
 - Ship forward direction: `-transform.basis.z`
 - Mouse-to-world: ray intersected with the Y = 0 plane — see Section 8
+
+### Physics Execution Model
+
+Ship.gd is a translator between input intent and Jolt force commands. It is not a
+physics engine. Three layers, strictly separated:
+
+1. **Input layer** — Player or AI writes `input_forward`, `input_strafe`,
+   `input_aim_target`, and `input_fire` each frame. No physics knowledge required.
+2. **Ship.gd** — Reads the input interface, computes thrust and torque demands
+   (including corrective assisted-steering torque and alignment drag force), and calls
+   `apply_central_force()` / `apply_torque()`. That is all.
+3. **Jolt** — Integrates the queued forces against mass and inertia, applies axis locks
+   and damping, and produces the next velocity and position. Ship.gd is not involved.
+
+**Ship.gd never writes to `linear_velocity`, `angular_velocity`, `position`, or
+`rotation` to produce motion.** The only direct position write is the Y = 0 backstop,
+which is defensive, not locomotion.
 
 ### No 2D Nodes
 
@@ -95,8 +114,8 @@ only for chunk grid coordinates.
 | Property | Type | Description |
 |---|---|---|
 | `mass` | float | Affects inertia and torque response |
-| `velocity` | Vector3 | Current linear velocity; Y always 0 |
-| `angular_velocity` | float | Current yaw rate (radians/sec) |
+| `velocity` | Vector3 | Getter: returns `linear_velocity` (RigidBody3D built-in); Y always 0 |
+| `yaw_rate` | float | Getter: returns `angular_velocity.y` — the only non-zero angular component |
 | `max_speed` | float | Soft speed cap |
 | `linear_drag` | float | Drag applied each physics step |
 | `alignment_drag` | float | Lateral drag during heading misalignment |
