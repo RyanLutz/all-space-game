@@ -67,7 +67,7 @@ player can handle directly.
 The four-phase vision is the north star. The immediate goal is a focused, polished
 combat prototype that establishes the mechanical foundation everything else builds on.
 
-**The MVP is a 2.5D top-down space combat simulator.** 3D ship assets render on a 2D
+**The MVP is a 3D top-down space combat simulator.** 3D ship assets render on a 2D
 gameplay plane. A small streaming map — a handful of asteroid fields and points of
 interest — hosts roaming AI patrol ships. The player fights, survives, and returns to
 a station to swap modules. The loop is tight and testable.
