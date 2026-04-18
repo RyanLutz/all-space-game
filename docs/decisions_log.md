@@ -176,3 +176,51 @@ Decision: NavigationController tuning fields (`arrival_distance`,
          `hull` block — reconciliation of flat vs. nested schema deferred to
          Ship System spec implementation (Step 9).
 Spec updated: no — reconciliation deferred to Step 9
+
+---
+
+## 2026-04-17 — ProjectileManager extends Node3D instead of Node
+
+Agent:   Claude Opus (Claude Code) — Step 6 implementation
+System:  ProjectileManager
+Spec:    feature_spec-weapons_and_projectiles.md §7
+Problem: ProjectileManager needs `GetWorld3D()` to access
+         `PhysicsDirectSpaceState3D` for sweep raycasts and hitscan. `Node` does
+         not expose `GetWorld3D()`; `Node3D` is the minimal base class that does.
+Decision: ProjectileManager extends `Node3D`. It has no visual/spatial presence —
+         the inherited transform is unused. This is the standard Godot pattern for
+         manager nodes that need physics space access.
+Spec updated: no — minor implementation detail
+
+---
+
+## 2026-04-17 — DumbProjectile struct stores combat values directly
+
+Agent:   Claude Opus (Claude Code) — Step 6 implementation
+System:  ProjectileManager
+Spec:    feature_spec-weapons_and_projectiles.md §7
+Problem: Spec struct shows `WeaponDataId: int` but the `request_spawn_dumb` signal
+         passes `weapon_id: String`. Resolving weapon data per-collision via
+         cross-language ContentRegistry calls would be expensive in the hot loop.
+Decision: Struct stores `Damage`, `ComponentDamageRatio`, and `DamageType` directly.
+         Weapon data is looked up once at spawn time via a `Dictionary<string,
+         WeaponCacheEntry>` that caches ContentRegistry results per weapon_id. The
+         signal contract and behavior are preserved; only the internal struct layout
+         differs from the spec illustration.
+Spec updated: no — signal contract unchanged; struct is internal implementation
+
+---
+
+## 2026-04-17 — Hitscan requests queued for physics tick
+
+Agent:   Claude Opus (Claude Code) — Step 6 implementation
+System:  ProjectileManager
+Spec:    feature_spec-weapons_and_projectiles.md §7
+Problem: `request_fire_hitscan` signal may be emitted during `_process()` by
+         WeaponComponent. Physics raycasts via `PhysicsDirectSpaceState3D` are only
+         valid during `_physics_process()`.
+Decision: Hitscan requests are queued in a `List<HitscanRequest>` when the signal
+         fires, then processed at the start of the next `_PhysicsProcess()`. Max
+         one-frame delay; invisible for continuous beams which fire every frame.
+Spec updated: no — implementation detail; spec's immediate-fire illustration is
+         conceptual

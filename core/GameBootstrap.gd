@@ -11,6 +11,7 @@ func _ready() -> void:
 	_register_performance_monitor()
 	_register_content_registry()
 	_register_game_event_bus()
+	_register_projectile_manager()
 	_register_custom_monitors()
 	print("[GameBootstrap] All core services registered.")
 
@@ -33,6 +34,13 @@ func _register_game_event_bus() -> void:
 	bus.name = "GameEventBus"
 	add_child(bus)
 	ServiceLocator.Register("GameEventBus", bus)
+
+
+func _register_projectile_manager() -> void:
+	var pm = load("res://gameplay/weapons/ProjectileManager.cs").new()
+	pm.name = "ProjectileManager"
+	add_child(pm)
+	ServiceLocator.Register("ProjectileManager", pm)
 
 
 ## All Godot debugger custom monitors are registered here, once, to avoid

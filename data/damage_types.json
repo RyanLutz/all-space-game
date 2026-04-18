@@ -1,0 +1,8 @@
+{
+	"damage_types": {
+		"ballistic": { "vs_shields": 0.4, "vs_hull": 1.5 },
+		"energy_beam": { "vs_shields": 1.8, "vs_hull": 0.5 },
+		"energy_pulse": { "vs_shields": 1.5, "vs_hull": 0.6 },
+		"missile": { "vs_shields": 0.6, "vs_hull": 1.4 }
+	}
+}
