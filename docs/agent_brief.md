@@ -75,7 +75,7 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 1 | PerformanceMonitor | Implemented |
 | 2 | ServiceLocator + GameEventBus + GameBootstrap | Implemented |
 | 3 | ContentRegistry | Implemented |
-| 4 | SpaceBody + Ship (physics only, no weapons) | Not started |
+| 4 | SpaceBody + Ship (physics only, no weapons) | Implemented |
 | 5 | NavigationController | Not started |
 | 6 | ProjectileManager (C#, dumb pool) | Not started |
 | 7 | WeaponComponent + HardpointComponent | Not started |
@@ -154,6 +154,11 @@ The last three decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-04-16 — Spec audit and 3D cleanup** — All feature specs reviewed and corrected
-   before implementation begins. See decisions_log.md for full list of fixes.
+1. **2026-04-17 — input_forward sign convention** — Physics spec has a sign error in
+   `apply_thrust_forces()`. Ship.gd uses `input_forward` directly (positive = forward).
+2. **2026-04-17 — Physics spec authoritative for hull fields** — Added `angular_drag`,
+   `max_torque`, `alignment_drag_base` to ship.json base_stats. Ship system spec
+   reconciliation deferred to Step 9.
+3. **2026-04-16 — Spec audit and 3D cleanup** — All feature specs reviewed and corrected
+   before implementation begins.
 <!-- RECENT-DECISIONS-END -->

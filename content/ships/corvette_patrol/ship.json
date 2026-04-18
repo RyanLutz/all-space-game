@@ -9,9 +9,11 @@
 		"mass": 2000,
 		"max_speed": 320,
 		"linear_drag": 1.2,
-		"alignment_drag": 2.8,
+		"angular_drag": 3.0,
+		"alignment_drag_base": 0.3,
 		"thruster_force": 18000,
 		"torque_thrust_ratio": 0.28,
+		"max_torque": 6000,
 		"power_capacity": 280,
 		"power_regen": 55,
 		"shield_max": 200,
@@ -51,7 +53,7 @@
 
 	"part_stats": {
 		"corvette_hull_standard": { "hp": 120, "mass": 400 },
-		"corvette_hull_heavy": { "hp": 280, "mass": 900, "alignment_drag": 1.2 },
+		"corvette_hull_heavy": { "hp": 280, "mass": 900, "alignment_drag_base": 0.15 },
 		"corvette_engine_dual": { "thruster_force": 3000 },
 		"corvette_bridge_open": { "power_regen": 8 },
 		"corvette_bridge_armored": { "hp": 60, "power_regen": -5 }

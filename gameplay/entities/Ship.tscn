@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://ship_base"]
+
+[ext_resource type="Script" path="res://gameplay/entities/Ship.gd" id="1"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_placeholder"]
+size = Vector3(2, 1, 4)
+
+[node name="Ship" type="RigidBody3D"]
+script = ExtResource("1")
+gravity_scale = 0.0
+axis_lock_linear_y = true
+axis_lock_angular_x = true
+axis_lock_angular_z = true
+linear_damp_mode = 1
+angular_damp_mode = 1
+linear_damp = 0.05
+angular_damp = 3.0
+can_sleep = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_placeholder")
+
+[node name="ShipVisual" type="Node3D" parent="."]

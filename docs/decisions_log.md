@@ -75,3 +75,41 @@ Decision: All issues fixed in the specs directly. Summary of fixes:
     _debris_count_max: int. Vector2i is permitted only for chunk grid coordinates.
 
 Spec updated: yes — all fixes applied directly to spec files
+
+---
+
+## 2026-04-17 — Ship physics stats: physics spec authoritative for hull fields
+
+Agent:   Claude Opus (Claude Code) — Phase 4 implementation
+System:  Ship physics / ContentRegistry
+Spec:    feature_spec-physics_and_movement.md §JSON Data Format, feature_spec-ship_system.md §3
+Problem: The physics spec defines the canonical JSON schema for ship hull physics
+         stats, including `angular_drag`, `max_torque`, and `alignment_drag_base`.
+         The ship system spec's `base_stats` section is incomplete — it references
+         `torque_thrust_ratio` but omits `angular_drag` and `max_torque`, and uses
+         `alignment_drag` instead of `alignment_drag_base`.
+Decision: Physics spec is authoritative for all hull physics fields. Added
+         `angular_drag`, `max_torque`, and `alignment_drag_base` to `base_stats`
+         in corvette_patrol/ship.json. Renamed `alignment_drag` to
+         `alignment_drag_base` in both base_stats and part_stats. Ship system spec
+         will need a reconciliation pass when Step 9 (ShipFactory) is implemented.
+Spec updated: no — ship system spec reconciliation deferred to Step 9
+
+---
+
+## 2026-04-17 — input_forward sign convention: positive = forward
+
+Agent:   Claude Opus (Claude Code) — Phase 4 implementation
+System:  Ship physics
+Spec:    feature_spec-physics_and_movement.md §Key Algorithms (Thruster Budget Allocation)
+Problem: The physics spec's `apply_thrust_forces()` uses `var fwd := -input_forward`
+         with the comment "positive = thrust forward". Tracing the math:
+         heading = -basis.z, fwd = -input_forward, so input_forward = 1.0 produces
+         force along +basis.z (backward). The negation appears to be a sign error
+         in the spec — the comment describes the desired behavior but the code
+         inverts it.
+Decision: Ship.gd uses `var fwd := input_forward` (no negation). input_forward = 1.0
+         means "go forward". This matches the intuitive convention and
+         Input.get_axis("move_backward", "move_forward") producing positive for W.
+         If playtesting reveals a sign flip is needed, it is trivial to fix.
+Spec updated: no — will update spec after playtesting confirms the correct sign
