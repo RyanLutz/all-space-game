@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 @onready var label: Label = $Label
+@onready var _perf: Node = ServiceLocator.GetService("PerformanceMonitor")
 
 var _visible: bool = false
 
@@ -58,7 +59,7 @@ func _process(_delta: float) -> void:
 	lines.append("[ All Space — Performance Monitor ]")
 	lines.append("───────────────────────────────────────────────────")
 
-	var metrics = PerformanceMonitor.get_all_metrics()
+	var metrics = _perf.get_all_metrics()
 	var total_ms = 0.0
 
 	# Timing metrics

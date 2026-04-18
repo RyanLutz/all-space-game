@@ -5,6 +5,8 @@ var _fake_projectiles: int = 0
 var _fake_ai_ships: int = 0
 var _fake_chunks: int = 0
 
+@onready var _perf: Node = ServiceLocator.GetService("PerformanceMonitor")
+
 func _ready() -> void:
 	# Add the performance overlay
 	var overlay = preload("res://ui/debug/PerformanceOverlay.tscn").instantiate()
@@ -30,74 +32,74 @@ func _process(delta: float) -> void:
 		_fake_ai_ships = 5 + int(cos(_frame_counter * 0.02) * 3)
 		_fake_chunks = 9 + int(sin(_frame_counter * 0.005) * 4)
 
-		PerformanceMonitor.set_count("ProjectileManager.active_count", _fake_projectiles)
-		PerformanceMonitor.set_count("AIController.active_count", _fake_ai_ships)
-		PerformanceMonitor.set_count("ChunkStreamer.loaded_chunks", _fake_chunks)
-		PerformanceMonitor.set_count("Ships.active_count", _fake_ai_ships + 1)  # +1 for player
+		_perf.set_count("ProjectileManager.active_count", _fake_projectiles)
+		_perf.set_count("AIController.active_count", _fake_ai_ships)
+		_perf.set_count("ChunkStreamer.loaded_chunks", _fake_chunks)
+		_perf.set_count("Ships.active_count", _fake_ai_ships + 1)  # +1 for player
 
 func _simulate_projectile_manager() -> void:
-	PerformanceMonitor.begin("ProjectileManager.dumb_update")
+	_perf.begin("ProjectileManager.dumb_update")
 
 	# Simulate work: iterate over fake projectiles
 	var total: float = 0.0
 	for i in range(_fake_projectiles):
 		total += i * 0.0001  # Small amount of work per projectile
 
-	PerformanceMonitor.end("ProjectileManager.dumb_update")
+	_perf.end("ProjectileManager.dumb_update")
 
-	PerformanceMonitor.begin("ProjectileManager.guided_update")
+	_perf.begin("ProjectileManager.guided_update")
 	# Simulate guided missile tracking (fewer, more expensive)
 	for i in range(5):
 		total += i * 0.001
-	PerformanceMonitor.end("ProjectileManager.guided_update")
+	_perf.end("ProjectileManager.guided_update")
 
-	PerformanceMonitor.begin("ProjectileManager.collision_checks")
+	_perf.begin("ProjectileManager.collision_checks")
 	# Simulate collision checks
 	for i in range(min(_fake_projectiles, 50)):
 		total += i * 0.0001
-	PerformanceMonitor.end("ProjectileManager.collision_checks")
+	_perf.end("ProjectileManager.collision_checks")
 
 func _simulate_ai_controller() -> void:
-	PerformanceMonitor.begin("AIController.state_updates")
+	_perf.begin("AIController.state_updates")
 
 	# Simulate AI state machine work
 	for i in range(_fake_ai_ships):
 		var state = i % 3  # patrol, chase, attack
 		var decision = state * 0.1
 
-	PerformanceMonitor.end("AIController.state_updates")
+	_perf.end("AIController.state_updates")
 
 func _simulate_physics() -> void:
-	PerformanceMonitor.begin("Physics.thruster_allocation")
+	_perf.begin("Physics.thruster_allocation")
 
 	# Simulate thruster calculations for all ships
 	for i in range(_fake_ai_ships + 1):
 		var force = Vector3(i * 0.1, 0, i * 0.1)
 		var torque = i * 0.01
 
-	PerformanceMonitor.end("Physics.thruster_allocation")
+	_perf.end("Physics.thruster_allocation")
 
 func _simulate_chunk_streamer() -> void:
 	# Occasionally simulate chunk load/unload
 	if _frame_counter % 120 == 0:
-		PerformanceMonitor.begin("ChunkStreamer.load")
+		_perf.begin("ChunkStreamer.load")
 		# Simulate chunk loading work
 		var data = []
 		for i in range(100):
 			data.append(i * 0.5)
-		PerformanceMonitor.end("ChunkStreamer.load")
+		_perf.end("ChunkStreamer.load")
 
 	if _frame_counter % 180 == 0:
-		PerformanceMonitor.begin("ChunkStreamer.unload")
+		_perf.begin("ChunkStreamer.unload")
 		# Simulate chunk cleanup
-		PerformanceMonitor.end("ChunkStreamer.unload")
+		_perf.end("ChunkStreamer.unload")
 
 func _simulate_navigation() -> void:
-	PerformanceMonitor.begin("Navigation.update")
+	_perf.begin("Navigation.update")
 
 	# Simulate pathfinding for AI ships
 	for i in range(_fake_ai_ships):
 		var target = Vector3(i * 10, 0, i * 10)
 		var distance = target.length()
 
-	PerformanceMonitor.end("Navigation.update")
+	_perf.end("Navigation.update")

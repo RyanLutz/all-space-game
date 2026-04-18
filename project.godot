@@ -25,7 +25,8 @@ project/assembly_name="All Space"
 
 [autoload]
 
-PerformanceMonitor="*res://core/services/PerformanceMonitor.gd"
+ServiceLocator="*res://core/services/ServiceLocator.cs"
+GameBootstrap="*res://core/GameBootstrap.gd"
 
 [rendering]
 
