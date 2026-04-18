@@ -282,3 +282,58 @@ Decision: Explicit type annotations added for GDScript type inference:
          - Renamed `position` parameters to `spawn_position` and `explosion_position`
            to avoid shadowing Node3D base class property
 Spec updated: no — implementation detail only
+
+---
+
+## 2026-04-18 — Phase 9: ShipFactory + Ship visual assembly implementation
+
+Agent:   Claude Sonnet (Cursor) — Phase 9 implementation
+System:  ShipFactory.gd, ContentRegistry.gd, PlayerState.gd, ServiceLocator.cs, ship_colorize.gdshader
+Spec:    feature_spec-ship_system.md §6, §8, §9, §11, §12
+Problem: Phase 9 implementation required creating several new core services that
+         were referenced but not yet implemented: ServiceLocator (C# singleton for
+         service registry), ContentRegistry (content indexing), PlayerState (active
+         ship tracking), and the ShipFactory itself with full part assembly pipeline.
+Decision: Implemented all missing services following spec architecture:
+         - ServiceLocator.cs: C# autoload singleton providing GetService() for both
+           C# and GDScript systems via Engine.get_singleton()
+         - ContentRegistry.gd: Scans /content/ directories at startup, indexes ships
+           weapons, and modules by folder name with _base_path for asset resolution
+         - PlayerState.gd: Tracks active player ship, emits player_ship_changed signal
+         - ShipFactory.gd: Full spawn_ship() pipeline with stat resolution, part
+           assembly from GLB, hardpoint discovery/configuration, name resolution,
+           faction color material application, and weapon attachment
+         - ship_colorize.gdshader: Vertex color-driven shader with 4 channels
+           (R=primary, G=trim, B=accent, A=glow emission)
+         - Added test weapons (autocannon_light, pulse_laser) for verification
+         - Updated GameBootstrap to register PlayerState and added custom monitors
+         - Updated Ship.gd to track active ship count for PerformanceMonitor
+Spec updated: no — implementation matches spec as written
+
+---
+
+### 2026-04-18 — Hardpoint empty naming must include part name for uniqueness
+
+**Context:** When multiple part meshes are assembled as siblings under `ShipVisual`,
+their child empties all land in the same node tree. Two parts with a hardpoint at
+the same conceptual location (e.g. both `appendage_1` and `appendage_2` having a
+`hp_wing_port_small` empty) would collide — Godot renames one silently or errors.
+
+**Decision:** The hardpoint empty naming convention is updated to include the part
+node name as a prefix component:
+
+  Old: `HardpointEmpty_{id}_{size}`
+  New: `HardpointEmpty_{part}_{id}_{size}`
+
+The parser (`_parse_hardpoint_name`) is unchanged — it already treats everything
+between the `HardpointEmpty_` prefix and the trailing size token as the id. The id
+is simply longer and globally unique:
+
+  `HardpointEmpty_hull_slim_hp_fore_port_small`
+  → id: "hull_slim_hp_fore_port", size: "small"
+
+`ship.json` references the full id in `hardpoint_types`, `default_loadout.weapons`,
+and `default_loadout.fire_groups`. No code changes required.
+
+Spec updated: yes — `feature_spec-ship_system.md` §5 naming convention, examples,
+and parser comment updated.

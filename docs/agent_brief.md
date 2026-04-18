@@ -80,7 +80,7 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 6 | ProjectileManager (C#, dumb pool) | Implemented |
 | 7 | WeaponComponent + HardpointComponent | Implemented |
 | 8 | GuidedProjectilePool | Implemented |
-| 9 | ShipFactory + Ship visual assembly | Not started |
+| 9 | ShipFactory + Ship visual assembly | Implemented |
 | 10 | GameCamera — Pilot mode | Not started |
 | 11 | AIController + NavigationController integration | Not started |
 | 12 | Test scene: player vs AI, full Pilot mode loop | Not started |
@@ -154,13 +154,15 @@ The last three decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-04-17 — Fire group indexing: 1-based in JSON, 0-based internally** —
+1. **2026-04-18 — Phase 9: ShipFactory + Ship visual assembly** — Implemented
+   ServiceLocator.cs, ContentRegistry.gd, PlayerState.gd, ShipFactory.gd, and
+   ship_colorize.gdshader. Full spawn_ship() pipeline with stat resolution, part
+   assembly from GLB, hardpoint discovery/configuration, faction-based naming, and
+   vertex color material application. All content is JSON-driven.
+2. **2026-04-17 — Fire group indexing: 1-based in JSON, 0-based internally** —
    Weapons spec uses [1], [2] in JSON for human readability. Ship spec defines
    input_fire as Array[bool] (0-based). HardpointComponent converts (subtracts 1)
    when reading from JSON. Kept both conventions; ship system spec needs comment update.
-2. **2026-04-17 — ProjectileManager extends Node3D** — Needs `GetWorld3D()` for physics
+3. **2026-04-17 — ProjectileManager extends Node3D** — Needs `GetWorld3D()` for physics
    raycast access. `Node` doesn't expose it; `Node3D` is the minimal base that does.
-3. **2026-04-17 — Dumb pool struct stores combat values directly** — Spec shows
-   `WeaponDataId: int` but signal passes `weapon_id: String`. Struct stores damage,
-   damageType, componentRatio directly to avoid per-collision lookups.
 <!-- RECENT-DECISIONS-END -->

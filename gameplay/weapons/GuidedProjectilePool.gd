@@ -224,7 +224,7 @@ func _trigger_explosion(explosion_position: Vector3, proj: GuidedProjectile) -> 
 		var area_damage := proj.damage * falloff
 
 		if area_damage > 0.0 and collider.has_method("apply_damage"):
-			collider.call("apply_damage", area_damage, proj.damage_type, position, proj.component_damage_ratio)
+			collider.call("apply_damage", area_damage, proj.damage_type, explosion_position, proj.component_damage_ratio)
 
 
 # ─── Spawn Handling ──────────────────────────────────────────────────────────────
@@ -289,10 +289,13 @@ func _acquire_auto_lock(proj: GuidedProjectile) -> void:
 	var best_dot: float = cos(deg_to_rad(proj.lock_cone_degrees * 0.5))
 	var launch_forward := proj.velocity.normalized()
 
-	# Query ships group for potential targets
-	var ships := get_tree().get_nodes_in_group("ai_ships")
+	# Query all ships, exclude owner
+	var owner_node := instance_from_id(proj.owner_id)
+	var ships := get_tree().get_nodes_in_group("ships")
 	for ship in ships:
 		if not is_instance_valid(ship):
+			continue
+		if ship == owner_node:
 			continue
 
 		var to_ship: Vector3 = (ship.global_position - proj.position).normalized()

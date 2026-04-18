@@ -4,29 +4,53 @@ using System.Collections.Generic;
 namespace AllSpace;
 
 /// <summary>
-/// Global service registry. Thin wrapper around a static Dictionary.
-/// C# only per architecture rules — this is one of two C# files in the project.
-///
-/// Autoload order: ServiceLocator must be first autoload, before GameBootstrap.
+/// Global service registry — C# autoload singleton.
+/// Provides type-safe service lookup for C# systems (ProjectileManager)
+/// and callable methods for GDScript systems.
 /// </summary>
 public partial class ServiceLocator : Node
 {
-    private static readonly Dictionary<string, Node> _services = new();
+    private readonly Dictionary<string, Node> _services = new();
 
     /// <summary>
-    /// Registers a service. Overwrites if name already exists.
+    /// Registers a service by name. Called by GameBootstrap during startup.
     /// </summary>
-    public static void Register(string name, Node service)
+    public void Register(string name, Node service)
     {
+        if (_services.ContainsKey(name))
+        {
+            GD.PushWarning($"[ServiceLocator] Service '{name}' already registered — overwriting");
+            _services.Remove(name);
+        }
         _services[name] = service;
     }
 
     /// <summary>
-    /// Gets a registered service, or null if not found.
+    /// Retrieves a service by name. Returns null if not found.
+    /// GDScript callable version.
     /// </summary>
-    public static Node GetService(string name)
+    public Node GetService(string name)
     {
-        _services.TryGetValue(name, out var service);
-        return service;
+        return _services.GetValueOrDefault(name);
+    }
+
+    /// <summary>
+    /// Static helper for C# systems to get services without instance reference.
+    /// Uses Engine.GetSingleton to find the ServiceLocator autoload.
+    /// </summary>
+    public static Node Get(string name)
+    {
+        var locator = Engine.GetSingleton("ServiceLocator") as ServiceLocator;
+        if (locator == null)
+        {
+            GD.PushError("[ServiceLocator] Singleton not found — ensure it's registered as autoload");
+            return null;
+        }
+        return locator.GetService(name);
+    }
+
+    public override void _Ready()
+    {
+        GD.Print("[ServiceLocator] Ready — service registry initialized");
     }
 }

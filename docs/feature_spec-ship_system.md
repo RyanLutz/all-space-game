@@ -307,17 +307,17 @@ object and come along when that part is instanced.
 
 ```
 hull_slim (MeshInstance3D)
-    ├── HardpointEmpty_hp_fore_port_small
-    └── HardpointEmpty_hp_fore_stbd_small
+    ├── HardpointEmpty_hull_slim_hp_fore_port_small
+    └── HardpointEmpty_hull_slim_hp_fore_stbd_small
 
 hull_wide (MeshInstance3D)
-    ├── HardpointEmpty_hp_fore_port_small    ← same IDs, different positions
-    ├── HardpointEmpty_hp_fore_stbd_small
-    └── HardpointEmpty_hp_mid_port_small     ← extra hardpoint only on wide hull
+    ├── HardpointEmpty_hull_wide_hp_fore_port_small
+    ├── HardpointEmpty_hull_wide_hp_fore_stbd_small
+    └── HardpointEmpty_hull_wide_hp_mid_port_small     ← extra hardpoint only on wide hull
 
 wing_swept (MeshInstance3D)
-    ├── HardpointEmpty_hp_wing_port_small
-    └── HardpointEmpty_hp_wing_stbd_small
+    ├── HardpointEmpty_wing_swept_hp_wing_port_small
+    └── HardpointEmpty_wing_swept_hp_wing_stbd_small
 
 wing_none (MeshInstance3D)
     └── (no hardpoint empties)
@@ -325,12 +325,43 @@ wing_none (MeshInstance3D)
 
 **Empty naming convention:**
 ```
-HardpointEmpty_{id}_{size}
+HardpointEmpty_{part}_{id}_{size}
+
+{part} — the part node name this empty belongs to (short form, no hyphens)
+{id}   — location descriptor; must be unique across the fully assembled ship tree
+{size} — small | medium | large
 
 Examples:
-HardpointEmpty_hp_fore_port_small
-HardpointEmpty_hp_mid_turret_medium
-HardpointEmpty_hp_wing_stbd_large
+HardpointEmpty_hull_slim_hp_fore_port_small
+HardpointEmpty_hull_wide_hp_mid_port_medium
+HardpointEmpty_wing_swept_hp_wing_stbd_large
+```
+
+**Uniqueness requirement:** All hardpoint empty names must be unique across the entire
+assembled ship node tree. Because parts from multiple part nodes are added as siblings
+under `ShipVisual`, two empties with the same name would collide. Including the part
+node name as a prefix in `{part}` guarantees uniqueness — different parts produce
+different ids even if they share the same location descriptor.
+
+The parser is unaffected: it still takes the last `_`-delimited token as size and
+joins everything between the prefix and the size as the id. The id is simply longer
+and unique:
+
+```
+"HardpointEmpty_hull_slim_hp_fore_port_small"
+ → id:   "hull_slim_hp_fore_port"
+ → size: "small"
+```
+
+`ship.json` references the full id in `hardpoint_types`, `default_loadout.weapons`,
+and `default_loadout.fire_groups`:
+
+```json
+"hardpoint_types": {
+    "hull_slim_hp_fore_port":  "gimbal",
+    "hull_slim_hp_fore_stbd":  "gimbal",
+    "wing_swept_hp_wing_port": "fixed"
+}
 ```
 
 The empty's Transform defines position and facing (`-Z` = forward = muzzle direction).
@@ -343,7 +374,7 @@ No enable/disable logic exists — presence of the empty *is* the toggle.
 ### Weapon Model Scene Structure
 
 ```
-HardpointEmpty_hp_fore_port_small (Node3D)
+HardpointEmpty_hull_slim_hp_fore_port_small (Node3D)
     └── WeaponModel (MeshInstance3D)    ← from /content/weapons/<id>/model.glb
             └── Muzzle (Marker3D)       ← projectile spawn point
 ```
@@ -707,7 +738,7 @@ func _find_hardpoints_recursive(node: Node, result: Array[Node3D]) -> void:
         _find_hardpoints_recursive(child, result)
 
 func _parse_hardpoint_name(node_name: String) -> Dictionary:
-    # "HardpointEmpty_hp_fore_port_small" → { id: "hp_fore_port", size: "small" }
+    # "HardpointEmpty_hull_slim_hp_fore_port_small" → { id: "hull_slim_hp_fore_port", size: "small" }
     var tokens := node_name.split("_")
     var size := tokens[-1]
     var id   := "_".join(tokens.slice(1, tokens.size() - 1))

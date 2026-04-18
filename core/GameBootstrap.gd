@@ -19,6 +19,7 @@ func _ready() -> void:
 	_register_performance_monitor()
 	_register_content_registry()
 	_register_game_event_bus()
+	_register_player_state()
 	_register_projectile_manager()
 	_register_custom_monitors()
 	print("[GameBootstrap] All core services registered.")
@@ -44,6 +45,13 @@ func _register_game_event_bus() -> void:
 	_service_locator.Register("GameEventBus", bus)
 
 
+func _register_player_state() -> void:
+	var ps = preload("res://core/services/PlayerState.gd").new()
+	ps.name = "PlayerState"
+	add_child(ps)
+	_service_locator.Register("PlayerState", ps)
+
+
 func _register_projectile_manager() -> void:
 	var pm = load("res://gameplay/weapons/ProjectileManager.cs").new()
 	pm.name = "ProjectileManager"
@@ -62,6 +70,8 @@ func _register_custom_monitors() -> void:
 		func(): return perf.get_count("ProjectileManager.active_count"))
 	Performance.add_custom_monitor("AllSpace/ai_ships_active",
 		func(): return perf.get_count("AIController.active_count"))
+	Performance.add_custom_monitor("AllSpace/ships_active",
+		func(): return perf.get_count("Ships.active_count"))
 	Performance.add_custom_monitor("AllSpace/chunks_loaded",
 		func(): return perf.get_count("ChunkStreamer.loaded_chunks"))
 	Performance.add_custom_monitor("AllSpace/projectile_ms",
@@ -72,3 +82,7 @@ func _register_custom_monitors() -> void:
 		func(): return perf.get_avg_ms("Physics.thruster_allocation"))
 	Performance.add_custom_monitor("AllSpace/nav_update_ms",
 		func(): return perf.get_avg_ms("Navigation.update"))
+	Performance.add_custom_monitor("AllSpace/ship_assembly_ms",
+		func(): return perf.get_avg_ms("ShipFactory.assemble"))
+	Performance.add_custom_monitor("AllSpace/content_load_ms",
+		func(): return perf.get_avg_ms("ContentRegistry.load"))

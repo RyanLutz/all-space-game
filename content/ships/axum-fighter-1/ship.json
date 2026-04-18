@@ -1,0 +1,134 @@
+{
+	"ship_class": "axum-fighter-1",
+	"display_name": "Axum Fighter Mk.1",
+	"class": "fighter",
+	"description": "A nimble single-seat combat vessel. Low mass and high thrust-to-weight ratio make it responsive and dangerous at close range.",
+
+	"base_stats": {
+		"hp": 120,
+		"mass": 600,
+		"max_speed": 480,
+		"linear_drag": 0.8,
+		"angular_drag": 4.5,
+		"alignment_drag_base": 0.2,
+		"thruster_force": 12000,
+		"torque_thrust_ratio": 0.38,
+		"max_torque": 4500,
+		"power_capacity": 160,
+		"power_regen": 40,
+		"shield_max": 80,
+		"shield_regen_rate": 10,
+		"shield_regen_delay": 3.0,
+		"shield_regen_power_draw": 14,
+		"arrival_distance": 20.0,
+		"brake_safety_margin": 1.2
+	},
+
+	"variants": {
+		"axum_fighter_interceptor": {
+			"display_name": "Interceptor",
+			"faction_display_names": {
+				"axum": "Republic Interceptor",
+				"pirate": "The Fastone",
+				"player_default": "Interceptor"
+			},
+			"rarity": "common",
+			"parts": {
+				"appendage": "appendage_1-sharps",
+				"core": "core_3-dagger",
+				"engine": "engine_2-tri"
+			}
+		},
+		"axum_fighter_patrol": {
+			"display_name": "Patrol",
+			"faction_display_names": {
+				"axum": "Republic Patrol",
+				"pirate": "Workhorse",
+				"player_default": "Patrol Fighter"
+			},
+			"rarity": "common",
+			"parts": {
+				"appendage": "appendage_2-donut",
+				"core": "core_2-barrel",
+				"engine": "engine_3-slots"
+			}
+		},
+		"axum_fighter_assault": {
+			"display_name": "Assault",
+			"faction_display_names": {
+				"axum": "Republic Assault",
+				"pirate": "The Brawler",
+				"player_default": "Assault Fighter"
+			},
+			"rarity": "uncommon",
+			"parts": {
+				"appendage": "appendage_1-sharps",
+				"core": "core_2-barrel",
+				"engine": "engine_2-tri"
+			}
+		},
+		"axum_fighter_scout": {
+			"display_name": "Scout",
+			"faction_display_names": {
+				"axum": "Republic Scout",
+				"pirate": "Ghost",
+				"player_default": "Scout"
+			},
+			"rarity": "uncommon",
+			"parts": {
+				"appendage": "appendage_2-donut",
+				"core": "core_1-steak",
+				"engine": "engine_1-spike"
+			}
+		}
+	},
+
+	"part_stats": {
+		"appendage_1-sharps": { "mass": -20, "max_speed": 15, "angular_drag": 0.4 },
+		"appendage_2-donut":  { "hp": 15, "mass": 30, "shield_max": 10 },
+		"core_1-steak":       { "hp": 40, "mass": 80, "power_capacity": 20 },
+		"core_2-barrel":      { "hp": 60, "mass": 120, "shield_max": 20, "power_capacity": 10 },
+		"core_3-dagger":      { "hp": -10, "mass": -80, "max_speed": 30 },
+		"engine_1-spike":     { "thruster_force": 800 },
+		"engine_2-tri":       { "thruster_force": 2400, "power_regen": -8 },
+		"engine_3-slots":     { "thruster_force": 1200, "power_regen": 6 }
+	},
+
+	"hardpoint_types": {
+		"sharps_hp_wing_port": "fixed",
+		"sharps_hp_wing_stbd": "fixed",
+		"donut_hp_wing_port":  "gimbal",
+		"donut_hp_wing_stbd":  "gimbal"
+	},
+
+	"module_slots": [
+		{ "id": "slot_shield",    "type": "shield",      "size": "small" },
+		{ "id": "slot_engine",    "type": "engine",      "size": "small" },
+		{ "id": "slot_power",     "type": "powerplant",  "size": "small" }
+	],
+
+	"default_loadout": {
+		"weapons": {
+			"sharps_hp_wing_port": "autocannon_light",
+			"sharps_hp_wing_stbd": "autocannon_light",
+			"donut_hp_wing_port":  "autocannon_light",
+			"donut_hp_wing_stbd":  "autocannon_light"
+		},
+		"fire_groups": {
+			"sharps_hp_wing_port": [1],
+			"sharps_hp_wing_stbd": [1],
+			"donut_hp_wing_port":  [1],
+			"donut_hp_wing_stbd":  [1]
+		},
+		"modules": {
+			"slot_shield": "shield_standard",
+			"slot_engine": "engine_standard",
+			"slot_power":  "powerplant_standard"
+		}
+	},
+
+	"assets": {
+		"parts": "parts.glb",
+		"icon":  "icon.png"
+	}
+}

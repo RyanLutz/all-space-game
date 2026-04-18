@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://shipfactory_test"]
+
+[ext_resource type="Script" path="res://test/ShipFactoryTest.gd" id="1"]
+
+[node name="ShipFactoryTest" type="Node3D"]
+script = ExtResource("1")
+test_class_id = "corvette_patrol"
+test_variant_id = "corvette_patrol_standard"
+test_faction = "axum"
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 100, 0)
+projection = 1
+size = 150.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 100, 0)
+light_energy = 1.5
+shadow_enabled = true

@@ -44,10 +44,22 @@ var _perf: Node
 var _event_bus: Node
 
 
+static var _active_ship_count: int = 0
+
 func _ready() -> void:
 	var service_locator := Engine.get_singleton("ServiceLocator")
 	_perf = service_locator.GetService("PerformanceMonitor")
 	_event_bus = service_locator.GetService("GameEventBus")
+
+	_active_ship_count += 1
+	if _perf:
+		_perf.set_count("Ships.active_count", _active_ship_count)
+
+
+func _exit_tree() -> void:
+	_active_ship_count -= 1
+	if _perf:
+		_perf.set_count("Ships.active_count", _active_ship_count)
 
 
 ## Called by ShipFactory (or test scene) after instantiation.
@@ -132,16 +144,16 @@ func _apply_thrust_forces() -> void:
 	var forward_dir := get_heading()
 	var right_dir := transform.basis.x
 	var fwd := input_forward
-	var str := input_strafe
+	var strafe := input_strafe
 
 	# Clamp diagonal input to unit magnitude — no extra thrust for holding W+D
-	var input_len_sq := fwd * fwd + str * str
+	var input_len_sq := fwd * fwd + strafe * strafe
 	if input_len_sq > 1.0:
 		var inv_len := 1.0 / sqrt(input_len_sq)
 		fwd *= inv_len
-		str *= inv_len
+		strafe *= inv_len
 
-	var translation_force := (forward_dir * fwd + right_dir * str) * remaining
+	var translation_force := (forward_dir * fwd + right_dir * strafe) * remaining
 
 	# 3. Hand off to Jolt
 	apply_central_force(translation_force)
@@ -194,7 +206,7 @@ func draw_power(amount: float) -> bool:
 # ─── Damage (SpaceBody contract) ─────────────────────────────────────────────
 
 func apply_damage(amount: float, damage_type: String,
-				  hit_pos: Vector3, component_ratio: float) -> void:
+				  _hit_pos: Vector3, component_ratio: float) -> void:
 	time_since_last_hit = 0.0
 
 	# Shield absorption
@@ -218,7 +230,7 @@ func apply_damage(amount: float, damage_type: String,
 		_event_bus.emit_signal("hull_critical", self, hull_hp / hull_max)
 
 
-func _damage_vs_shields(damage_type: String) -> float:
+func _damage_vs_shields(_damage_type: String) -> float:
 	# Placeholder — damage type multipliers deferred to balancing pass
 	return 1.0
 
