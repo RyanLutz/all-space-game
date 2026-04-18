@@ -5,9 +5,11 @@ var _fake_projectiles: int = 0
 var _fake_ai_ships: int = 0
 var _fake_chunks: int = 0
 
-@onready var _perf: Node = ServiceLocator.GetService("PerformanceMonitor")
+var _perf: Node
 
 func _ready() -> void:
+	var service_locator := Engine.get_singleton("ServiceLocator")
+	_perf = service_locator.GetService("PerformanceMonitor")
 	# Add the performance overlay
 	var overlay = preload("res://ui/debug/PerformanceOverlay.tscn").instantiate()
 	add_child(overlay)

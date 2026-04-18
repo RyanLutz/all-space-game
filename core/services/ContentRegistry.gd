@@ -9,7 +9,8 @@ var modules: Dictionary = {}
 var _factions: Dictionary = {}
 
 func _ready() -> void:
-	var perf: Node = ServiceLocator.GetService("PerformanceMonitor")
+	var service_locator := Engine.get_singleton("ServiceLocator")
+	var perf: Node = service_locator.GetService("PerformanceMonitor")
 	perf.begin("ContentRegistry.load")
 	_scan_directory("res://content/ships", ships, "ship.json")
 	_scan_directory("res://content/weapons", weapons, "weapon.json")

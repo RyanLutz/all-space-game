@@ -32,8 +32,9 @@ var _perf: Node = null
 
 
 func _ready() -> void:
-	_event_bus = ServiceLocator.GetService("GameEventBus")
-	_perf = ServiceLocator.GetService("PerformanceMonitor")
+	var service_locator := Engine.get_singleton("ServiceLocator")
+	_event_bus = service_locator.GetService("GameEventBus")
+	_perf = service_locator.GetService("PerformanceMonitor")
 
 
 func _process(delta: float) -> void:
@@ -54,6 +55,8 @@ func _process(delta: float) -> void:
 			_fire_pulse(should_fire)
 		"energy_beam":
 			_fire_beam(should_fire, delta)
+		"missile_guided":
+			_fire_guided(should_fire)
 
 
 # ─── Discrete Firing (Ballistic, Missile) ────────────────────────────────────
@@ -145,6 +148,31 @@ func _fire_beam(should_fire: bool, delta: float) -> void:
 	_is_firing_beam = true
 
 
+# ─── Guided Missile Firing ────────────────────────────────────────────────────
+
+func _fire_guided(should_fire: bool) -> void:
+	if not should_fire:
+		return
+	if _fire_cooldown > 0.0:
+		return
+	if hardpoint.roll_misfire():
+		return  # Critical state misfire
+
+	# Apply heat (launch heat only)
+	hardpoint.apply_heat(heat_per_shot)
+	if hardpoint.is_overheated:
+		return
+
+	# Fire guided missile!
+	_spawn_guided_projectile()
+
+	# Set cooldown
+	var cooldown: float = 1.0 / (fire_rate * hardpoint.get_fire_rate_multiplier())
+	_fire_cooldown = cooldown
+
+	_event_bus.emit_signal("weapon_fired", hardpoint.owner_ship, weapon_id, get_muzzle_pos())
+
+
 # ─── Projectile Spawning ─────────────────────────────────────────────────────
 
 func _spawn_dumb_projectile() -> void:
@@ -167,6 +195,57 @@ func _spawn_dumb_projectile() -> void:
 		weapon_id,
 		hardpoint.owner_ship.get_instance_id()
 	)
+
+
+func _spawn_guided_projectile() -> void:
+	var muzzle_pos: Vector3 = get_muzzle_pos()
+	var aim_dir: Vector3 = hardpoint.get_aim_direction()
+	var inherited_vel: Vector3 = hardpoint.owner_ship.linear_velocity
+
+	# Zero Y components
+	muzzle_pos.y = 0.0
+	aim_dir.y = 0.0
+	aim_dir = aim_dir.normalized()
+	inherited_vel.y = 0.0
+
+	var velocity: Vector3 = aim_dir * muzzle_speed + inherited_vel
+
+	# Get guidance mode from weapon data (default to auto_lock)
+	var stats: Dictionary = _get_weapon_stats()
+	var guidance_mode: String = stats.get("guidance", "auto_lock")
+
+	# Build weapon data dictionary for the pool
+	var weapon_data := {
+		"archetype": archetype,
+		"stats": stats
+	}
+
+	_event_bus.emit_signal("request_spawn_guided",
+		muzzle_pos,
+		velocity,
+		guidance_mode,
+		weapon_data,
+		hardpoint.owner_ship.get_instance_id()
+	)
+
+
+func _get_weapon_stats() -> Dictionary:
+	# Reconstruct stats dict from current properties
+	return {
+		"damage": damage,
+		"fire_rate": fire_rate,
+		"muzzle_speed": muzzle_speed,
+		"range": range_val,
+		"heat_per_shot": heat_per_shot,
+		"power_per_shot": power_per_shot,
+		"projectile_lifetime": projectile_lifetime,
+		"component_damage_ratio": component_damage_ratio,
+		"turn_rate": 90.0,  # Default guided missile turn rate
+		"fuel": 4.0,         # Default guided missile fuel
+		"guidance": "auto_lock",
+		"lock_cone_degrees": 60.0,
+		"blast_radius": 80.0
+	}
 
 
 # ─── Hitscan Firing ──────────────────────────────────────────────────────────

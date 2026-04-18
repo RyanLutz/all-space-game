@@ -45,8 +45,9 @@ var _event_bus: Node
 
 
 func _ready() -> void:
-	_perf = ServiceLocator.GetService("PerformanceMonitor")
-	_event_bus = ServiceLocator.GetService("GameEventBus")
+	var service_locator := Engine.get_singleton("ServiceLocator")
+	_perf = service_locator.GetService("PerformanceMonitor")
+	_event_bus = service_locator.GetService("GameEventBus")
 
 
 ## Called by ShipFactory (or test scene) after instantiation.

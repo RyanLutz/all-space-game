@@ -69,10 +69,9 @@ public partial class ProjectileManager : Node3D
 
 	public override void _Ready()
 	{
-		var serviceLocator = GetNode<ServiceLocator>("/root/ServiceLocator");
-		_perf = serviceLocator.GetService("PerformanceMonitor");
-		_eventBus = serviceLocator.GetService("GameEventBus");
-		_contentRegistry = serviceLocator.GetService("ContentRegistry");
+		_perf = global::AllSpace.ServiceLocator.GetService("PerformanceMonitor");
+		_eventBus = global::AllSpace.ServiceLocator.GetService("GameEventBus");
+		_contentRegistry = global::AllSpace.ServiceLocator.GetService("ContentRegistry");
 
 		_dumbPool = new DumbProjectile[DumbPoolCapacity];
 

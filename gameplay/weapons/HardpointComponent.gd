@@ -33,7 +33,8 @@ var _event_bus: Node = null
 
 
 func _ready() -> void:
-	_event_bus = ServiceLocator.GetService("GameEventBus")
+	var service_locator := Engine.get_singleton("ServiceLocator")
+	_event_bus = service_locator.GetService("GameEventBus")
 
 
 func _process(delta: float) -> void:

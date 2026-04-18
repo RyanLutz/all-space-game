@@ -1,7 +1,17 @@
 extends CanvasLayer
 
 @onready var label: Label = $Label
-@onready var _perf: Node = ServiceLocator.GetService("PerformanceMonitor")
+var _perf: Node
+
+func _ready() -> void:
+	var service_locator := Engine.get_singleton("ServiceLocator")
+	_perf = service_locator.GetService("PerformanceMonitor")
+	visible = false
+	if label:
+		label.position = Vector2(10, 10)
+		var font = SystemFont.new()
+		font.font_names = PackedStringArray(["Courier New", "DejaVu Sans Mono", "Lucida Console", "Monospace"])
+		label.add_theme_font_override("font", font)
 
 var _visible: bool = false
 
@@ -24,14 +34,6 @@ const METRIC_DISPLAY_NAMES = {
 	"Ships.active_count": "Ships",
 	"Camera.update": "Camera"
 }
-
-func _ready() -> void:
-	visible = false
-	if label:
-		label.position = Vector2(10, 10)
-		var font = SystemFont.new()
-		font.font_names = PackedStringArray(["Courier New", "DejaVu Sans Mono", "Lucida Console", "Monospace"])
-		label.add_theme_font_override("font", font)
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:

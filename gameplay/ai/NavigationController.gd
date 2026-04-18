@@ -77,7 +77,7 @@ func _update_nav(_delta: float) -> void:
 	velocity.y = 0.0
 	var speed := velocity.length()
 
-	var max_decel := (ship.thruster_force * _thrust_fraction) / maxf(ship.mass, 0.001)
+	var max_decel: float = (ship.thruster_force * _thrust_fraction) / maxf(ship.mass, 0.001)
 	var braking_distance := 0.0
 	if max_decel > 0.0:
 		braking_distance = (speed * speed) / (2.0 * max_decel) * brake_safety_margin
