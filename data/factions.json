@@ -1,0 +1,34 @@
+{
+	"factions": [
+		{
+			"id": "axum",
+			"name": "Axum Republic",
+			"color_scheme": {
+				"primary": "#4A90D9",
+				"secondary": "#2C5A8C",
+				"accent": "#87CEEB"
+			},
+			"culture": "bureaucratic"
+		},
+		{
+			"id": "pirate",
+			"name": "Free Raiders",
+			"color_scheme": {
+				"primary": "#8B4513",
+				"secondary": "#A0522D",
+				"accent": "#CD853F"
+			},
+			"culture": "frontier"
+		},
+		{
+			"id": "player_default",
+			"name": "Independent",
+			"color_scheme": {
+				"primary": "#C0C0C0",
+				"secondary": "#808080",
+				"accent": "#FFD700"
+			},
+			"culture": "independent"
+		}
+	]
+}

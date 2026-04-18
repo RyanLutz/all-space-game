@@ -74,7 +74,7 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 |---|---|---|
 | 1 | PerformanceMonitor | Implemented |
 | 2 | ServiceLocator + GameEventBus + GameBootstrap | Implemented |
-| 3 | ContentRegistry | Not started |
+| 3 | ContentRegistry | Implemented |
 | 4 | SpaceBody + Ship (physics only, no weapons) | Not started |
 | 5 | NavigationController | Not started |
 | 6 | ProjectileManager (C#, dumb pool) | Not started |

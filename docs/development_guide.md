@@ -22,7 +22,7 @@ The **Model** column uses two tiers:
 |---|---|---|---|---|---|
 | 1 | ✅ | PerformanceMonitor | `feature_spec-performance_monitor.md` | Sonnet | First build. Proves the CLI workflow. Tight spec, low risk. Test scene: `test/PerformanceMonitorTest.tscn`. |
 | 2 | ✅ | ServiceLocator + GameEventBus + GameBootstrap | `core_spec.md` §§ 8–9 | **Opus** | Load-bearing foundation. Every other system depends on the event bus contract. |
-| 3 | 🔲 | ContentRegistry | `feature_spec-ship_system.md` (ContentRegistry section) | Sonnet | JSON loading and folder-per-item resolution. Well-defined, bounded. |
+| 3 | ✅ | ContentRegistry | `feature_spec-ship_system.md` (ContentRegistry section) | Sonnet | JSON loading and folder-per-item resolution. Well-defined, bounded. |
 | 4 | 🔲 | SpaceBody + Ship (physics only, no weapons) | `feature_spec-physics_and_movement.md` | **Opus** | RigidBody3D + Jolt integration with XZ plane enforcement, thruster budget, and alignment drag. Novel and high blast radius. |
 | 5 | 🔲 | NavigationController | `feature_spec-nav_controller` | **Opus** | Flight computer with braking/arrival algorithm. Complex math, novel logic. |
 | 6 | 🔲 | ProjectileManager (C#, dumb pool) | `feature_spec-weapons_and_projectiles.md` | **Opus** | Only C# system. Performance-critical. Requires holding the full pooling architecture in context. |

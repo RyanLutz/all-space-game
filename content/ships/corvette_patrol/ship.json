@@ -1,0 +1,96 @@
+{
+	"ship_class": "corvette_patrol",
+	"display_name": "Patrol Corvette",
+	"class": "corvette",
+	"description": "A versatile multi-role vessel. Slower than a fighter but considerably tougher.",
+
+	"base_stats": {
+		"hp": 350,
+		"mass": 2000,
+		"max_speed": 320,
+		"linear_drag": 1.2,
+		"alignment_drag": 2.8,
+		"thruster_force": 18000,
+		"torque_thrust_ratio": 0.28,
+		"power_capacity": 280,
+		"power_regen": 55,
+		"shield_max": 200,
+		"shield_regen_rate": 14,
+		"shield_regen_delay": 4.0,
+		"shield_regen_power_draw": 20
+	},
+
+	"variants": {
+		"corvette_patrol_standard": {
+			"display_name": "Wanderer",
+			"faction_display_names": {
+				"pirate": "The Opportunist",
+				"axum": "Vigil"
+			},
+			"rarity": "common",
+			"parts": {
+				"hull": "corvette_hull_standard",
+				"engine": "corvette_engine_dual",
+				"bridge": "corvette_bridge_open"
+			}
+		},
+		"corvette_patrol_heavy": {
+			"display_name": "Ironside",
+			"faction_display_names": {
+				"pirate": "Broadside",
+				"axum": "Rampart"
+			},
+			"rarity": "uncommon",
+			"parts": {
+				"hull": "corvette_hull_heavy",
+				"engine": "corvette_engine_dual",
+				"bridge": "corvette_bridge_armored"
+			}
+		}
+	},
+
+	"part_stats": {
+		"corvette_hull_standard": { "hp": 120, "mass": 400 },
+		"corvette_hull_heavy": { "hp": 280, "mass": 900, "alignment_drag": 1.2 },
+		"corvette_engine_dual": { "thruster_force": 3000 },
+		"corvette_bridge_open": { "power_regen": 8 },
+		"corvette_bridge_armored": { "hp": 60, "power_regen": -5 }
+	},
+
+	"hardpoint_types": {
+		"hp_fore_port": "gimbal",
+		"hp_fore_stbd": "gimbal",
+		"hp_mid_turret": "full_turret"
+	},
+
+	"module_slots": [
+		{ "id": "slot_shield", "type": "shield", "size": "medium" },
+		{ "id": "slot_engine", "type": "engine", "size": "medium" },
+		{ "id": "slot_power", "type": "powerplant", "size": "medium" },
+		{ "id": "slot_armor", "type": "armor", "size": "medium" }
+	],
+
+	"default_loadout": {
+		"weapons": {
+			"hp_fore_port": "autocannon_light",
+			"hp_fore_stbd": "autocannon_light",
+			"hp_mid_turret": "pulse_laser"
+		},
+		"fire_groups": {
+			"hp_fore_port": [0],
+			"hp_fore_stbd": [0],
+			"hp_mid_turret": [1]
+		},
+		"modules": {
+			"slot_shield": "shield_standard",
+			"slot_engine": "engine_standard",
+			"slot_power": "powerplant_standard",
+			"slot_armor": "armor_light"
+		}
+	},
+
+	"assets": {
+		"parts": "parts.glb",
+		"icon": "icon.png"
+	}
+}

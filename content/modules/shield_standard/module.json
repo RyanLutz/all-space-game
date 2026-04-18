@@ -1,0 +1,18 @@
+{
+	"display_name": "Standard Shield Generator",
+	"type": "shield",
+	"size": "medium",
+
+	"stats": {
+		"shield_max": 200,
+		"shield_regen_rate": 14,
+		"shield_regen_delay": 4.0,
+		"shield_regen_power_draw": 20,
+		"power_capacity": 0,
+		"mass": 50
+	},
+
+	"assets": {
+		"icon": "icon.png"
+	}
+}

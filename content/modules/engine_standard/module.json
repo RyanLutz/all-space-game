@@ -1,0 +1,16 @@
+{
+	"display_name": "Standard Engine",
+	"type": "engine",
+	"size": "medium",
+
+	"stats": {
+		"max_speed": 50,
+		"thruster_force": 2000,
+		"power_capacity": 0,
+		"mass": 80
+	},
+
+	"assets": {
+		"icon": "icon.png"
+	}
+}
