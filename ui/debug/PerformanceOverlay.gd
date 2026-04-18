@@ -8,7 +8,7 @@ const METRIC_DISPLAY_NAMES = {
 	"ProjectileManager.dumb_update": "Projectiles (dumb)",
 	"ProjectileManager.guided_update": "Projectiles (guided)",
 	"ProjectileManager.collision_checks": "Projectile collisions",
-	"ProjectileManager.active_count": "Projectiles (dumb)",
+	"ProjectileManager.active_count": "Projectiles active",
 	"AIController.state_updates": "AI state updates",
 	"AIController.active_count": "AI ships",
 	"Navigation.update": "Navigation",
@@ -28,6 +28,9 @@ func _ready() -> void:
 	visible = false
 	if label:
 		label.position = Vector2(10, 10)
+		var font = SystemFont.new()
+		font.font_names = PackedStringArray(["Courier New", "DejaVu Sans Mono", "Lucida Console", "Monospace"])
+		label.add_theme_font_override("font", font)
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:

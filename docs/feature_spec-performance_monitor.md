@@ -172,6 +172,10 @@ Frame budget is calculated as `Engine.get_frames_per_second()` target (default 6
 
 The overlay is its own scene (`PerformanceOverlay.tscn`) added as a child of the root — never a child of a gameplay node, so it survives scene changes.
 
+**Implementation constraints:**
+- The label **must use a monospace font** — column alignment is space-padded and breaks with proportional fonts. Set via `SystemFont` in `_ready()`, e.g. `["Courier New", "DejaVu Sans Mono", "Lucida Console", "Monospace"]`.
+- Every entry in `METRIC_DISPLAY_NAMES` must have a **unique display string** — duplicate labels will cause count and timing rows to appear under the same name with no way to distinguish them.
+
 ---
 
 ## Integration Contract
