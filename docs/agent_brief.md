@@ -78,7 +78,7 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 4 | SpaceBody + Ship (physics only, no weapons) | Implemented |
 | 5 | NavigationController | Implemented |
 | 6 | ProjectileManager (C#, dumb pool) | Implemented |
-| 7 | WeaponComponent + HardpointComponent | Not started |
+| 7 | WeaponComponent + HardpointComponent | Implemented |
 | 8 | GuidedProjectilePool | Not started |
 | 9 | ShipFactory + Ship visual assembly | Not started |
 | 10 | GameCamera — Pilot mode | Not started |
@@ -154,11 +154,13 @@ The last three decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-04-17 — ProjectileManager extends Node3D** — Needs `GetWorld3D()` for physics
+1. **2026-04-17 — Fire group indexing: 1-based in JSON, 0-based internally** —
+   Weapons spec uses [1], [2] in JSON for human readability. Ship spec defines
+   input_fire as Array[bool] (0-based). HardpointComponent converts (subtracts 1)
+   when reading from JSON. Kept both conventions; ship system spec needs comment update.
+2. **2026-04-17 — ProjectileManager extends Node3D** — Needs `GetWorld3D()` for physics
    raycast access. `Node` doesn't expose it; `Node3D` is the minimal base that does.
-2. **2026-04-17 — Dumb pool struct stores combat values directly** — Spec shows
+3. **2026-04-17 — Dumb pool struct stores combat values directly** — Spec shows
    `WeaponDataId: int` but signal passes `weapon_id: String`. Struct stores damage,
    damageType, componentRatio directly to avoid per-collision lookups.
-3. **2026-04-17 — Hitscan queued for physics tick** — `request_fire_hitscan` may fire
-   during `_Process`; raycast requires `_PhysicsProcess`. Queue and resolve next tick.
 <!-- RECENT-DECISIONS-END -->

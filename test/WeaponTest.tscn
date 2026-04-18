@@ -1,0 +1,73 @@
+[gd_scene load_steps=10 format=3 uid="uid://weapon_test"]
+
+[ext_resource type="Script" path="res://test/WeaponTest.gd" id="1"]
+[ext_resource type="PackedScene" path="res://gameplay/entities/Ship.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://ui/debug/PerformanceOverlay.tscn" id="3"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_grid"]
+size = Vector2(500, 500)
+
+[sub_resource type="StandardMaterial3D" id="Material_grid"]
+albedo_color = Color(0.15, 0.15, 0.2, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_cursor"]
+radius = 0.5
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Material_cursor"]
+albedo_color = Color(1, 0.2, 0.2, 1)
+emission_enabled = true
+emission = Color(1, 0.2, 0.2, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_dummy"]
+size = Vector3(2, 2, 2)
+
+[sub_resource type="StandardMaterial3D" id="Material_dummy"]
+albedo_color = Color(0.3, 0.5, 0.3, 1)
+transparency = 1
+alpha = 0.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dummy"]
+size = Vector3(2, 2, 2)
+
+[node name="WeaponTest" type="Node3D"]
+script = ExtResource("1")
+ship_path = NodePath("Ship")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 60, 0)
+fov = 50.0
+
+[node name="Ship" parent="." instance=ExtResource("2")]
+
+[node name="ProjectileManager" type="Node" parent="."]
+script = ExtResource("res://gameplay/weapons/ProjectileManager.cs")
+DumbPoolCapacity = 1024
+
+[node name="PerformanceOverlay" parent="." instance=ExtResource("3")]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 20, 0)
+
+[node name="GridFloor" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, 0)
+mesh = SubResource("PlaneMesh_grid")
+surface_material_override/0 = SubResource("Material_grid")
+
+[node name="AimCursor" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_cursor")
+surface_material_override/0 = SubResource("Material_cursor")
+
+# Dummy target for testing
+[node name="DummyTarget" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+collision_layer = 2
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="DummyTarget"]
+mesh = SubResource("BoxMesh_dummy")
+surface_material_override/0 = SubResource("Material_dummy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DummyTarget"]
+shape = SubResource("BoxShape3D_dummy")

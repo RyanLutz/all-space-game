@@ -181,6 +181,15 @@ func _update_power_regen(delta: float) -> void:
 		power_current = minf(power_current + power_regen * delta, power_capacity)
 
 
+# ─── Power Draw (for weapons) ────────────────────────────────────────────────
+
+func draw_power(amount: float) -> bool:
+	if power_current >= amount:
+		power_current -= amount
+		return true
+	return false
+
+
 # ─── Damage (SpaceBody contract) ─────────────────────────────────────────────
 
 func apply_damage(amount: float, damage_type: String,

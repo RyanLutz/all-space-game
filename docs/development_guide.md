@@ -26,7 +26,7 @@ The **Model** column uses two tiers:
 | 4 | ✅ | SpaceBody + Ship (physics only, no weapons) | `feature_spec-physics_and_movement.md` | **Opus** | RigidBody3D + Jolt integration with XZ plane enforcement, thruster budget, and alignment drag. Novel and high blast radius. Test scene: `test/ShipPhysicsTest.tscn`. |
 | 5 | ✅ | NavigationController | `feature_spec-nav_controller` | **Opus** | Flight computer with braking/arrival algorithm. Complex math, novel logic. |
 | 6 | ✅ | ProjectileManager (C#, dumb pool) | `feature_spec-weapons_and_projectiles.md` | **Opus** | Only C# system. Performance-critical. Requires holding the full pooling architecture in context. |
-| 7 | 🔲 | WeaponComponent + HardpointComponent | `feature_spec-weapons_and_projectiles.md` | Sonnet | Well-specced stat containers + fire logic. Clear contract, bounded scope. |
+| 7 | ✅ | WeaponComponent + HardpointComponent | `feature_spec-weapons_and_projectiles.md` | Sonnet | Hardpoint types (fixed/gimbal/turret), heat system, fire groups, aim algorithm. All non-missile archetypes fire. Test scene: `test/WeaponTest.tscn`. |
 | 8 | 🔲 | GuidedProjectilePool | `feature_spec-weapons_and_projectiles.md` | Sonnet | GDScript guided missile pool. Spec is detailed; logic is self-contained. |
 | 9 | 🔲 | ShipFactory + Ship visual assembly | `feature_spec-ship_system.md` | Sonnet | Assembles ship from JSON definition. Mostly wiring, no novel decisions. |
 | 10 | 🔲 | GameCamera — Pilot mode | `feature_spec-camera_system.md` | Sonnet | Follow camera with cursor offset. Bounded, spec is clear. |

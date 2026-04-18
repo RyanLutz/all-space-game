@@ -21,3 +21,12 @@ can_sleep = false
 shape = SubResource("BoxShape3D_placeholder")
 
 [node name="ShipVisual" type="Node3D" parent="."]
+
+[node name="HardpointEmpty_hp_fore_port_small" type="Marker3D" parent="ShipVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0, 1.5)
+
+[node name="HardpointEmpty_hp_fore_stbd_small" type="Marker3D" parent="ShipVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0, 1.5)
+
+[node name="HardpointEmpty_hp_mid_turret_medium" type="Marker3D" parent="ShipVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.5)

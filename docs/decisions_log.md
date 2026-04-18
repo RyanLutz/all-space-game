@@ -224,3 +224,22 @@ Decision: Hitscan requests are queued in a `List<HitscanRequest>` when the signa
          one-frame delay; invisible for continuous beams which fire every frame.
 Spec updated: no — implementation detail; spec's immediate-fire illustration is
          conceptual
+
+---
+
+## 2026-04-17 — Fire group indexing: 1-based in JSON, 0-based internally
+
+Agent:   Claude Sonnet (Cursor) — Step 7 implementation
+System:  HardpointComponent / Ship / Weapon system
+Spec:    feature_spec-weapons_and_projectiles.md §4.2, feature_spec-ship_system.md §3
+Problem: The weapons spec JSON examples use 1-based indexing ("groups": [1], "groups": [2])
+         and the success criteria say "left click fires group 1." But the ship system
+         spec defines `input_fire: Array[bool]` as 0-based ([group0_active, group1_active,
+         group2_active]). These don't agree.
+Decision: Use 1-based in JSON for human readability (matches UI convention where
+         Group 1 = Primary, Group 2 = Secondary), convert to 0-based internally when
+         HardpointComponent reads from JSON (subtract 1 from each group index).
+         This keeps the array access correct while the JSON remains intuitive.
+         Ship system spec's `input_fire` comment needs update to clarify mapping.
+Spec updated: pending — ship system spec needs `input_fire` comment updated to
+         document: "JSON uses 1-based (Group 1 = index 0), internal array is 0-based"

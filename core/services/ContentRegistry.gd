@@ -1,5 +1,8 @@
 extends Node
 
+## Scans /content/ at startup and indexes ships, weapons, and modules.
+## Provides lookup by ID and asset path resolution.
+
 var ships: Dictionary = {}
 var weapons: Dictionary = {}
 var modules: Dictionary = {}

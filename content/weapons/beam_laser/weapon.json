@@ -1,0 +1,18 @@
+{
+    "display_name": "Beam Laser",
+    "archetype": "energy_beam",
+    "size": "medium",
+
+    "stats": {
+        "damage_per_second": 80,
+        "heat_per_second": 30,
+        "power_per_second": 25,
+        "component_damage_ratio": 0.1,
+        "range": 600
+    },
+
+    "assets": {
+        "model": "model.glb",
+        "icon": "icon.png"
+    }
+}

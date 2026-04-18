@@ -1,21 +1,20 @@
 {
-	"display_name": "Light Autocannon",
-	"archetype": "ballistic",
-	"size": "small",
+    "display_name": "Light Autocannon",
+    "archetype": "ballistic",
+    "size": "small",
 
-	"stats": {
-		"damage": 18,
-		"fire_rate": 8.0,
-		"muzzle_speed": 900,
-		"heat_per_shot": 12,
-		"power_per_shot": 0,
-		"component_damage_ratio": 0.15,
-		"projectile_lifetime": 1.8,
-		"ammo_capacity": 500
-	},
+    "stats": {
+        "damage": 18,
+        "fire_rate": 8.0,
+        "muzzle_speed": 900,
+        "heat_per_shot": 12,
+        "power_per_shot": 0,
+        "component_damage_ratio": 0.15,
+        "projectile_lifetime": 1.8,
+        "ammo_capacity": 500
+    },
 
-	"assets": {
-		"model": "model.glb",
-		"icon": "icon.png"
-	}
+    "assets": {
+        "icon": "icon.png"
+    }
 }
