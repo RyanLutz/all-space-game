@@ -79,7 +79,7 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 5 | NavigationController | Implemented |
 | 6 | ProjectileManager (C#, dumb pool) | Implemented |
 | 7 | WeaponComponent + HardpointComponent | Implemented |
-| 8 | GuidedProjectilePool | Not started |
+| 8 | GuidedProjectilePool | Implemented |
 | 9 | ShipFactory + Ship visual assembly | Not started |
 | 10 | GameCamera — Pilot mode | Not started |
 | 11 | AIController + NavigationController integration | Not started |

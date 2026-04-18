@@ -243,3 +243,42 @@ Decision: Use 1-based in JSON for human readability (matches UI convention where
          Ship system spec's `input_fire` comment needs update to clarify mapping.
 Spec updated: pending — ship system spec needs `input_fire` comment updated to
          document: "JSON uses 1-based (Group 1 = index 0), internal array is 0-based"
+
+---
+
+## 2026-04-18 — Phase 8: GuidedProjectilePool implementation
+
+Agent:   Claude Sonnet (Cursor) — Step 8 implementation
+System:  GuidedProjectilePool.gd, WeaponComponent.gd
+Spec:    feature_spec-weapons_and_projectiles.md §7, §8
+Problem: PlayerState system does not exist yet (scheduled for later phase), but
+         guided missiles in `track_cursor` and `click_lock` modes require
+         querying `PlayerState.get_active_ship().get_aim_world_pos()` for aim
+         point resolution per the spec.
+Decision: Implement target resolution with fallback behavior:
+         - `track_cursor` mode (default): Falls back to projecting missile forward
+           when PlayerState is unavailable. Target acquisition deferred to PlayerState
+           implementation phase.
+         - `auto_lock` mode: Fully implemented — acquires nearest enemy in forward
+           cone at launch using `get_tree().get_nodes_in_group("ai_ships")`.
+         - `click_lock` mode: Treated as `auto_lock` until PlayerState provides
+           explicit lock target functionality.
+         Area damage (blast_radius) implemented with distance-based falloff. Collision
+         detection uses sweep raycast from previous to current position.
+Spec updated: no — spec's PlayerState dependency remains valid; implementation
+         provides graceful degradation until PlayerState exists
+
+---
+
+## 2026-04-18 — GuidedProjectilePool: Shadowing and type inference fixes
+
+Agent:   Claude Sonnet (Cursor) — Step 8 implementation
+System:  GuidedProjectilePool.gd
+Problem: Linter reported errors: "Cannot infer the type" for `collider_pos` and
+         `to_ship` variables. Warnings: `position` parameter shadows Node3D property.
+Decision: Explicit type annotations added for GDScript type inference:
+         - `var collider_pos: Vector3` with if/else assignment instead of ternary
+         - `var to_ship: Vector3` explicit type on declaration
+         - Renamed `position` parameters to `spawn_position` and `explosion_position`
+           to avoid shadowing Node3D base class property
+Spec updated: no — implementation detail only
