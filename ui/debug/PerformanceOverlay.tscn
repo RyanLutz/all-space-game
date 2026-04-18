@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8yvxg3ulq3a"]
+
+[ext_resource type="Script" path="res://ui/debug/PerformanceOverlay.gd" id="1_abc12"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_mono"]
+font_size = 14
+
+[node name="PerformanceOverlay" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_abc12")
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 400.0
+offset_bottom = 300.0
+text = "[ All Space — Performance Monitor ]
+───────────────────────────────────────────────────"
+label_settings = SubResource("LabelSettings_mono")

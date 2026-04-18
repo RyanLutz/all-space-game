@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://b1c8yvxg3ulq3a"]
+
+[ext_resource type="Script" path="res://test/PerformanceMonitorTest.gd" id="1_testpm"]
+
+[node name="PerformanceMonitorTest" type="Node3D"]
+script = ExtResource("1_testpm")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 50, 0)
+projection = 1
+size = 100.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 50, 0)

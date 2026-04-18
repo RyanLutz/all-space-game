@@ -72,7 +72,7 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 
 | Step | System | Status |
 |---|---|---|
-| 1 | PerformanceMonitor | Not started |
+| 1 | PerformanceMonitor | Implemented |
 | 2 | ServiceLocator + GameEventBus + GameBootstrap | Not started |
 | 3 | ContentRegistry | Not started |
 | 4 | SpaceBody + Ship (physics only, no weapons) | Not started |
