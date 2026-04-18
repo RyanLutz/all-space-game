@@ -113,3 +113,66 @@ Decision: Ship.gd uses `var fwd := input_forward` (no negation). input_forward =
          Input.get_axis("move_backward", "move_forward") producing positive for W.
          If playtesting reveals a sign flip is needed, it is trivial to fix.
 Spec updated: no — will update spec after playtesting confirms the correct sign
+
+---
+
+## 2026-04-17 — NavigationController monitor registration in PerformanceMonitor
+
+Agent:   Claude Opus (Claude Code) — Phase 5 implementation
+System:  NavigationController / PerformanceMonitor
+Spec:    feature_spec-nav_controller.md §6
+Problem: The nav controller spec shows `Performance.add_custom_monitor` in
+         NavigationController's `_ready()`. However, multiple ship instances would
+         each have a NavigationController, causing repeated registration of the
+         same monitor name. The existing project pattern registers all custom
+         monitors centrally in PerformanceMonitor.gd.
+Decision: Registered `AllSpace/nav_update_ms` in PerformanceMonitor.gd alongside
+         all other monitors. NavigationController calls `_perf.begin/end` as
+         specified. The metric is visible in the debugger and F3 overlay regardless
+         of which node registers it.
+Spec updated: no — minor implementation detail, spec intent fully satisfied
+Superseded by: 2026-04-17 — Custom monitor registration moved to GameBootstrap (below)
+
+---
+
+## 2026-04-17 — Custom monitor registration moved to GameBootstrap
+
+Agent:   Claude Opus (Cursor) — Phase 5 follow-up
+System:  GameBootstrap / PerformanceMonitor / all systems that expose monitors
+Spec:    feature_spec-nav_controller.md §6, feature_spec-performance_monitor.md
+Problem: `Performance.add_custom_monitor` calls were living inside
+         `PerformanceMonitor.gd::_ready()`. That is an instrumentation-layer
+         service — adding Godot-debugger wiring there conflates two concerns
+         (per-call timing/counts vs. exposing a metric to the debugger) and
+         forces every future monitor addition to touch an instance class that
+         does not otherwise own startup sequencing.
+Decision: `Performance.add_custom_monitor` calls moved from individual system
+         `_ready()` to `GameBootstrap._ready()` via a new
+         `_register_custom_monitors()` step, to avoid duplicate registration
+         errors when multiple instances exist (NavigationController, AIController,
+         etc.). All systems continue to call `PerformanceMonitor.begin/end`
+         per-instance as specified. GameBootstrap owns all custom monitor
+         registration going forward. Retroactive audit of Step 4 confirmed
+         Ship.gd and SpaceBody.gd do not call `add_custom_monitor`; no further
+         cleanup needed.
+Spec updated: no — implementation-layer ownership decision; spec intent fully
+         satisfied (metrics still visible in debugger / F3 overlay).
+
+---
+
+## 2026-04-17 — NavigationController tuning in base_stats (flat schema)
+
+Agent:   Claude Opus (Cursor) — Phase 5 follow-up
+System:  NavigationController / ContentRegistry / Ship
+Spec:    feature_spec-nav_controller.md §5
+Problem: Nav controller spec §5 places `arrival_distance` and
+         `brake_safety_margin` in a `hull` sub-block. The existing
+         `content/ships/corvette_patrol/ship.json` schema — which ContentRegistry
+         and ShipPhysicsTest were built against in Step 4 — uses a flat
+         `base_stats` block for all hull-level physics fields.
+Decision: NavigationController tuning fields (`arrival_distance`,
+         `brake_safety_margin`) added to `base_stats` block (flat) to match the
+         existing corvette_patrol/ship.json schema. Physics spec §5 shows a
+         `hull` block — reconciliation of flat vs. nested schema deferred to
+         Ship System spec implementation (Step 9).
+Spec updated: no — reconciliation deferred to Step 9

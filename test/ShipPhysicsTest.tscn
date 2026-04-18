@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://ship_physics_test"]
+[gd_scene load_steps=9 format=3 uid="uid://ship_physics_test"]
 
 [ext_resource type="Script" path="res://test/ShipPhysicsTest.gd" id="1"]
 [ext_resource type="PackedScene" path="res://gameplay/entities/Ship.tscn" id="2"]
@@ -18,6 +18,17 @@ height = 1.0
 albedo_color = Color(1, 0.2, 0.2, 1)
 emission_enabled = true
 emission = Color(1, 0.2, 0.2, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_dest"]
+top_radius = 2.5
+bottom_radius = 2.5
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="Material_dest"]
+albedo_color = Color(0.2, 0.8, 1, 1)
+emission_enabled = true
+emission = Color(0.2, 0.8, 1, 1)
 emission_energy_multiplier = 2.0
 
 [node name="ShipPhysicsTest" type="Node3D"]
@@ -42,3 +53,8 @@ surface_material_override/0 = SubResource("Material_grid")
 [node name="AimCursor" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_cursor")
 surface_material_override/0 = SubResource("Material_cursor")
+
+[node name="DestMarker" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("CylinderMesh_dest")
+surface_material_override/0 = SubResource("Material_dest")

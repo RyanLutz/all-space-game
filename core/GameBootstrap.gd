@@ -11,6 +11,7 @@ func _ready() -> void:
 	_register_performance_monitor()
 	_register_content_registry()
 	_register_game_event_bus()
+	_register_custom_monitors()
 	print("[GameBootstrap] All core services registered.")
 
 
@@ -32,3 +33,26 @@ func _register_game_event_bus() -> void:
 	bus.name = "GameEventBus"
 	add_child(bus)
 	ServiceLocator.Register("GameEventBus", bus)
+
+
+## All Godot debugger custom monitors are registered here, once, to avoid
+## duplicate-registration errors when systems with multiple instances each try
+## to register their own monitor in _ready(). Per-call instrumentation
+## (PerformanceMonitor.begin/end/set_count) still happens per-instance in the
+## owning system.
+func _register_custom_monitors() -> void:
+	var perf = ServiceLocator.GetService("PerformanceMonitor")
+	Performance.add_custom_monitor("AllSpace/projectiles_active",
+		func(): return perf.get_count("ProjectileManager.active_count"))
+	Performance.add_custom_monitor("AllSpace/ai_ships_active",
+		func(): return perf.get_count("AIController.active_count"))
+	Performance.add_custom_monitor("AllSpace/chunks_loaded",
+		func(): return perf.get_count("ChunkStreamer.loaded_chunks"))
+	Performance.add_custom_monitor("AllSpace/projectile_ms",
+		func(): return perf.get_avg_ms("ProjectileManager.dumb_update"))
+	Performance.add_custom_monitor("AllSpace/ai_ms",
+		func(): return perf.get_avg_ms("AIController.state_updates"))
+	Performance.add_custom_monitor("AllSpace/physics_ms",
+		func(): return perf.get_avg_ms("Physics.thruster_allocation"))
+	Performance.add_custom_monitor("AllSpace/nav_update_ms",
+		func(): return perf.get_avg_ms("Navigation.update"))

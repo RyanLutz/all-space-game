@@ -2,24 +2,17 @@ extends Node
 
 const WINDOW_SIZE = 60
 
+## Pure instrumentation service: per-call timing and count tracking.
+##
+## Godot-facing Performance.add_custom_monitor registrations are owned by
+## GameBootstrap._register_custom_monitors() to avoid duplicate-registration
+## errors when multiple instances of a system exist (NavigationController,
+## AIController, etc.). Systems call begin/end/set_count here per-instance.
+
 var _timers: Dictionary = {}
 var _samples: Dictionary = {}
 var _counts: Dictionary = {}
 var _peaks: Dictionary = {}
-
-func _ready() -> void:
-	Performance.add_custom_monitor("AllSpace/projectiles_active",
-		func(): return get_count("ProjectileManager.active_count"))
-	Performance.add_custom_monitor("AllSpace/ai_ships_active",
-		func(): return get_count("AIController.active_count"))
-	Performance.add_custom_monitor("AllSpace/chunks_loaded",
-		func(): return get_count("ChunkStreamer.loaded_chunks"))
-	Performance.add_custom_monitor("AllSpace/projectile_ms",
-		func(): return get_avg_ms("ProjectileManager.dumb_update"))
-	Performance.add_custom_monitor("AllSpace/ai_ms",
-		func(): return get_avg_ms("AIController.state_updates"))
-	Performance.add_custom_monitor("AllSpace/physics_ms",
-		func(): return get_avg_ms("Physics.thruster_allocation"))
 
 func begin(metric: String) -> void:
 	_timers[metric] = Time.get_ticks_usec()
