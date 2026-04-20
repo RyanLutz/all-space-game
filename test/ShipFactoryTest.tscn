@@ -4,8 +4,8 @@
 
 [node name="ShipFactoryTest" type="Node3D"]
 script = ExtResource("1")
-test_class_id = "corvette_patrol"
-test_variant_id = "corvette_patrol_standard"
+test_class_id = "axum-fighter-1"
+test_variant_id = "axum_fighter_interceptor"
 test_faction = "axum"
 
 [node name="Camera3D" type="Camera3D" parent="."]

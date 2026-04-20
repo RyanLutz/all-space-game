@@ -1,0 +1,33 @@
+{
+  "ai_profiles": [
+    {
+      "id": "default",
+      "display_name": "Standard Patrol",
+
+      "detection_range": 800.0,
+      "leash_range": 1500.0,
+      "engage_distance": 500.0,
+      "preferred_engage_distance": 350.0,
+
+      "wander_radius": 600.0,
+      "wander_thrust_fraction": 0.4,
+      "wander_arrival_distance": 40.0,
+      "wander_pause_min": 1.0,
+      "wander_pause_max": 3.0,
+
+      "pursue_thrust_fraction": 0.85,
+
+      "engage_thrust_fraction": 0.7,
+      "strafe_thrust_fraction": 0.3,
+      "fire_angle_threshold": 15.0,
+
+      "aim_accuracy": 0.7,
+
+      "flee_enabled": false,
+      "flee_hp_threshold": 0.0,
+
+      "faction": "neutral",
+      "personality": "standard"
+    }
+  ]
+}

@@ -8,6 +8,7 @@ var ships: Dictionary = {}
 var weapons: Dictionary = {}
 var modules: Dictionary = {}
 var _factions: Dictionary = {}
+var _ai_profiles: Dictionary = {}
 
 var _perf: Node
 
@@ -21,11 +22,12 @@ func _ready() -> void:
 	_scan_directory("res://content/weapons", weapons, "weapon.json")
 	_scan_directory("res://content/modules", modules, "module.json")
 	_load_factions("res://data/factions.json")
+	_load_ai_profiles("res://data/ai_profiles.json")
 
 	_perf.end("ContentRegistry.load")
 
-	print("[ContentRegistry] Loaded: %d ships, %d weapons, %d modules, %d factions" % [
-		ships.size(), weapons.size(), modules.size(), _factions.size()
+	print("[ContentRegistry] Loaded: %d ships, %d weapons, %d modules, %d factions, %d AI profiles" % [
+		ships.size(), weapons.size(), modules.size(), _factions.size(), _ai_profiles.size()
 	])
 
 
@@ -74,6 +76,13 @@ func _load_factions(path: String) -> void:
 			_factions[faction["id"]] = faction
 
 
+func _load_ai_profiles(path: String) -> void:
+	var data := _load_json(path)
+	if data.has("ai_profiles"):
+		for profile in data["ai_profiles"]:
+			_ai_profiles[profile["id"]] = profile
+
+
 # ─── Public API ─────────────────────────────────────────────────────────────
 
 func get_ship(id: String) -> Dictionary:
@@ -90,6 +99,10 @@ func get_module(id: String) -> Dictionary:
 
 func get_faction(id: String) -> Dictionary:
 	return _factions.get(id, {})
+
+
+func get_ai_profile(id: String) -> Dictionary:
+	return _ai_profiles.get(id, {})
 
 
 func get_asset_path(content_data: Dictionary, asset_key: String) -> String:

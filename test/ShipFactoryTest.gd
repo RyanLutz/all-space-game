@@ -57,7 +57,7 @@ func _ready() -> void:
 	print("[ShipFactoryTest] Spawning AI ship (axum_fighter_patrol / pirate)...")
 	var ai_ship := _ship_factory.spawn_ship(
 		test_class_id,
-		"axum_fighter_patrol",
+		"corvette_patrol_heavy",
 		Vector3(60, 0, 0),
 		"pirate",
 		false

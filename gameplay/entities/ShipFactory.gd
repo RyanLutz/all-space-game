@@ -25,7 +25,8 @@ func spawn_ship(
 	pos: Vector3,
 	faction: String,
 	is_player: bool = false,
-	weapon_loadout_override: Dictionary = {}
+	weapon_loadout_override: Dictionary = {},
+	ai_profile_id: String = "default"
 ) -> RigidBody3D:
 	var class_data: Dictionary = _content_registry.get_ship(class_id)
 	if class_data.is_empty():
@@ -44,7 +45,7 @@ func spawn_ship(
 	# 2. Instantiate base scene
 	var ship_scene := preload("res://gameplay/entities/Ship.tscn")
 	var ship: RigidBody3D = ship_scene.instantiate()
-	ship.global_position = pos
+	ship.position = pos
 	ship.position.y = 0.0
 
 	# 3. Resolve loadout
@@ -97,15 +98,49 @@ func spawn_ship(
 		_player_state.set_active_ship(ship)
 	else:
 		ship.add_to_group("ai_ships")
-		# AIController attachment deferred to Phase 11
+		_attach_ai_components(ship, ai_profile_id)
 
 	ship.add_to_group("ships")
 
 	# Add to scene tree
-	get_tree().get_root().add_child(ship)
+	get_tree().get_root().add_child.call_deferred(ship)
 
 	print("[ShipFactory] Spawned %s (%s) for %s at %s" % [display_name, variant_id, faction, pos])
 	return ship
+
+
+# ─── AI Component Attachment ────────────────────────────────────────────────
+
+func _attach_ai_components(ship: RigidBody3D, profile_id: String) -> void:
+	var profile_data: Dictionary = _content_registry.get_ai_profile(profile_id)
+	if profile_data.is_empty():
+		push_warning("ShipFactory: AI profile '%s' not found, using empty profile" % profile_id)
+
+	# NavigationController — flight computer
+	var nav := NavigationController.new()
+	nav.name = "NavigationController"
+	ship.add_child(nav)
+
+	# DetectionVolume — Area3D with SphereShape3D for player detection
+	var detection := Area3D.new()
+	detection.name = "DetectionVolume"
+	detection.collision_layer = 0
+	detection.collision_mask = 1  # detect player physics layer
+	detection.monitoring = true
+	detection.monitorable = false
+
+	var shape := CollisionShape3D.new()
+	var sphere := SphereShape3D.new()
+	sphere.radius = profile_data.get("detection_range", 800.0)
+	shape.shape = sphere
+	detection.add_child(shape)
+	ship.add_child(detection)
+
+	# AIController — state machine (must be added after nav + detection)
+	var ai := AIController.new()
+	ai.name = "AIController"
+	ai.profile = profile_data
+	ship.add_child(ai)
 
 
 # ─── Stat Resolution ────────────────────────────────────────────────────────

@@ -81,8 +81,8 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 7 | WeaponComponent + HardpointComponent | Implemented |
 | 8 | GuidedProjectilePool | Implemented |
 | 9 | ShipFactory + Ship visual assembly | Implemented |
-| 10 | GameCamera — Pilot mode | Not started |
-| 11 | AIController + NavigationController integration | Not started |
+| 10 | GameCamera — Pilot mode | Implemented |
+| 11 | AIController + NavigationController integration | Implemented |
 | 12 | Test scene: player vs AI, full Pilot mode loop | Not started |
 | 13 | Tactical mode camera + input layer | Not started |
 | 14 | ChunkStreamer + Asteroid + Debris | Not started |
@@ -150,19 +150,26 @@ a new pattern, or requires updating a spec — flag it rather than deciding your
 
 ## Recent Decisions
 
-The last three decisions are summarised here for quick context. Full history in
+The most recent decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-04-18 — Phase 9: ShipFactory + Ship visual assembly** — Implemented
+1. **2026-04-19 — Phase 11: AIController + NavigationController integration** —
+   `AIController.gd`, `data/ai_profiles.json`, ShipFactory `_attach_ai_components`,
+   ContentRegistry `get_ai_profile`, NavigationController ship via `get_parent()` (factory
+   spawn). `Engine.RegisterSingleton("ServiceLocator", …)` for GDScript `get_singleton`.
+2. **2026-04-19 — Phase 10: GameCamera — Pilot mode** — Implemented
+   GameCamera.gd (extends Camera3D), GameCamera.tscn, CameraTest.tscn/.gd, and
+   .cursor/rules/camera.mdc. Critically damped spring follow, cursor-offset lead,
+   height-based zoom, ray-plane mouse-to-world, and PlayerState signal retargeting.
+   No deviations from spec.
+3. **2026-04-18 — Phase 9: ShipFactory + Ship visual assembly** — Implemented
    ServiceLocator.cs, ContentRegistry.gd, PlayerState.gd, ShipFactory.gd, and
    ship_colorize.gdshader. Full spawn_ship() pipeline with stat resolution, part
    assembly from GLB, hardpoint discovery/configuration, faction-based naming, and
    vertex color material application. All content is JSON-driven.
-2. **2026-04-17 — Fire group indexing: 1-based in JSON, 0-based internally** —
+4. **2026-04-17 — Fire group indexing: 1-based in JSON, 0-based internally** —
    Weapons spec uses [1], [2] in JSON for human readability. Ship spec defines
    input_fire as Array[bool] (0-based). HardpointComponent converts (subtracts 1)
    when reading from JSON. Kept both conventions; ship system spec needs comment update.
-3. **2026-04-17 — ProjectileManager extends Node3D** — Needs `GetWorld3D()` for physics
-   raycast access. `Node` doesn't expose it; `Node3D` is the minimal base that does.
 <!-- RECENT-DECISIONS-END -->

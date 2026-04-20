@@ -1,0 +1,51 @@
+---
+description: GameCamera conventions — cursor-to-world, scene placement, and spring follow rules
+globs: ["gameplay/camera/**", "test/CameraTest*"]
+alwaysApply: false
+---
+
+# GameCamera — Agent Rules
+
+## Scene Placement
+- `GameCamera` is **never a child of a ship** — always a sibling of the game world
+- In any scene that uses GameCamera, it must appear at the same level as world content, not nested inside any entity node
+
+## Script Attachment
+- `GameCamera.gd` extends `Camera3D` — `self` is the camera
+- All `look_at()`, `project_ray_origin()`, `project_ray_normal()`, and `global_position` calls are on self; there is no child camera node
+
+## Cursor-to-World (Canonical Pattern)
+`get_global_mouse_position()` does not exist in 3D. Always use ray-plane intersection:
+
+```gdscript
+func get_cursor_world_position() -> Vector3:
+    var mouse_pos: Vector2 = get_viewport().get_mouse_position()
+    var ray_origin: Vector3 = project_ray_origin(mouse_pos)
+    var ray_dir: Vector3 = project_ray_normal(mouse_pos)
+    var play_plane := Plane(Vector3.UP, 0.0)
+    var intersect = play_plane.intersects_ray(ray_origin, ray_dir)
+    if intersect != null:
+        return intersect
+    return Vector3.ZERO
+```
+
+Other systems that need cursor world position should call `GameCamera.get_cursor_world_position()` or expose it through `PlayerState` post-MVP. **Do not re-implement this pattern.**
+
+## Target Management
+- `follow(target: Node3D)` — always resets `_spring_velocity` to `Vector3.ZERO`
+- `release()` — always resets `_spring_velocity` to `Vector3.ZERO`
+- Carry-over spring velocity causes visible camera lurches when switching targets
+
+## ServiceLocator Access
+GameEventBus is **not** a Godot autoload. Fetch it via ServiceLocator:
+
+```gdscript
+var service_locator := Engine.get_singleton("ServiceLocator")
+_event_bus = service_locator.GetService("GameEventBus")
+```
+
+## Zoom
+Zoom is implemented by changing the camera's Y position (`_current_height`), **not** by changing FOV. FOV is never touched.
+
+## Performance
+Camera instrumentation (`Camera.update`) is reserved but **not registered by default**. Do not add PerformanceMonitor calls to GameCamera unless profiling identifies it as a hotspot.

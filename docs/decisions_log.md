@@ -337,3 +337,63 @@ and `default_loadout.fire_groups`. No code changes required.
 
 Spec updated: yes — `feature_spec-ship_system.md` §5 naming convention, examples,
 and parser comment updated.
+
+---
+
+## 2026-04-19 — Phase 10: GameCamera — Pilot mode
+
+**Session:** Phase 10 implementation
+**Status:** Implemented — no deviations from spec
+
+### Files created
+
+| File | Purpose |
+|---|---|
+| `gameplay/camera/GameCamera.gd` | Camera script — extends Camera3D |
+| `gameplay/camera/GameCamera.tscn` | Camera3D scene with script attached |
+| `test/CameraTest.tscn` | Manual test scene |
+| `test/CameraTest.gd` | Test harness — WASD + mouse drive spawned ship |
+| `.cursor/rules/camera.mdc` | Camera conventions for future agents |
+
+### Implementation notes
+
+- **`extends Camera3D`** — script attaches directly to the Camera3D node; `self` is the camera, no child node needed.
+- **ServiceLocator for GameEventBus** — matches project convention. GameEventBus is not a Godot autoload; fetched via `Engine.get_singleton("ServiceLocator").GetService("GameEventBus")`.
+- **Signal chain**: `ShipFactory.spawn_ship(... is_player=true)` → `PlayerState.set_active_ship()` → `GameEventBus.player_ship_changed` → `GameCamera._on_player_ship_changed()` → `follow()`. Camera does not need to find the ship by group at spawn time because the signal arrives after `_ready()`.
+- **Spring reset**: both `follow()` and `release()` reset `_spring_velocity` to `Vector3.ZERO` to prevent velocity carry-over when retargeting.
+- **Zero-vector guard** in `_compute_desired_position()`: `to_cursor.normalized()` is only called when `to_cursor.length() > 0.001` to avoid NaN from normalizing a zero vector.
+- **`_on_player_ship_changed` type guard**: checks `is Node3D` before calling `follow()`; calls `release()` when `null` is passed (e.g. `PlayerState.clear_active_ship()`).
+- **No PerformanceMonitor instrumentation** — per spec, Camera.update is reserved but not registered by default at MVP.
+
+### Spec compliance
+
+All success criteria from `feature_spec-camera_system.md` are addressed by the implementation. No conflicts with core spec or other feature specs were found. No deviations required.
+
+---
+
+## 2026-04-19 — Phase 11: AIController + NavigationController integration
+
+**Session:** Phase 11 implementation  
+**Status:** Implemented
+
+### Files touched / created
+
+| File | Purpose |
+|---|---|
+| `gameplay/ai/AIController.gd` | State machine; drives `input_*` and NavigationController |
+| `data/ai_profiles.json` | Profile definitions (e.g. detection range) |
+| `core/services/ContentRegistry.gd` | Load profiles; `get_ai_profile(id)` |
+| `gameplay/entities/ShipFactory.gd` | `_attach_ai_components` — nav, DetectionVolume, AIController |
+| `gameplay/ai/NavigationController.gd` | Resolve ship via `get_parent()`; ServiceLocator via `Engine.get_singleton` |
+| `core/services/ServiceLocator.cs` | `Engine.RegisterSingleton("ServiceLocator", this)` for GDScript access |
+| `test/ShipFactoryTest.tscn` / `.gd` | Spawn config tweaks for axum fighter + AI opponent |
+
+### Implementation notes
+
+- **Ship reference:** NavigationController is parented under the ship by ShipFactory without setting `owner`; `get_parent()` is the supported path (tests that set `owner` manually still work for the ship node as parent).
+- **Deferred `add_child`:** Ship is added to the scene root with `call_deferred` so children added before tree insert run `_ready()` after the ship is in the tree.
+- **ServiceLocator:** C# registry registers itself as an engine singleton so GDScript can call `Engine.get_singleton("ServiceLocator").GetService(...)` consistently with Phase 10 camera code.
+
+### Spec compliance
+
+Aligned with `feature_spec-ai_patrol_behavior.md` intent; file any deviations in future sessions if spec audit finds gaps.

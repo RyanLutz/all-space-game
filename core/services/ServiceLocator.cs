@@ -51,6 +51,7 @@ public partial class ServiceLocator : Node
 
     public override void _Ready()
     {
+        Engine.RegisterSingleton("ServiceLocator", this);
         GD.Print("[ServiceLocator] Ready — service registry initialized");
     }
 }

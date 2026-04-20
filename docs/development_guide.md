@@ -28,9 +28,9 @@ The **Model** column uses two tiers:
 | 6 | ✅ | ProjectileManager (C#, dumb pool) | `feature_spec-weapons_and_projectiles.md` | **Opus** | Only C# system. Performance-critical. Requires holding the full pooling architecture in context. |
 | 7 | ✅ | WeaponComponent + HardpointComponent | `feature_spec-weapons_and_projectiles.md` | Sonnet | Hardpoint types (fixed/gimbal/turret), heat system, fire groups, aim algorithm. All non-missile archetypes fire. Test scene: `test/WeaponTest.tscn`. |
 | 8 | ✅ | GuidedProjectilePool | `feature_spec-weapons_and_projectiles.md` | Sonnet | GDScript guided missile pool with track_cursor, auto_lock, click_lock modes. Area damage with falloff. |
-| 9 | 🔲 | ShipFactory + Ship visual assembly | `feature_spec-ship_system.md` | Sonnet | Assembles ship from JSON definition. Mostly wiring, no novel decisions. |
-| 10 | 🔲 | GameCamera — Pilot mode | `feature_spec-camera_system.md` | Sonnet | Follow camera with cursor offset. Bounded, spec is clear. |
-| 11 | 🔲 | AIController (+ NavigationController integration) | `feature_spec-ai_patrol_behavior.md` | **Opus** | Three-state machine, behavior profiles, aim prediction. Novel and high blast radius — breaks if NavigationController integration is wrong. |
+| 9 | ✅ | ShipFactory + Ship visual assembly | `feature_spec-ship_system.md` | Sonnet | `ShipFactory.gd`, `PlayerState.gd`, `ship_colorize.gdshader`. Spawns from `ship.json` + `parts.glb`; hardpoints `HardpointEmpty_{part}_{id}_{size}`. Example ship: `content/ships/axum-fighter-1/`. Test scene: `test/ShipFactoryTest.tscn`. |
+| 10 | ✅ | GameCamera — Pilot mode | `feature_spec-camera_system.md` | Sonnet | Follow camera with cursor offset. Bounded, spec is clear. |
+| 11 | ✅ | AIController (+ NavigationController integration) | `feature_spec-ai_patrol_behavior.md` | **Opus** | `AIController.gd` state machine; `data/ai_profiles.json` via ContentRegistry. ShipFactory attaches NavigationController, DetectionVolume (Area3D), and AIController for AI ships; nav uses `get_parent()` as ship. Test scene: `test/ShipFactoryTest.tscn`. |
 | 12 | 🔲 | Test scene: player vs AI, full Pilot mode loop | — | Sonnet | Wire existing systems into a playable test. No new logic; mostly scene setup and signal hookup. |
 | 13 | 🔲 | Tactical mode camera + input layer | `feature_spec-camera_system.md`, `feature_spec-fleet_command` | **Opus** | Mode switching, RTS input, camera transition. Complex interaction surface across multiple specs. |
 | 14 | 🔲 | Fleet Command — selection, orders, stance, escort queue | `feature_spec-fleet_command` | **Opus** | Full RTS command layer. Large spec, many interacting concerns. |
@@ -58,7 +58,7 @@ During the session:
 
 After the session:
 
-- [ ] Run the test scene (once it exists at Step 12) — nothing regresses
+- [ ] Run the relevant test scene for the step you touched (e.g. `test/ShipFactoryTest.tscn` for Step 9, `test/ShipPhysicsTest.tscn` for Step 4) — nothing regresses; at Step 12, run the full Pilot loop test
 - [ ] Mark the step complete in this document
 - [ ] Commit before starting the next session
 

@@ -24,10 +24,12 @@ var _perf: Node
 
 
 func _ready() -> void:
-	_perf = ServiceLocator.GetService("PerformanceMonitor")
+	var service_locator := Engine.get_singleton("ServiceLocator")
+	_perf = service_locator.GetService("PerformanceMonitor")
 
-	# Read tuning from parent ship's stats
-	var ship := owner
+	# Read tuning from parent ship — get_parent() because this node is added
+	# programmatically by ShipFactory (owner is not set automatically)
+	var ship := get_parent()
 	if ship and "arrival_distance" in ship:
 		arrival_distance = ship.arrival_distance
 	if ship and "brake_safety_margin" in ship:
@@ -59,7 +61,7 @@ func update(delta: float) -> void:
 # ─── Core Navigation Logic ──────────────────────────────────────────────────
 
 func _update_nav(_delta: float) -> void:
-	var ship := owner as RigidBody3D
+	var ship := get_parent() as RigidBody3D
 
 	var to_dest := _destination - ship.global_position
 	to_dest.y = 0.0

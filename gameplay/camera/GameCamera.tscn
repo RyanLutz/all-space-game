@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://gamecamera"]
+
+[ext_resource type="Script" path="res://gameplay/camera/GameCamera.gd" id="1"]
+
+[node name="GameCamera" type="Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 500, 0)
+script = ExtResource("1")
