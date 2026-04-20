@@ -37,11 +37,25 @@ signal explosion_triggered(position: Vector3, radius: float, intensity: float)
 signal game_mode_changed(old_mode: String, new_mode: String)
 
 # ─── Tactical Orders ───────────────────────────────────────────────────────────
-signal request_tactical_move(ship_ids: Array, destination: Vector3)
-signal request_tactical_attack(ship_ids: Array, target_id: int)
-signal request_tactical_mine(ship_ids: Array, asteroid_id: int)
+signal request_tactical_move(ship_ids: Array, destination: Vector3, queue_mode: String)
+signal request_tactical_attack(ship_ids: Array, target_id: int, queue_mode: String)
+signal request_tactical_mine(ship_ids: Array, asteroid_id: int, queue_mode: String)
 signal request_tactical_dock(ship_ids: Array, station_id: int)
+signal request_tactical_stop(ship_ids: Array)
+signal request_tactical_set_stance(ship_id: int, stance: int)
+signal request_tactical_set_escort_stance(stance: int)
+signal request_tactical_add_to_escort(ship_id: int)
+signal request_tactical_remove_from_escort(ship_id: int)
 signal tactical_selection_changed(ship_ids: Array)
+signal context_menu_requested(ship_id: int, screen_pos: Vector2)
+
+# ─── Escort & Formation ───────────────────────────────────────────────────────
+signal escort_queue_changed(ship_ids: Array)
+signal escort_stance_changed(stance: int)
+signal request_formation_destination(ship_id: int, destination: Vector3)
+
+# ─── Damage ───────────────────────────────────────────────────────────────────
+signal ship_damaged(victim: Node, attacker: Node)
 
 # ─── Station ───────────────────────────────────────────────────────────────────
 signal dock_requested(ship: Node, station: Node)

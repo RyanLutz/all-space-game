@@ -114,7 +114,7 @@ func _idle_process(delta: float) -> void:
 
 func _pick_new_wander_target() -> void:
 	var angle := randf() * TAU
-	var dist := randf() * profile.get("wander_radius", 600.0)
+	var dist: float = randf() * float(profile.get("wander_radius", 600.0))
 	_wander_target = _spawn_position + Vector3(cos(angle) * dist, 0.0, sin(angle) * dist)
 	_wander_pause_timer = randf_range(
 		profile.get("wander_pause_min", 1.0),
@@ -167,9 +167,9 @@ func _engage_process(delta: float) -> void:
 	ship.input_aim_target = predicted_pos
 
 	var dist_to_player := ship.global_position.distance_to(_target_player.global_position)
-	var preferred := profile.get("preferred_engage_distance", 350.0)
-	var ratio := dist_to_player / maxf(preferred, 1.0)
-	var engage_thrust := profile.get("engage_thrust_fraction", 0.7)
+	var preferred: float = float(profile.get("preferred_engage_distance", 350.0))
+	var ratio: float = dist_to_player / maxf(preferred, 1.0)
+	var engage_thrust: float = float(profile.get("engage_thrust_fraction", 0.7))
 
 	if ratio < 0.7:
 		# Too close — reverse away from player
@@ -216,7 +216,7 @@ func _predict_aim_position(target: Node3D) -> Vector3:
 
 	var travel_time := distance / _primary_muzzle_speed
 	var target_vel: Vector3 = target.linear_velocity if target is RigidBody3D else Vector3.ZERO
-	var predicted := target.global_position + target_vel * travel_time * profile.get("aim_accuracy", 0.7)
+	var predicted: Vector3 = target.global_position + target_vel * travel_time * float(profile.get("aim_accuracy", 0.7))
 	predicted.y = 0.0
 	return predicted
 

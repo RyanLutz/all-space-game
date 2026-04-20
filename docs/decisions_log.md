@@ -409,3 +409,32 @@ Aligned with `feature_spec-ai_patrol_behavior.md` intent; file any deviations in
 **Default AI loadout:** AI uses `axum-fighter-1` / `axum_fighter_patrol` / `pirate` so both ships resolve against the same `ship.json` (the `corvette_patrol_heavy` variant belongs to class `corvette_patrol`, not `axum-fighter-1`).
 
 **Commit packaging:** This Step 12 deliverable was committed as one changeset: `test/PilotLoopTest.tscn`, `test/PilotLoopTest.gd`, `project.godot` main scene, and updates to `docs/development_guide.md`, `docs/agent_brief.md`, and this file. Unrelated local edits to Blender sources and ship GLBs under `assets/` and `content/` were left unstaged.
+
+---
+
+## 2026-04-19 — Phase 13: Tactical mode camera + input layer
+
+Agent:   Claude Opus (Claude Code)
+System:  Fleet Command (camera + input layer), GameCamera, GameEventBus
+Spec:    `feature_spec-camera_system.md` §Future Extension, `feature_spec-fleet_command.md` §2–4
+
+**Decision:** Implemented the tactical mode camera and input layer as Phase 13.
+
+### New files
+- `gameplay/fleet_command/InputManager.gd` — Tab key mode toggle (`game_mode_changed` signal), pilot input routing (WASD + mouse → ship unified input interface). In tactical mode, stops writing to ship inputs.
+- `gameplay/fleet_command/SelectionState.gd` — Selection tracking by instance id. Click-select, shift-toggle, drag-box select, cleared on mode switch, pruned on `ship_destroyed`.
+- `gameplay/fleet_command/TacticalInputHandler.gd` — Tactical-only input: left-click select, drag-box, right-click target classification (fleet → context menu, enemy → attack, asteroid → mine, empty → move), Stop key (Esc + S).
+
+### Modified files
+- `gameplay/camera/GameCamera.gd` — Added tactical mode: `game_mode_changed` listener, free-pan (WASD + edge scroll), zoom-out on enter tactical, re-follow player on exit, `set_zoom_limits()`, separate tactical zoom bounds. Orientation uses look-at-ground when no follow target.
+- `core/GameEventBus.gd` — Added `queue_mode: String` param to `request_tactical_move/attack/mine`. New signals: `request_tactical_stop`, `request_tactical_set_stance`, `request_tactical_set_escort_stance`, `request_tactical_add_to_escort`, `request_tactical_remove_from_escort`, `context_menu_requested`, `escort_queue_changed`, `escort_stance_changed`, `request_formation_destination`, `ship_damaged`.
+- `project.godot` — Added `toggle_mode` (Tab) and `tactical_stop` (Esc + S) input actions.
+- `test/PilotLoopTest.gd` — Refactored: removed inline `_physics_process` and `_input` player routing; now creates InputManager, SelectionState, and TacticalInputHandler as children.
+
+### Deviation
+- **File location:** Spec says `systems/fleet_command/`; used `gameplay/fleet_command/` to match the existing project layout where all gameplay code lives under `gameplay/`.
+
+### Not yet implemented (later phases)
+- EscortQueue, FormationController, StanceController (fleet command internals)
+- TacticalUI (SelectionBox visual, ContextMenu, EscortPanel)
+- AI integration with stance system
