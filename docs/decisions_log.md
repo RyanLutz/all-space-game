@@ -397,3 +397,15 @@ All success criteria from `feature_spec-camera_system.md` are addressed by the i
 ### Spec compliance
 
 Aligned with `feature_spec-ai_patrol_behavior.md` intent; file any deviations in future sessions if spec audit finds gaps.
+
+---
+
+## 2026-04-19 — Step 12: Pilot loop integration test scene
+
+**Decision:** Added `test/PilotLoopTest.tscn` and `test/PilotLoopTest.gd` as the Step 12 harness: `ShipFactory` spawns player + AI, `GameCamera` for Pilot follow + cursor aim, `InputMap` actions `move_*` for thrust, LMB/RMB for fire groups 1–2. Tunables (`class_id`, variant, faction, spawns, `ai_profile_id`) are `@export` fields, not magic numbers in code.
+
+**Main scene:** `project.godot` `run/main_scene` now points at `res://test/PilotLoopTest.tscn` so Run Project exercises the full Pilot loop instead of `CameraTest.tscn`.
+
+**Default AI loadout:** AI uses `axum-fighter-1` / `axum_fighter_patrol` / `pirate` so both ships resolve against the same `ship.json` (the `corvette_patrol_heavy` variant belongs to class `corvette_patrol`, not `axum-fighter-1`).
+
+**Commit packaging:** This Step 12 deliverable was committed as one changeset: `test/PilotLoopTest.tscn`, `test/PilotLoopTest.gd`, `project.godot` main scene, and updates to `docs/development_guide.md`, `docs/agent_brief.md`, and this file. Unrelated local edits to Blender sources and ship GLBs under `assets/` and `content/` were left unstaged.
