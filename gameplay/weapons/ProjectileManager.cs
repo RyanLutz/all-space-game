@@ -172,7 +172,7 @@ public partial class ProjectileManager : Node3D
 			hitPos = new Vector3(hitPos.X, 0f, hitPos.Z);
 
 			ApplyDamage(collider, proj.Damage, proj.DamageType, hitPos,
-				proj.ComponentDamageRatio);
+				proj.ComponentDamageRatio, proj.OwnerEntityId);
 
 			proj.Active = false;
 			_activeDumbCount--;
@@ -217,7 +217,7 @@ public partial class ProjectileManager : Node3D
 				beamEnd = hitPos;
 
 				ApplyDamage(collider, req.Damage, req.DamageType, hitPos,
-					req.ComponentDamageRatio);
+					req.ComponentDamageRatio, req.OwnerEntityId);
 			}
 			else
 			{
@@ -234,7 +234,7 @@ public partial class ProjectileManager : Node3D
 	// ── Damage application ──────────────────────────────────────────────
 
 	private void ApplyDamage(Node target, float damage, string damageType,
-		Vector3 hitPos, float componentRatio)
+		Vector3 hitPos, float componentRatio, ulong ownerId = 0)
 	{
 		if (target == null)
 			return;
@@ -242,7 +242,7 @@ public partial class ProjectileManager : Node3D
 		if (target.HasMethod("apply_damage"))
 		{
 			target.Call("apply_damage", (double)damage, damageType, hitPos,
-				(double)componentRatio);
+				(double)componentRatio, (long)ownerId);
 		}
 
 		_eventBus.EmitSignal("projectile_hit", target, (double)damage,

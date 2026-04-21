@@ -28,6 +28,35 @@
 
       "faction": "neutral",
       "personality": "standard"
+    },
+    {
+      "id": "fleet_default",
+      "display_name": "Fleet Default",
+
+      "detection_range": 600.0,
+      "leash_range": 99999.0,
+      "engage_distance": 400.0,
+      "preferred_engage_distance": 300.0,
+
+      "wander_radius": 50.0,
+      "wander_thrust_fraction": 0.2,
+      "wander_arrival_distance": 20.0,
+      "wander_pause_min": 2.0,
+      "wander_pause_max": 5.0,
+
+      "pursue_thrust_fraction": 0.8,
+
+      "engage_thrust_fraction": 0.7,
+      "strafe_thrust_fraction": 0.3,
+      "fire_angle_threshold": 15.0,
+
+      "aim_accuracy": 0.7,
+
+      "flee_enabled": false,
+      "flee_hp_threshold": 0.0,
+
+      "faction": "player_fleet",
+      "personality": "obedient"
     }
   ]
 }

@@ -53,6 +53,7 @@ signal context_menu_requested(ship_id: int, screen_pos: Vector2)
 signal escort_queue_changed(ship_ids: Array)
 signal escort_stance_changed(stance: int)
 signal request_formation_destination(ship_id: int, destination: Vector3)
+signal navigation_order_completed(ship_id: int)
 
 # ─── Damage ───────────────────────────────────────────────────────────────────
 signal ship_damaged(victim: Node, attacker: Node)

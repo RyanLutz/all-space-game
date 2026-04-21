@@ -206,8 +206,13 @@ func draw_power(amount: float) -> bool:
 # ─── Damage (SpaceBody contract) ─────────────────────────────────────────────
 
 func apply_damage(amount: float, damage_type: String,
-				  _hit_pos: Vector3, component_ratio: float) -> void:
+				  _hit_pos: Vector3, component_ratio: float,
+				  attacker_id: int = 0) -> void:
 	time_since_last_hit = 0.0
+
+	# Emit ship_damaged for stance system (defensive fan-out)
+	var attacker_node: Node = instance_from_id(attacker_id) if attacker_id != 0 else null
+	_event_bus.ship_damaged.emit(self, attacker_node)
 
 	# Shield absorption
 	if shield_hp > 0.0:

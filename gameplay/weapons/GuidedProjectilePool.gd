@@ -177,7 +177,7 @@ func _apply_damage(proj: GuidedProjectile, target: Node, hit_pos: Vector3) -> vo
 
 	# Apply direct hit damage
 	if target.has_method("apply_damage"):
-		target.call("apply_damage", proj.damage, proj.damage_type, hit_pos, proj.component_damage_ratio)
+		target.call("apply_damage", proj.damage, proj.damage_type, hit_pos, proj.component_damage_ratio, proj.owner_id)
 
 	# Emit hit signal
 	if _event_bus:
@@ -224,7 +224,7 @@ func _trigger_explosion(explosion_position: Vector3, proj: GuidedProjectile) -> 
 		var area_damage := proj.damage * falloff
 
 		if area_damage > 0.0 and collider.has_method("apply_damage"):
-			collider.call("apply_damage", area_damage, proj.damage_type, explosion_position, proj.component_damage_ratio)
+			collider.call("apply_damage", area_damage, proj.damage_type, explosion_position, proj.component_damage_ratio, proj.owner_id)
 
 
 # ─── Spawn Handling ──────────────────────────────────────────────────────────────

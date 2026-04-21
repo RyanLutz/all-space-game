@@ -1,0 +1,11 @@
+{
+  "id": "v_wing",
+  "display_name": "V-Wing",
+  "default": true,
+  "slots": [
+    { "role": "wingman_port",      "offset": [-25.0, 0.0,  15.0] },
+    { "role": "wingman_starboard", "offset": [ 25.0, 0.0,  15.0] },
+    { "role": "trail_port",        "offset": [-40.0, 0.0,  30.0] },
+    { "role": "trail_starboard",   "offset": [ 40.0, 0.0,  30.0] }
+  ]
+}

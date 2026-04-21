@@ -95,7 +95,13 @@ func spawn_ship(
 	# 9. Identity and groups
 	if is_player:
 		ship.add_to_group("player")
+		ship.add_to_group("player_fleet")
 		_player_state.set_active_ship(ship)
+
+		# Player ship gets a NavigationController for tactical move orders
+		var nav := NavigationController.new()
+		nav.name = "NavigationController"
+		ship.add_child(nav)
 	else:
 		ship.add_to_group("ai_ships")
 		_attach_ai_components(ship, ai_profile_id)

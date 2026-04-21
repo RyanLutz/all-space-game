@@ -4,9 +4,19 @@ class_name NavigationController
 ## Flight computer: translates a world-space destination into per-frame
 ## input_forward and input_strafe values for Ship.gd.
 ##
-## This is a tool, not an actor. It has no _physics_process and makes no
-## decisions about where to go. The caller (AIController, TacticalInputHandler)
-## drives it explicitly via set_destination() + set_thrust_fraction() + update().
+## Two drive modes:
+##   EXTERNAL — legacy behavior. The caller (AIController) drives via
+##              set_destination() + set_thrust_fraction() + update() each frame.
+##   TACTICAL_ORDER / FORMATION — self-driving via _physics_process after
+##              receiving a signal from GameEventBus.
+##
+## Tactical orders take priority over formation destinations.
+
+enum DriveMode { EXTERNAL, TACTICAL_ORDER, FORMATION }
+
+# ─── Drive state ───────────────────────────────────────────────────────────
+var _drive_mode: DriveMode = DriveMode.EXTERNAL
+var _tactical_override: bool = false
 
 # ─── Caller-set each frame (before update()) ────────────────────────────────
 var _destination: Vector3 = Vector3.ZERO
@@ -21,11 +31,13 @@ var brake_safety_margin: float = 1.25
 
 # ─── Cached services ────────────────────────────────────────────────────────
 var _perf: Node
+var _event_bus: Node
 
 
 func _ready() -> void:
 	var service_locator := Engine.get_singleton("ServiceLocator")
 	_perf = service_locator.GetService("PerformanceMonitor")
+	_event_bus = service_locator.GetService("GameEventBus")
 
 	# Read tuning from parent ship — get_parent() because this node is added
 	# programmatically by ShipFactory (owner is not set automatically)
@@ -35,8 +47,14 @@ func _ready() -> void:
 	if ship and "brake_safety_margin" in ship:
 		brake_safety_margin = ship.brake_safety_margin
 
+	# Signal connections for self-drive
+	if _event_bus:
+		_event_bus.connect("request_tactical_move", _on_request_tactical_move)
+		_event_bus.connect("request_tactical_stop", _on_request_tactical_stop)
+		_event_bus.connect("request_formation_destination", _on_request_formation_destination)
 
-# ─── Public Interface ───────────────────────────────────────────────────────
+
+# ─── Public Interface (EXTERNAL mode — AIController) ───────────────────────
 
 func set_destination(pos: Vector3) -> void:
 	pos.y = 0.0
@@ -52,9 +70,72 @@ func has_arrived() -> bool:
 	return _arrived
 
 
+func has_tactical_order() -> bool:
+	return _tactical_override
+
+
 func update(delta: float) -> void:
 	_perf.begin("Navigation.update")
 	_update_nav(delta)
+	_perf.end("Navigation.update")
+
+
+# ─── Signal Handlers (self-drive) ──────────────────────────────────────────
+
+func _on_request_tactical_move(ship_ids: Array, destination: Vector3, _queue_mode: String) -> void:
+	var my_id := get_parent().get_instance_id()
+	if my_id not in ship_ids:
+		return
+	_destination = destination
+	_destination.y = 0.0
+	_arrived = false
+	_drive_mode = DriveMode.TACTICAL_ORDER
+	_tactical_override = true
+	_thrust_fraction = 1.0
+
+
+func _on_request_tactical_stop(ship_ids: Array) -> void:
+	var my_id := get_parent().get_instance_id()
+	if my_id not in ship_ids:
+		return
+	_drive_mode = DriveMode.EXTERNAL
+	_tactical_override = false
+	_arrived = true
+	var ship := get_parent()
+	if ship:
+		ship.input_forward = 0.0
+		ship.input_strafe = 0.0
+
+
+func _on_request_formation_destination(ship_id: int, destination: Vector3) -> void:
+	if get_parent().get_instance_id() != ship_id:
+		return
+	if _tactical_override:
+		return  # tactical order takes priority over formation
+	_destination = destination
+	_destination.y = 0.0
+	_arrived = false
+	_drive_mode = DriveMode.FORMATION
+	_thrust_fraction = 1.0
+
+
+# ─── Self-Drive Physics ───────────────────────────────────────────────────
+
+func _physics_process(_delta: float) -> void:
+	if _drive_mode == DriveMode.EXTERNAL:
+		return
+
+	if _arrived:
+		if _drive_mode == DriveMode.TACTICAL_ORDER:
+			_drive_mode = DriveMode.EXTERNAL
+			_tactical_override = false
+			if _event_bus:
+				_event_bus.navigation_order_completed.emit(get_parent().get_instance_id())
+		# FORMATION: stay arrived, next tick from FormationController will push new dest
+		return
+
+	_perf.begin("Navigation.update")
+	_update_nav(_delta)
 	_perf.end("Navigation.update")
 
 

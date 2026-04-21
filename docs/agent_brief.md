@@ -85,7 +85,8 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 11 | AIController + NavigationController integration | Implemented |
 | 12 | Test scene: player vs AI, full Pilot mode loop | Implemented |
 | 13 | Tactical mode camera + input layer | Implemented |
-| 14 | ChunkStreamer + Asteroid + Debris | Not started |
+| 14 | Fleet Command — selection, orders, stance, escort queue | Implemented |
+| 15 | ChunkStreamer + Asteroid + Debris | Not started |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 
@@ -154,29 +155,34 @@ The most recent decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-04-19 — Phase 13: Tactical mode camera + input layer** — InputManager.gd
+1. **2026-04-20 — Phase 14: Fleet Command — selection, orders, stance, escort queue** —
+   EscortQueue.gd (ordered queue, away-on-orders, queue-shared stance),
+   StanceController.gd (per-ship stance, defensive fan-out, signal-cached escort state),
+   FormationController.gd (V-Wing formation tick, slot destinations via signal).
+   NavigationController gains DriveMode (EXTERNAL/TACTICAL_ORDER/FORMATION) + self-drive.
+   AIController gains TACTICAL_ATTACK state, fleet-friendly detection, stance check.
+   Ship.gd emits ship_damaged with attacker_id threaded from ProjectileManager/GuidedPool.
+   ShipFactory adds player_fleet group + NavigationController to player ship. Minimal
+   TacticalUI: ContextMenu (Stance/Escort submenus) + EscortPanel (stance selector + list).
+   PilotLoopTest spawns player + 2 fleet ships + 1 enemy with full system wiring.
+2. **2026-04-19 — Phase 13: Tactical mode camera + input layer** — InputManager.gd
    (Tab toggle, pilot input routing), SelectionState.gd (click/drag/shift selection),
    TacticalInputHandler.gd (right-click dispatch, stop key), GameCamera tactical mode
    (free-pan WASD + edge-scroll, zoom-out on enter, re-follow on exit). GameEventBus
    updated with queue_mode on order signals, new signals for escort/stance/formation/
    damage. PilotLoopTest refactored to use InputManager. Spec file location deviation:
    `gameplay/fleet_command/` instead of `systems/fleet_command/` to match existing layout.
-2. **2026-04-19 — Step 12: Pilot loop test scene** — `test/PilotLoopTest.tscn` / `PilotLoopTest.gd`:
+3. **2026-04-19 — Step 12: Pilot loop test scene** — `test/PilotLoopTest.tscn` / `PilotLoopTest.gd`:
    ShipFactory spawns player + AI, GameCamera + `move_*` thrust + LMB/RMB fire; exports for
    spawns and content IDs. `run/main_scene` set to PilotLoopTest. Default AI variant
    `axum_fighter_patrol` (same class as player) so JSON variants resolve.
-3. **2026-04-19 — Phase 11: AIController + NavigationController integration** —
+4. **2026-04-19 — Phase 11: AIController + NavigationController integration** —
    `AIController.gd`, `data/ai_profiles.json`, ShipFactory `_attach_ai_components`,
    ContentRegistry `get_ai_profile`, NavigationController ship via `get_parent()` (factory
    spawn). `Engine.RegisterSingleton("ServiceLocator", …)` for GDScript `get_singleton`.
-4. **2026-04-19 — Phase 10: GameCamera — Pilot mode** — Implemented
+5. **2026-04-19 — Phase 10: GameCamera — Pilot mode** — Implemented
    GameCamera.gd (extends Camera3D), GameCamera.tscn, CameraTest.tscn/.gd, and
    .cursor/rules/camera.mdc. Critically damped spring follow, cursor-offset lead,
    height-based zoom, ray-plane mouse-to-world, and PlayerState signal retargeting.
    No deviations from spec.
-5. **2026-04-18 — Phase 9: ShipFactory + Ship visual assembly** — Implemented
-   ServiceLocator.cs, ContentRegistry.gd, PlayerState.gd, ShipFactory.gd, and
-   ship_colorize.gdshader. Full spawn_ship() pipeline with stat resolution, part
-   assembly from GLB, hardpoint discovery/configuration, faction-based naming, and
-   vertex color material application. All content is JSON-driven.
 <!-- RECENT-DECISIONS-END -->

@@ -438,3 +438,46 @@ Spec:    `feature_spec-camera_system.md` §Future Extension, `feature_spec-fleet
 - EscortQueue, FormationController, StanceController (fleet command internals)
 - TacticalUI (SelectionBox visual, ContextMenu, EscortPanel)
 - AI integration with stance system
+
+---
+
+## 2026-04-20 — Phase 14: Fleet Command — selection, orders, stance, escort queue
+
+Agent:   Claude Opus (Claude Code)
+System:  Fleet Command, NavigationController, AIController, Ship, ProjectileManager, GuidedProjectilePool, ShipFactory
+Spec:    `feature_spec-fleet_command.md` §2–9
+
+**Decision:** Implemented the full RTS command layer (Phase 14).
+
+### New files
+- `gameplay/fleet_command/EscortQueue.gd` — Ordered escort ship list with queue-shared stance, away-on-orders tracking, and automatic pruning on ship_destroyed.
+- `gameplay/fleet_command/StanceController.gd` — Per-ship stance for non-escort ships, `get_effective_stance()` single call for AIController. Caches escort membership via signals (no direct EscortQueue reference). Defensive fan-out: when escort queue member is damaged and stance is DEFENSIVE, all queue members attack the aggressor.
+- `gameplay/fleet_command/FormationController.gd` — Timer-based tick (~0.25s) pushes slot destinations for escort queue members in Pilot mode via `request_formation_destination` signal. Slot = player position + offset rotated by player yaw.
+- `content/formations/v_wing/formation.json` — Default 4-slot V-Wing formation.
+- `ui/tactical/ContextMenu.gd` — PopupMenu with Stance + Escort submenus; listens to `context_menu_requested`, emits stance/escort signals. Stance hidden when ship is in escort queue. Player ship cannot be added to own escort.
+- `ui/tactical/EscortPanel.gd` — PanelContainer with stance selector buttons and queue member list. Visible only when queue is non-empty.
+
+### Modified files
+- `core/GameEventBus.gd` — Added `navigation_order_completed(ship_id: int)` signal.
+- `gameplay/entities/Ship.gd` — `apply_damage()` gains optional `attacker_id: int = 0` param; emits `ship_damaged(self, attacker_node)` on all damage.
+- `gameplay/weapons/ProjectileManager.cs` — `ApplyDamage()` threads `OwnerEntityId` as 5th arg to GDScript `apply_damage`.
+- `gameplay/weapons/GuidedProjectilePool.gd` — Threads `owner_id` through `_apply_damage()` and `_trigger_explosion()` to `apply_damage`.
+- `gameplay/entities/ShipFactory.gd` — Player ship gets `player_fleet` group and a NavigationController for tactical move orders.
+- `gameplay/ai/NavigationController.gd` — Added `DriveMode` enum (EXTERNAL/TACTICAL_ORDER/FORMATION), signal listeners for `request_tactical_move`, `request_tactical_stop`, `request_formation_destination`, `_physics_process()` self-drive, `has_tactical_order()` query.
+- `gameplay/ai/AIController.gd` — Added `TACTICAL_ATTACK` state, signal listeners for `request_tactical_attack`/`request_tactical_stop`, fleet-friendly detection (fleet ships target `enemies` group, not `player` group), stance check via StanceController (HOLD_FIRE suppresses fire), nav override check (`has_tactical_order()`). Renamed `_target_player`/`_player_detected` to `_target`/`_target_detected`.
+- `data/ai_profiles.json` — Added `fleet_default` profile (small wander, obedient personality, no autonomous engagement).
+- `test/PilotLoopTest.gd` — Wires all Phase 14 systems: EscortQueue, FormationController, StanceController (registered via ServiceLocator), TacticalUI (CanvasLayer with ContextMenu + EscortPanel). Spawns 2 fleet ships (player faction, fleet_default profile, player_fleet group) + 1 enemy (enemies group).
+
+### Key design decisions
+1. **NavigationController self-drive via DriveMode.** EXTERNAL = legacy (AIController calls `update()`), TACTICAL_ORDER/FORMATION = self-driving via `_physics_process`. AIController checks `has_tactical_order()` before overriding nav.
+2. **StanceController signal-cached escort state.** Listens to `escort_queue_changed` and `escort_stance_changed` to avoid direct reference to EscortQueue. Registered via ServiceLocator for AIController access.
+3. **Player ship attack orders = move-to-target only.** No AIController on player ship; no auto-fire. Player switches to pilot mode to fire.
+4. **Fleet-friendly detection.** `_on_detection_volume_body_entered` checks `player_fleet` membership to avoid targeting friendlies.
+5. **`ship_damaged` attacker threading.** Optional param on `apply_damage()` preserves backward compat across the C#/GDScript boundary.
+
+### Deviations
+- **File location:** Spec says `systems/fleet_command/` and `ui/tactical/`; used `gameplay/fleet_command/` and `ui/tactical/` matching existing layout.
+- **TacticalUI.tscn not created.** UI components are instantiated programmatically in PilotLoopTest.gd, consistent with how all Phase 13 components are wired. A .tscn can be extracted later.
+- **Stance submenu disabled (not hidden)** when ship is in escort queue. PopupMenu item hiding for submenu entries is complex; disabled state provides equivalent behavioral correctness. Visual polish deferred per spec §9.4.
+
+Spec updated: no — implementation matches spec intent; file locations follow existing convention
