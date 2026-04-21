@@ -49,6 +49,9 @@ var _formation_controller: FormationController = null
 var _stance_controller: StanceController = null
 var _context_menu: TacticalContextMenu = null
 var _escort_panel: EscortPanel = null
+var _cursor_indicator: MeshInstance3D = null
+var _debug_grid: MeshInstance3D = null
+var _debug_visible: bool = false
 
 @export_group("Player ship")
 @export var player_class_id: String = "axum-fighter-1"
@@ -82,6 +85,15 @@ func _ready() -> void:
 	if _camera == null:
 		push_error("[PilotLoopTest] GameCamera child missing.")
 		return
+
+	# ─── Cursor indicator ──────────────────────────────────────────────
+	_cursor_indicator = _create_cursor_indicator()
+	add_child(_cursor_indicator)
+
+	# ─── Debug grid ────────────────────────────────────────────────────
+	_debug_grid = _create_debug_grid()
+	_debug_grid.visible = false
+	add_child(_debug_grid)
 
 	# ─── Fleet Command components ──────────────────────────────────────
 	_input_manager = InputManager.new()
@@ -195,3 +207,62 @@ func _ready() -> void:
 	])
 	print("[PilotLoopTest] WASD = thrust  |  Mouse = aim  |  Scroll = zoom  |  LMB/RMB = fire  |  Tab = mode toggle")
 	print("[PilotLoopTest] Tactical: click/drag select  |  R-click = order  |  R-click fleet ship = context menu")
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		if event.pressed and event.keycode == KEY_F3:
+			_debug_visible = not _debug_visible
+			if _debug_grid:
+				_debug_grid.visible = _debug_visible
+
+
+func _process(_delta: float) -> void:
+	if _cursor_indicator and _camera:
+		var cursor_pos: Vector3 = _camera.get_cursor_world_position()
+		cursor_pos.y = 0.5
+		_cursor_indicator.global_position = cursor_pos
+
+
+func _create_cursor_indicator() -> MeshInstance3D:
+	var mesh_instance := MeshInstance3D.new()
+	mesh_instance.name = "CursorIndicator"
+
+	var cylinder := CylinderMesh.new()
+	cylinder.top_radius = 5.0
+	cylinder.bottom_radius = 5.0
+	cylinder.height = 1.0
+	mesh_instance.mesh = cylinder
+
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(1.0, 0.0, 0.0)
+	material.emission_enabled = true
+	material.emission = Color(0.5, 0.0, 0.0)
+	mesh_instance.material_override = material
+
+	return mesh_instance
+
+
+func _create_debug_grid() -> MeshInstance3D:
+	var mesh_instance := MeshInstance3D.new()
+	mesh_instance.name = "DebugGrid"
+
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(10000, 10000)
+	mesh_instance.mesh = plane
+
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(1, 1, 1)
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+
+	# Load the grid texture
+	var texture_path := "res://assets/textures/debug/grid.png"
+	if FileAccess.file_exists(texture_path):
+		var texture := load(texture_path)
+		material.albedo_texture = texture
+		material.uv1_scale = Vector3(50, 50, 1)
+	else:
+		push_warning("Debug grid texture not found at " + texture_path + " — grid will be invisible until texture is provided")
+
+	mesh_instance.material_override = material
+	return mesh_instance
