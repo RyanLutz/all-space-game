@@ -1,5 +1,11 @@
 extends Node3D
 
+const EscortQueue := preload("res://gameplay/fleet_command/EscortQueue.gd")
+const FormationController := preload("res://gameplay/fleet_command/FormationController.gd")
+const StanceController := preload("res://gameplay/fleet_command/StanceController.gd")
+const TacticalContextMenu := preload("res://ui/tactical/ContextMenu.gd")
+const EscortPanel := preload("res://ui/tactical/EscortPanel.gd")
+
 ## Step 12/13/14 — Player vs AI, Pilot + Tactical mode loop, Fleet Command.
 ##
 ## Controls (Pilot mode):

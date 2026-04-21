@@ -49,7 +49,9 @@ func _input(event: InputEvent) -> void:
 		if old_mode == "pilot" and _player_ship and is_instance_valid(_player_ship):
 			_player_ship.input_forward = 0.0
 			_player_ship.input_strafe = 0.0
-			_player_ship.input_fire = [false, false, false]
+			_player_ship.input_fire[0] = false
+			_player_ship.input_fire[1] = false
+			_player_ship.input_fire[2] = false
 
 		print("[InputManager] Mode: %s → %s" % [old_mode, _current_mode])
 

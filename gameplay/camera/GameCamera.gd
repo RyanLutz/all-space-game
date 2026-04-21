@@ -263,6 +263,9 @@ func _update_zoom(delta: float) -> void:
 # ─── Main Loop ────────────────────────────────────────────────────────────────
 
 func _physics_process(delta: float) -> void:
+	if not is_inside_tree():
+		return
+
 	if _follow_target != null and not is_instance_valid(_follow_target):
 		release()
 

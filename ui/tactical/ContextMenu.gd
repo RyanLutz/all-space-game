@@ -57,7 +57,7 @@ func _on_context_menu_requested(ship_id: int, screen_pos: Vector2) -> void:
 
 	# Don't show context menu for the player's own ship (can't escort yourself)
 	if _player_state:
-		var player_ship := _player_state.get_active_ship()
+		var player_ship: Node = _player_state.get_active_ship()
 		if player_ship and player_ship.get_instance_id() == ship_id:
 			# Player ship — only show stance if not in escort
 			pass  # Still show the menu for stance changes
@@ -75,7 +75,7 @@ func _on_context_menu_requested(ship_id: int, screen_pos: Vector2) -> void:
 	# Escort submenu: populate dynamically
 	_escort_menu.clear()
 	if _player_state:
-		var player_ship := _player_state.get_active_ship()
+		var player_ship: Node = _player_state.get_active_ship()
 		# Don't allow adding the player ship to its own escort
 		if player_ship and player_ship.get_instance_id() == ship_id:
 			_escort_menu.add_item("(Player ship)", -1)
