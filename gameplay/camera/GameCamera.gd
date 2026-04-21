@@ -8,14 +8,12 @@ class_name GameCamera
 
 # ─── Angle & Position ─────────────────────────────────────────────────────────
 @export_group("Angle & Position")
-@export var camera_angle: float = 25.0        # degrees from straight down (0 = top-down)
 @export var smoothing_speed: float = 10.0     # spring response; higher = snappier
-@export var max_cursor_offset: float = 120.0  # world-space units of cursor lead
 
 # ─── Zoom ─────────────────────────────────────────────────────────────────────
 @export_group("Zoom")
-@export var height_min: float = 300.0         # closest zoom (camera Y)
-@export var height_max: float = 1200.0        # farthest zoom (camera Y)
+@export var height_min: float = 200.0         # closest zoom (camera Y)
+@export var height_max: float = 2000.0        # farthest zoom (camera Y)
 @export var height_default: float = 500.0     # starting zoom
 @export var zoom_step: float = 50.0           # world units per scroll tick
 @export var zoom_smoothing: float = 10.0      # zoom interpolation speed
@@ -161,24 +159,15 @@ func _compute_desired_position() -> Vector3:
 
 	var target_pos: Vector3 = _follow_target.global_position
 
-	var cursor_world: Vector3 = get_cursor_world_position()
-	var to_cursor: Vector3 = cursor_world - target_pos
-	to_cursor.y = 0.0
-
-	var offset_magnitude: float = clampf(to_cursor.length(), 0.0, max_cursor_offset)
-	# Scale offset down when zoomed out — wide view already covers more ground
-	var effective_offset: float = offset_magnitude * (height_default / _current_height)
-	var cursor_offset_3d: Vector3 = Vector3.ZERO
-	if to_cursor.length() > 0.001:
-		cursor_offset_3d = to_cursor.normalized() * effective_offset
-
-	# Pull camera behind and above the look target based on the tilt angle
-	var depth_back: float = _current_height * tan(deg_to_rad(camera_angle))
+	# Position camera behind target based on current tilt angle
+	# No cursor offset - fixed position relative to target
+	var tilt_angle := _get_tilt_for_height()
+	var depth_back: float = _current_height * tan(deg_to_rad(90.0 - tilt_angle))
 
 	return Vector3(
-		target_pos.x + cursor_offset_3d.x,
+		target_pos.x,
 		_current_height,
-		target_pos.z + cursor_offset_3d.z + depth_back
+		target_pos.z + depth_back
 	)
 
 
@@ -195,16 +184,18 @@ func _smooth_follow(desired: Vector3, delta: float) -> Vector3:
 	return new_pos
 
 
+func _get_tilt_for_height() -> float:
+	# Map height to tilt angle: 45° at zoom_in (height_min) to 90° at zoom_out (height_max)
+	var t := (_current_height - height_min) / (height_max - height_min)
+	return lerpf(45.0, 90.0, clampf(t, 0.0, 1.0))
+
+
 func _update_orientation() -> void:
-	if _follow_target != null:
-		look_at(_follow_target.global_position, Vector3.UP)
-	else:
-		# Tactical / no target: look at a point below the camera on the play plane
-		var look_target := global_position + Vector3(0.0, -global_position.y, 0.0)
-		# Offset forward (negative Z in camera space) based on camera angle
-		var depth_forward := _current_height * tan(deg_to_rad(camera_angle))
-		look_target.z -= depth_forward
-		look_at(look_target, Vector3.UP)
+	# Fixed orientation - no rotation based on target or mouse
+	# Camera tilt: 45° (angled) at zoom_in to 90° (top-down) at zoom_out
+	# In Godot, negative X rotation looks downward
+	var tilt_angle := _get_tilt_for_height()
+	rotation_degrees = Vector3(-tilt_angle, 0, 0)
 
 
 # ─── Tactical Pan ────────────────────────────────────────────────────────────
