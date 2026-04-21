@@ -215,6 +215,11 @@ func _input(event: InputEvent) -> void:
 			_debug_visible = not _debug_visible
 			if _debug_grid:
 				_debug_grid.visible = _debug_visible
+			# Emit signal to all systems that need to toggle debug visuals
+			var service_locator := Engine.get_singleton("ServiceLocator")
+			var event_bus: Node = service_locator.GetService("GameEventBus")
+			if event_bus:
+				event_bus.debug_toggled.emit(_debug_visible)
 
 
 func _process(_delta: float) -> void:

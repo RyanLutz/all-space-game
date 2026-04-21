@@ -66,3 +66,6 @@ signal loadout_changed(ship: Node, slot_id: String, item_id: String)
 
 # ─── Player State ──────────────────────────────────────────────────────────────
 signal player_ship_changed(ship: Node)
+
+# ─── Debug ─────────────────────────────────────────────────────────────────────
+signal debug_toggled(visible: bool)
