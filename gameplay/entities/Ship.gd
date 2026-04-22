@@ -43,12 +43,6 @@ var input_fire: Array[bool] = [false, false, false]
 var _perf: Node
 var _event_bus: Node
 
-# ─── Debug visualization lines ───────────────────────────────────────────────
-var _debug_heading_line: MeshInstance3D = null
-var _debug_torque_indicator: MeshInstance3D = null
-var _debug_thrust_line: MeshInstance3D = null
-var _debug_visible: bool = false
-
 
 static var _active_ship_count: int = 0
 
@@ -56,13 +50,6 @@ func _ready() -> void:
 	var service_locator := Engine.get_singleton("ServiceLocator")
 	_perf = service_locator.GetService("PerformanceMonitor")
 	_event_bus = service_locator.GetService("GameEventBus")
-
-	# Create debug visualization lines
-	_create_debug_lines()
-
-	# Connect to debug toggle signal
-	if _event_bus:
-		_event_bus.connect("debug_toggled", _on_debug_toggled)
 
 	_active_ship_count += 1
 	if _perf:
@@ -123,10 +110,6 @@ func _physics_process(delta: float) -> void:
 
 	# Y-enforcement backstop
 	enforce_play_plane()
-
-	# Update debug visualization lines
-	if _debug_visible:
-		_update_debug_lines()
 
 
 # ─── Assisted Steering ────────────────────────────────────────────────────────
@@ -260,110 +243,3 @@ func _damage_vs_shields(_damage_type: String) -> float:
 func _die() -> void:
 	_event_bus.emit_signal("ship_destroyed", self, global_position, faction)
 	queue_free()
-
-
-# ─── Debug Visualization ─────────────────────────────────────────────────────
-
-func _create_debug_lines() -> void:
-	# Heading line (green) - shows ship facing direction
-	_debug_heading_line = _create_debug_line(Color(0, 1, 0), 0.5, 30.0)
-	_debug_heading_line.name = "DebugHeading"
-	_debug_heading_line.visible = false
-	add_child(_debug_heading_line)
-
-	# Torque indicator (blue) - perpendicular to heading at tip
-	_debug_torque_indicator = _create_debug_line(Color(0, 0.5, 1), 0.3, 15.0)
-	_debug_torque_indicator.name = "DebugTorque"
-	_debug_torque_indicator.visible = false
-	add_child(_debug_torque_indicator)
-
-	# Thrust vector (yellow) - shows applied force direction
-	_debug_thrust_line = _create_debug_line(Color(1, 1, 0), 0.4, 1.0)
-	_debug_thrust_line.name = "DebugThrust"
-	_debug_thrust_line.visible = false
-	add_child(_debug_thrust_line)
-
-
-func _create_debug_line(color: Color, radius: float, default_length: float) -> MeshInstance3D:
-	var mesh_instance := MeshInstance3D.new()
-
-	var cylinder := CylinderMesh.new()
-	cylinder.top_radius = radius
-	cylinder.bottom_radius = radius
-	cylinder.height = default_length
-	mesh_instance.mesh = cylinder
-
-	var material := StandardMaterial3D.new()
-	material.albedo_color = color
-	material.emission_enabled = true
-	material.emission = color * 0.5
-	mesh_instance.material_override = material
-
-	return mesh_instance
-
-
-func _on_debug_toggled(show_lines: bool) -> void:
-	_debug_visible = show_lines
-	if _debug_heading_line:
-		_debug_heading_line.visible = show_lines
-	if _debug_torque_indicator:
-		_debug_torque_indicator.visible = show_lines
-	if _debug_thrust_line:
-		_debug_thrust_line.visible = show_lines
-
-
-func _update_debug_lines() -> void:
-	if not _debug_heading_line or not _debug_thrust_line or not _debug_torque_indicator:
-		return
-
-	var heading := get_heading()
-	var heading_right := Vector3.UP.cross(heading).normalized()
-
-	# Update heading line - extends forward from ship center
-	# Use look_at to properly orient cylinder on XZ plane
-	var heading_target := global_position + heading * 30.0
-	_debug_heading_line.global_position = global_position + heading * 15.0
-	_debug_heading_line.look_at(heading_target, Vector3.UP)
-	_debug_heading_line.scale = Vector3(1, 30.0, 1)
-
-	# Get thrust values from physics computation
-	var torque_demand := _compute_steering_torque()
-	var forward_dir := get_heading()
-	var right_dir := transform.basis.x
-	var fwd := input_forward
-	var strafe := input_strafe
-	var input_len_sq := fwd * fwd + strafe * strafe
-	if input_len_sq > 1.0:
-		var inv_len := 1.0 / sqrt(input_len_sq)
-		fwd *= inv_len
-		strafe *= inv_len
-	var torque_cost := absf(torque_demand) * torque_thrust_ratio
-	var remaining := maxf(0.0, thruster_force - torque_cost)
-	var translation_force := (forward_dir * fwd + right_dir * strafe) * remaining
-
-	# Update torque indicator - perpendicular to heading at the tip
-	if absf(torque_demand) > 0.01:
-		var torque_scale := clampf(absf(torque_demand) / maxf(max_torque, 1.0), 0.0, 1.0)
-		var torque_dir := heading_right * signf(torque_demand)
-		var torque_start := global_position + heading * 30.0
-		var torque_end := torque_start + torque_dir * 15.0 * torque_scale
-		_debug_torque_indicator.global_position = torque_start + (torque_end - torque_start) * 0.5
-		_debug_torque_indicator.look_at(torque_end, Vector3.UP)
-		_debug_torque_indicator.scale = Vector3(1, (torque_end - torque_start).length(), 1)
-		_debug_torque_indicator.visible = true
-	else:
-		_debug_torque_indicator.visible = false
-
-	# Update thrust vector - shows applied thrust direction and magnitude
-	if translation_force.length() > 1.0:
-		var thrust_dir := translation_force.normalized()
-		var thrust_mag := translation_force.length() / maxf(thruster_force, 1.0)
-		var thrust_length := 30.0 * thrust_mag
-		var thrust_start := global_position
-		var thrust_end := thrust_start + thrust_dir * thrust_length
-		_debug_thrust_line.global_position = thrust_start + (thrust_end - thrust_start) * 0.5
-		_debug_thrust_line.look_at(thrust_end, Vector3.UP)
-		_debug_thrust_line.scale = Vector3(1, thrust_length, 1)
-		_debug_thrust_line.visible = true
-	else:
-		_debug_thrust_line.visible = false
