@@ -11,7 +11,7 @@
 		"linear_drag": 0.8,
 		"angular_drag": 4.5,
 		"alignment_drag_base": 0.2,
-		"thruster_force": 12000,
+		"thruster_force": 120000,
 		"torque_thrust_ratio": 0.38,
 		"max_torque": 4500,
 		"power_capacity": 160,
