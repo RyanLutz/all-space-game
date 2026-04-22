@@ -6,7 +6,7 @@ const StanceController := preload("res://gameplay/fleet_command/StanceController
 const TacticalContextMenu := preload("res://ui/tactical/ContextMenu.gd")
 const EscortPanel := preload("res://ui/tactical/EscortPanel.gd")
 
-## Step 12/13/14 — Player vs AI, Pilot + Tactical mode loop, Fleet Command.
+## Step 12/13/14/15 — Player vs AI, Pilot + Tactical mode loop, Fleet Command, ChunkStreamer.
 ##
 ## Controls (Pilot mode):
 ##   W / S / A / D  — thrust (InputMap: move_forward, move_backward, move_left, move_right)
@@ -49,6 +49,7 @@ var _formation_controller: FormationController = null
 var _stance_controller: StanceController = null
 var _context_menu: TacticalContextMenu = null
 var _escort_panel: EscortPanel = null
+var _chunk_streamer: ChunkStreamer = null
 var _cursor_indicator: MeshInstance3D = null
 var _debug_grid: MeshInstance3D = null
 var _debug_visible: bool = false
@@ -200,6 +201,12 @@ func _ready() -> void:
 			print("[PilotLoopTest] Fleet ship %d spawned: %s" % [i + 1, fleet_ship.display_name])
 		else:
 			push_error("[PilotLoopTest] Failed to spawn fleet ship %d." % (i + 1))
+
+	# ─── Chunk Streamer ────────────────────────────────────────────────
+	_chunk_streamer = ChunkStreamer.new()
+	_chunk_streamer.name = "ChunkStreamer"
+	add_child(_chunk_streamer)
+	_chunk_streamer.set_follow_target(_player_ship)
 
 	print("[PilotLoopTest] Player: %s  |  Enemy: %s  |  Fleet ships: 2" % [
 		_player_ship.display_name,

@@ -86,7 +86,7 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 12 | Test scene: player vs AI, full Pilot mode loop | Implemented |
 | 13 | Tactical mode camera + input layer | Implemented |
 | 14 | Fleet Command — selection, orders, stance, escort queue | Implemented |
-| 15 | ChunkStreamer + Asteroid + Debris | Not started |
+| 15 | ChunkStreamer + Asteroid + Debris | Implemented |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 
@@ -155,7 +155,12 @@ The most recent decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-04-20 — Phase 14: Fleet Command — selection, orders, stance, escort queue** —
+1. **2026-04-21 — Phase 15: ChunkStreamer + Asteroid + Debris** —
+   ChunkStreamer.gd (deterministic chunk gen, load/unload on boundary crossing, perf instrumented),
+   Asteroid.gd (extends SpaceBody, Jolt axis locks, apply_damage, debris spawning on destroy),
+   Debris.gd/tscn (manual velocity, alpha fade, lifetime queue_free),
+   world_config.json (all tunables). Wired into PilotLoopTest. No deviations.
+2. **2026-04-20 — Phase 14: Fleet Command — selection, orders, stance, escort queue** —
    EscortQueue.gd (ordered queue, away-on-orders, queue-shared stance),
    StanceController.gd (per-ship stance, defensive fan-out, signal-cached escort state),
    FormationController.gd (V-Wing formation tick, slot destinations via signal).

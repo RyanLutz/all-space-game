@@ -481,3 +481,23 @@ Spec:    `feature_spec-fleet_command.md` §2–9
 - **Stance submenu disabled (not hidden)** when ship is in escort queue. PopupMenu item hiding for submenu entries is complex; disabled state provides equivalent behavioral correctness. Visual polish deferred per spec §9.4.
 
 Spec updated: no — implementation matches spec intent; file locations follow existing convention
+
+---
+
+## 2026-04-21 — Phase 15: ChunkStreamer + Asteroid + Debris
+
+Agent:   Claude Opus (Claude Code)
+System:  ChunkStreamer, Asteroid, Debris
+Spec:    feature_spec-chunk_streamer.md
+
+### What was built
+1. **`data/world_config.json`** — all tunable values: chunk size (2000), load radius (2), asteroid field params, HP tiers, debris config.
+2. **`gameplay/world/Debris.gd` + `Debris.tscn`** — lightweight Node3D with manual velocity integration, alpha fade over lifetime, queue_free on expiry. No physics body.
+3. **`gameplay/world/Asteroid.gd`** — extends SpaceBody (RigidBody3D). Jolt axis locks (Y linear, XZ angular). apply_damage matching Ship signature. Destruction spawns debris fragments with non-deterministic RNG. Placeholder SphereMesh + CollisionShape3D created in setup_mesh(). Added to "asteroids" group.
+4. **`gameplay/world/ChunkStreamer.gd`** — Node3D that tracks follow target, computes chunk neighborhood, loads/unloads on boundary crossing. Deterministic RNG per chunk coordinate via hash(Vector2i). Asteroid field clustering, AI spawn point markers in "ai_spawn_points" group. PerformanceMonitor instrumentation.
+5. **PilotLoopTest.gd** — ChunkStreamer wired as child, follow target set to player ship.
+
+### Deviations
+- None. Implementation follows spec exactly. GameEventBus signals (chunk_loaded, chunk_unloaded, explosion_triggered) already existed.
+
+Spec updated: no — no deviations
