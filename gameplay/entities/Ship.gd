@@ -293,9 +293,6 @@ func _create_debug_line(color: Color, radius: float, default_length: float) -> M
 	cylinder.height = default_length
 	mesh_instance.mesh = cylinder
 
-	# Rotate cylinder to lie on XZ plane (Godot cylinders are vertical by default)
-	mesh_instance.rotation_degrees.x = -90
-
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	material.emission_enabled = true
@@ -323,9 +320,11 @@ func _update_debug_lines() -> void:
 	var heading_right := Vector3.UP.cross(heading).normalized()
 
 	# Update heading line - extends forward from ship center
+	# Use look_at to properly orient cylinder on XZ plane
+	var heading_target := global_position + heading * 30.0
 	_debug_heading_line.global_position = global_position + heading * 15.0
-	_debug_heading_line.global_rotation = Vector3(0, atan2(heading.x, heading.z), 0)
-	_debug_heading_line.scale = Vector3(1, 1, 1)
+	_debug_heading_line.look_at(heading_target, Vector3.UP)
+	_debug_heading_line.scale = Vector3(1, 30.0, 1)
 
 	# Get thrust values from physics computation
 	var torque_demand := _compute_steering_torque()
@@ -346,9 +345,11 @@ func _update_debug_lines() -> void:
 	if absf(torque_demand) > 0.01:
 		var torque_scale := clampf(absf(torque_demand) / maxf(max_torque, 1.0), 0.0, 1.0)
 		var torque_dir := heading_right * signf(torque_demand)
-		_debug_torque_indicator.global_position = global_position + heading * 30.0 + torque_dir * 7.5
-		_debug_torque_indicator.global_rotation = Vector3(0, atan2(torque_dir.x, torque_dir.z), 0)
-		_debug_torque_indicator.scale = Vector3(1, torque_scale, 1)
+		var torque_start := global_position + heading * 30.0
+		var torque_end := torque_start + torque_dir * 15.0 * torque_scale
+		_debug_torque_indicator.global_position = torque_start + (torque_end - torque_start) * 0.5
+		_debug_torque_indicator.look_at(torque_end, Vector3.UP)
+		_debug_torque_indicator.scale = Vector3(1, (torque_end - torque_start).length(), 1)
 		_debug_torque_indicator.visible = true
 	else:
 		_debug_torque_indicator.visible = false
@@ -357,9 +358,12 @@ func _update_debug_lines() -> void:
 	if translation_force.length() > 1.0:
 		var thrust_dir := translation_force.normalized()
 		var thrust_mag := translation_force.length() / maxf(thruster_force, 1.0)
-		_debug_thrust_line.global_position = global_position + thrust_dir * 15.0 * thrust_mag
-		_debug_thrust_line.global_rotation = Vector3(0, atan2(thrust_dir.x, thrust_dir.z), 0)
-		_debug_thrust_line.scale = Vector3(1, thrust_mag * 30.0 / 15.0, 1)
+		var thrust_length := 30.0 * thrust_mag
+		var thrust_start := global_position
+		var thrust_end := thrust_start + thrust_dir * thrust_length
+		_debug_thrust_line.global_position = thrust_start + (thrust_end - thrust_start) * 0.5
+		_debug_thrust_line.look_at(thrust_end, Vector3.UP)
+		_debug_thrust_line.scale = Vector3(1, thrust_length, 1)
 		_debug_thrust_line.visible = true
 	else:
 		_debug_thrust_line.visible = false
