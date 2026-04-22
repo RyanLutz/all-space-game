@@ -268,6 +268,7 @@ func _create_debug_lines() -> void:
 	# Heading line (green) - shows ship facing direction
 	_debug_heading_line = _create_debug_line(Color(0, 1, 0), 0.5, 30.0)
 	_debug_heading_line.name = "DebugHeading"
+	_debug_heading_line.visible = false
 	add_child(_debug_heading_line)
 
 	# Torque indicator (blue) - perpendicular to heading at tip
@@ -279,6 +280,7 @@ func _create_debug_lines() -> void:
 	# Thrust vector (yellow) - shows applied force direction
 	_debug_thrust_line = _create_debug_line(Color(1, 1, 0), 0.4, 1.0)
 	_debug_thrust_line.name = "DebugThrust"
+	_debug_thrust_line.visible = false
 	add_child(_debug_thrust_line)
 
 
@@ -290,6 +292,9 @@ func _create_debug_line(color: Color, radius: float, default_length: float) -> M
 	cylinder.bottom_radius = radius
 	cylinder.height = default_length
 	mesh_instance.mesh = cylinder
+
+	# Rotate cylinder to lie on XZ plane (Godot cylinders are vertical by default)
+	mesh_instance.rotation_degrees.x = -90
 
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
@@ -305,7 +310,7 @@ func _on_debug_toggled(show_lines: bool) -> void:
 	if _debug_heading_line:
 		_debug_heading_line.visible = show_lines
 	if _debug_torque_indicator:
-		_debug_torque_indicator.visible = show_lines and false  # Only show when torque applied
+		_debug_torque_indicator.visible = show_lines
 	if _debug_thrust_line:
 		_debug_thrust_line.visible = show_lines
 
