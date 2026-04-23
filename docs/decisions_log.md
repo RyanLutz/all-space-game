@@ -501,3 +501,39 @@ Spec:    feature_spec-chunk_streamer.md
 - None. Implementation follows spec exactly. GameEventBus signals (chunk_loaded, chunk_unloaded, explosion_triggered) already existed.
 
 Spec updated: no — no deviations
+
+---
+
+## 2026-04-21 — Phase 16: GameEventBus signal audit
+
+Agent:   Claude Opus (Claude Code)
+System:  GameEventBus (cross-cutting)
+Spec:    feature_spec-game_event_bus_signals.md (all sections)
+Problem: Spec was written before phases 12-15 and had drifted from reality. 12 signals
+         existed in code but not in the spec. 3 signals had signature mismatches
+         (missing queue_mode parameter). Emitter/listener columns were stale.
+
+Decision: Update the spec to match the code (code is authoritative — it was tested
+through phases 12-15). No code changes needed.
+
+### Changes to spec
+1. Added 12 signals to spec: request_tactical_stop, request_tactical_set_stance,
+   request_tactical_set_escort_stance, request_tactical_add_to_escort,
+   request_tactical_remove_from_escort, context_menu_requested, escort_queue_changed,
+   escort_stance_changed, request_formation_destination, navigation_order_completed,
+   ship_damaged, debug_toggled.
+2. Added new spec sections: Escort & Formation Signals, Damage Signals, Debug Signals.
+3. Fixed queue_mode: String on request_tactical_move, request_tactical_attack,
+   request_tactical_mine to match code.
+4. Updated all emitter/listener columns to reflect actual .connect() and .emit() calls.
+5. Marked reserved-but-unused signals: projectile_spawned, power_depleted, all 4
+   station signals (dock_requested, dock_complete, undock_requested, loadout_changed).
+6. Added TACTICAL_ATTACK to ai_state_changed documented values.
+7. Corrected emitter for request_spawn_dumb/hitscan/guided from HardpointComponent
+   to WeaponComponent (WeaponComponent emits, not HardpointComponent).
+8. Added audit log section at bottom of spec.
+
+### Deviations
+- None. Spec-only update to match existing code.
+
+Spec updated: yes — feature_spec-game_event_bus_signals.md fully rewritten

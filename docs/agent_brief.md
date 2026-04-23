@@ -87,6 +87,7 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 13 | Tactical mode camera + input layer | Implemented |
 | 14 | Fleet Command — selection, orders, stance, escort queue | Implemented |
 | 15 | ChunkStreamer + Asteroid + Debris | Implemented |
+| 16 | GameEventBus signal audit | Implemented |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 
@@ -155,7 +156,13 @@ The most recent decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-04-21 — Phase 15: ChunkStreamer + Asteroid + Debris** —
+1. **2026-04-21 — Phase 16: GameEventBus signal audit** —
+   Reconciled spec with code after phases 12-15. Added 12 undocumented signals to spec
+   (tactical stop/stance/escort, context menu, escort & formation, ship_damaged, debug_toggled).
+   Fixed queue_mode parameter on tactical move/attack/mine. Updated all emitter/listener
+   columns to match actual connections. Marked reserved-but-unused signals (projectile_spawned,
+   power_depleted, all station signals). No code changes — spec-only update. No deviations.
+2. **2026-04-21 — Phase 15: ChunkStreamer + Asteroid + Debris** —
    ChunkStreamer.gd (deterministic chunk gen, load/unload on boundary crossing, perf instrumented),
    Asteroid.gd (extends SpaceBody, Jolt axis locks, apply_damage, debris spawning on destroy),
    Debris.gd/tscn (manual velocity, alpha fade, lifetime queue_free),
