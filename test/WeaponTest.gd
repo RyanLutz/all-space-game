@@ -96,13 +96,11 @@ func _create_weapon(hardpoint_comp: Node, weapon_id: String) -> void:
 
 	# Create weapon model (MeshInstance3D or imported model)
 	var weapon_model: Node3D = null
-	var model_path: String = weapon_data.get("assets", {}).get("model", "")
+	var resolved_model: String = _content_registry.get_asset_path(weapon_data, "model")
 
-	if not model_path.is_empty():
-		# Try to load the model
-		var full_path := "res://content/weapons/%s/%s" % [weapon_id, model_path]
-		if ResourceLoader.exists(full_path):
-			weapon_model = load(full_path).instantiate() as Node3D
+	if not resolved_model.is_empty():
+		if ResourceLoader.exists(resolved_model):
+			weapon_model = load(resolved_model).instantiate() as Node3D
 
 	# If no model loaded, create a placeholder
 	if weapon_model == null:

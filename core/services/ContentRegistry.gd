@@ -2,6 +2,7 @@ extends Node
 class_name ContentRegistry
 
 ## Scans /content/ at startup and indexes ships, weapons, and modules by folder name.
+## Weapons are also indexed by `weapon_id` from weapon.json when present (loadout keys).
 ## All content is JSON-driven — adding a new ship requires only a new folder.
 
 var ships: Dictionary = {}
@@ -48,6 +49,10 @@ func _scan_directory(base_path: String, target: Dictionary, filename: String) ->
 					data["_id"] = folder
 					data["_base_path"] = "%s/%s" % [base_path, folder]
 					target[folder] = data
+					if target == weapons:
+						var weapon_key: String = data.get("weapon_id", "")
+						if not weapon_key.is_empty() and weapon_key != folder:
+							target[weapon_key] = data
 		folder = dir.get_next()
 
 

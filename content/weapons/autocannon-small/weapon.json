@@ -19,7 +19,7 @@
 	},
 
 	"assets": {
-		"model": "model.glb",
+		"model": "autocannon-small.glb",
 		"icon": "icon.png"
 	}
 }

@@ -1,0 +1,21 @@
+{
+	"weapon_id": "dumb_rocket",
+	"display_name": "Dumb Rocket",
+	"archetype": "missile_dumb",
+	"description": "Unguided rocket with area damage on impact.",
+	"size": "medium",
+
+	"stats": {
+		"damage": 180,
+		"blast_radius": 80,
+		"muzzle_speed": 600,
+		"component_damage_ratio": 0.2,
+		"projectile_lifetime": 3.0,
+		"ammo_capacity": 12
+	},
+
+	"assets": {
+		"model": "torpedo_launcher-small.glb",
+		"icon": "icon.png"
+	}
+}

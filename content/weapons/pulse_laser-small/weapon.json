@@ -19,7 +19,7 @@
 	},
 
 	"assets": {
-		"model": "model.glb",
+		"model": "pulse_laser-small.glb",
 		"icon": "icon.png"
 	}
 }
