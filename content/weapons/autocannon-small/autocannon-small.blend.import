@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dty22m6tqufqk"
-path="res://.godot/imported/ weapons.blend-82dba8158382c1658d837a55f9d91f1e.scn"
+uid="uid://5s2tqlkx1x3n"
+path="res://.godot/imported/autocannon-small.blend-2a84171bb9a29bf4d560246457aa9407.scn"
 
 [deps]
 
-source_file="res://assets/blender/ weapons.blend"
-dest_files=["res://.godot/imported/ weapons.blend-82dba8158382c1658d837a55f9d91f1e.scn"]
+source_file="res://content/weapons/autocannon-small/autocannon-small.blend"
+dest_files=["res://.godot/imported/autocannon-small.blend-2a84171bb9a29bf4d560246457aa9407.scn"]
 
 [params]
 

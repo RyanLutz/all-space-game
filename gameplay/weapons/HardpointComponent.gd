@@ -169,6 +169,14 @@ func set_weapon_model(model: Node3D, component: Node) -> void:
 		component.hardpoint = self
 
 
+func get_weapon_model() -> Node3D:
+	return _weapon_model
+
+
+func has_weapon() -> bool:
+	return _weapon_component != null
+
+
 # ─── Fire Rate Modifiers (from damage state) ─────────────────────────────────
 
 func get_fire_rate_multiplier() -> float:

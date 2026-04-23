@@ -12,7 +12,7 @@ class_name GameCamera
 
 # ─── Zoom ─────────────────────────────────────────────────────────────────────
 @export_group("Zoom")
-@export var height_min: float = 200.0         # closest zoom (camera Y)
+@export var height_min: float = 50.0         # closest zoom (camera Y)
 @export var height_max: float = 2000.0        # farthest zoom (camera Y)
 @export var height_default: float = 500.0     # starting zoom
 @export var zoom_step: float = 50.0           # world units per scroll tick

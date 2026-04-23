@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://drpvgivmgoboc"
-path="res://.godot/imported/ weapons copy.blend-d42c9be026203990814c12d84d9e76f1.scn"
+uid="uid://ngpdx3iy03v5"
+path="res://.godot/imported/torpedo_launcher-small.blend-d7a28d692e342442595de6d168ca8be7.scn"
 
 [deps]
 
-source_file="res://assets/blender/ weapons copy.blend"
-dest_files=["res://.godot/imported/ weapons copy.blend-d42c9be026203990814c12d84d9e76f1.scn"]
+source_file="res://content/weapons/torpedo_launcher-small/torpedo_launcher-small.blend"
+dest_files=["res://.godot/imported/torpedo_launcher-small.blend-d7a28d692e342442595de6d168ca8be7.scn"]
 
 [params]
 
