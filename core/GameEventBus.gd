@@ -1,22 +1,23 @@
 extends Node
 
 # ─── Combat ────────────────────────────────────────────────────────────────────
-signal projectile_hit(target: Node, damage: float, damage_type: String,
-                      position: Vector3, component_ratio: float)
+signal projectile_hit(position: Vector3, normal: Vector3, surface_type: String)
+signal shield_hit(ship: Node3D, hit_position_local: Vector3)
 signal ship_destroyed(ship: Node, position: Vector3, faction: String)
+signal missile_detonated(position: Vector3, explosion_id: String)
 signal weapon_fired(ship: Node, weapon_id: String, position: Vector3)
 signal hardpoint_state_changed(ship: Node, hardpoint_id: String, new_state: String)
 signal projectile_spawned(position: Vector3, velocity: Vector3,
-                          weapon_data: Dictionary)
+						  weapon_data: Dictionary)
 
 # ─── Requests ──────────────────────────────────────────────────────────────────
 signal request_spawn_dumb(position: Vector3, velocity: Vector3, lifetime: float,
-                          weapon_id: String, owner_id: int)
+						  weapon_id: String, owner_id: int)
 signal request_fire_hitscan(origin: Vector3, direction: Vector3, range_val: float,
-                            weapon_id: String, owner_id: int)
+							weapon_id: String, owner_id: int)
 signal request_spawn_guided(position: Vector3, velocity: Vector3,
-                            guidance_mode: String, weapon_data: Dictionary,
-                            owner_id: int)
+							guidance_mode: String, weapon_data: Dictionary,
+							owner_id: int)
 
 # ─── Ship State ─────────────────────────────────────────────────────────────────
 signal shield_depleted(ship: Node)

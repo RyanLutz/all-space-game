@@ -25,8 +25,6 @@ const StanceController := preload("res://gameplay/fleet_command/StanceController
 ##   [ ] Player: Mixed loadout (port=autocannon LMB, stbd=pulse_laser RMB) - interceptor (2x sharps fixed)
 ##   [ ] Enemy 1: 2x autocannon (gimbal kinetic) - patrol variant (2x donut gimbal)
 ##   [ ] Enemy 2: 2x pulse laser (gimbal shield stripper) - patrol variant
-##   [ ] Enemy 3: 2x beam laser (sustained) - patrol variant
-##   [ ] Enemy 4: 2x dumb rocket (area damage) - patrol variant
 ##   [ ] Dummy target: Stationary for weapon testing
 
 var _player_ship: Ship = null
@@ -118,7 +116,7 @@ func _ready() -> void:
 		_spawn_dummy_target()
 
 	print("[CombatTest] Combatants spawned. WASD=thrust | Mouse=aim | LMB/RMB=fire | Tab=Tactical | F3=Debug")
-	print("[CombatTest] Enemy 1: 2x autocannon (gimbal) | Enemy 2: 2x pulse (gimbal) | Enemy 3: 2x beam | Enemy 4: 2x rockets")
+	print("[CombatTest] Enemy 1: 2x autocannon (gimbal) | Enemy 2: 2x pulse (gimbal)")
 
 	# Verify weapons after a frame delay (allow ShipFactory to finish setup)
 	call_deferred("_verify_weapons")
@@ -411,9 +409,7 @@ func _spawn_player() -> void:
 func _spawn_enemies() -> void:
 	var spawns := [
 		$SpawnPoints/EnemySpawn1,
-		$SpawnPoints/EnemySpawn2,
-		$SpawnPoints/EnemySpawn3,
-		$SpawnPoints/EnemySpawn4
+		$SpawnPoints/EnemySpawn2
 	]
 
 	# NOTE: enemy_variant is "axum_fighter_patrol" which has DONUT hardpoints only
@@ -443,36 +439,10 @@ func _spawn_enemies() -> void:
 		}
 	}
 
-	# Enemy 3: 2x beam laser (sustained damage with gimbal tracking)
-	var enemy3_loadout := {
-		"weapons": {
-			"donut_hp_wing_port": "beam_laser",
-			"donut_hp_wing_stbd": "beam_laser"
-		},
-		"fire_groups": {
-			"donut_hp_wing_port": [1],
-			"donut_hp_wing_stbd": [1]
-		}
-	}
-
-	# Enemy 4: 2x dumb rocket (area damage, fixed mount equivalent)
-	var enemy4_loadout := {
-		"weapons": {
-			"donut_hp_wing_port": "dumb_rocket",
-			"donut_hp_wing_stbd": "dumb_rocket"
-		},
-		"fire_groups": {
-			"donut_hp_wing_port": [1],
-			"donut_hp_wing_stbd": [1]
-		}
-	}
-
-	var loadouts := [enemy1_loadout, enemy2_loadout, enemy3_loadout, enemy4_loadout]
+	var loadouts := [enemy1_loadout, enemy2_loadout]
 	var descriptions := [
 		"2x autocannon (gimbal)",
-		"2x pulse laser (gimbal)",
-		"2x beam laser (sustained)",
-		"2x dumb rocket (area)"
+		"2x pulse laser (gimbal)"
 	]
 
 	for i in spawns.size():

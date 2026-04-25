@@ -381,7 +381,8 @@ public partial class ProjectileManager : Node3D
 			var hitPos = result["position"].AsVector3();
 			hitPos = new Vector3(hitPos.X, 0f, hitPos.Z);
 
-			ApplyDamage(collider, proj.Damage, proj.DamageType, hitPos,
+			var normal = result.ContainsKey("normal") ? result["normal"].AsVector3() : Vector3.Up;
+			ApplyDamage(collider, proj.Damage, proj.DamageType, hitPos, normal,
 				proj.ComponentDamageRatio, proj.OwnerEntityId);
 
 			proj.Active = false;
@@ -419,14 +420,16 @@ public partial class ProjectileManager : Node3D
 			var result = spaceState.IntersectRay(query);
 
 			Vector3 beamEnd;
+			Vector3 hitNormal = Vector3.Up;
 			if (result.ContainsKey("collider"))
 			{
 				var collider = result["collider"].AsGodotObject() as Node;
 				var hitPos = result["position"].AsVector3();
 				hitPos = new Vector3(hitPos.X, 0f, hitPos.Z);
 				beamEnd = hitPos;
+				hitNormal = result.ContainsKey("normal") ? result["normal"].AsVector3() : Vector3.Up;
 
-				ApplyDamage(collider, req.Damage, req.DamageType, hitPos,
+				ApplyDamage(collider, req.Damage, req.DamageType, hitPos, hitNormal,
 					req.ComponentDamageRatio, req.OwnerEntityId);
 			}
 			else
@@ -446,8 +449,20 @@ public partial class ProjectileManager : Node3D
 
 	// ── Damage application ──────────────────────────────────────────────
 
+	private string GetSurfaceType(Node target)
+	{
+		if (target == null) return "hull";
+		var shieldHp = target.Get("shield_hp");
+		if (shieldHp.VariantType != Variant.Type.Nil)
+		{
+			float hp = shieldHp.AsSingle();
+			if (hp > 0f) return "shield";
+		}
+		return "hull";
+	}
+
 	private void ApplyDamage(Node target, float damage, string damageType,
-		Vector3 hitPos, float componentRatio, ulong ownerId = 0)
+		Vector3 hitPos, Vector3 normal, float componentRatio, ulong ownerId = 0)
 	{
 		if (target == null)
 			return;
@@ -458,8 +473,13 @@ public partial class ProjectileManager : Node3D
 				(double)componentRatio, (long)ownerId);
 		}
 
-		_eventBus.EmitSignal("projectile_hit", target, (double)damage,
-			damageType, hitPos, (double)componentRatio);
+		string surfaceType = GetSurfaceType(target);
+		_eventBus.EmitSignal("projectile_hit", hitPos, normal, surfaceType);
+
+		if (surfaceType == "shield" && target is Node3D target3d)
+		{
+			_eventBus.EmitSignal("shield_hit", target3d, target3d.ToLocal(hitPos));
+		}
 	}
 
 	// ── Signal handlers ─────────────────────────────────────────────────

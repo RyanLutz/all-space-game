@@ -83,7 +83,9 @@ func get_aim_direction() -> Vector3:
 	if _weapon_model == null or owner_ship == null:
 		return hardpoint_fwd
 
-	var muzzle := _weapon_model.get_node_or_null("Muzzle") as Marker3D
+	var muzzle := _weapon_model.get_node_or_null("Muzzle") as Node3D
+	if muzzle == null:
+		muzzle = _weapon_model.get_node_or_null("WeaponModel/Muzzle") as Node3D
 	if muzzle == null:
 		return hardpoint_fwd
 

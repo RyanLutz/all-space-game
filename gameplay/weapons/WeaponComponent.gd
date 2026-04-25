@@ -292,7 +292,9 @@ func get_muzzle_pos() -> Vector3:
 	if model == null:
 		return Vector3.ZERO
 
-	var muzzle := model.get_node_or_null("Muzzle") as Marker3D
+	var muzzle := model.get_node_or_null("Muzzle") as Node3D
+	if muzzle == null:
+		muzzle = model.get_node_or_null("WeaponModel/Muzzle") as Node3D
 	if muzzle != null:
 		return muzzle.global_position
 

@@ -165,13 +165,14 @@ func _process_collisions() -> void:
 		var collider := result.get("collider") as Node
 		var hit_pos: Vector3 = result.get("position", proj.position)
 		hit_pos.y = 0.0
+		var normal: Vector3 = result.get("normal", Vector3.UP)
 
-		_apply_damage(proj, collider, hit_pos)
+		_apply_damage(proj, collider, hit_pos, normal)
 		_deactivate(proj)
 
 
 # ─── Damage Application ────────────────────────────────────────────────────────
-func _apply_damage(proj: GuidedProjectile, target: Node, hit_pos: Vector3) -> void:
+func _apply_damage(proj: GuidedProjectile, target: Node, hit_pos: Vector3, normal: Vector3 = Vector3.UP) -> void:
 	if target == null:
 		return
 
@@ -179,9 +180,12 @@ func _apply_damage(proj: GuidedProjectile, target: Node, hit_pos: Vector3) -> vo
 	if target.has_method("apply_damage"):
 		target.call("apply_damage", proj.damage, proj.damage_type, hit_pos, proj.component_damage_ratio, proj.owner_id)
 
-	# Emit hit signal
+	# Emit hit signal for VFX
 	if _event_bus:
-		_event_bus.emit_signal("projectile_hit", target, proj.damage, proj.damage_type, hit_pos, proj.component_damage_ratio)
+		var surface_type := "shield" if (target.get("shield_hp") != null and target.shield_hp > 0.0) else "hull"
+		_event_bus.emit_signal("projectile_hit", hit_pos, normal, surface_type)
+		if surface_type == "shield" and target is Node3D:
+			_event_bus.emit_signal("shield_hit", target as Node3D, (target as Node3D).to_local(hit_pos))
 
 	# Area damage if blast radius > 0
 	if proj.blast_radius > 0.0:
@@ -194,6 +198,9 @@ func _trigger_explosion(explosion_position: Vector3, proj: GuidedProjectile) -> 
 
 	if _event_bus:
 		_event_bus.emit_signal("explosion_triggered", explosion_position, proj.blast_radius, 1.0)
+		# VFX event — missile detonation
+		var explosion_id := "explosion_small"  # Default; could be weapon-data driven in future
+		_event_bus.emit_signal("missile_detonated", explosion_position, explosion_id)
 
 	# Query physics for nearby bodies in blast radius
 	var space_state := get_world_3d().direct_space_state

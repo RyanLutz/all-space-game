@@ -391,7 +391,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L1",
       "id": "core_services_servicelocator_cs",
-      "community": 10,
+      "community": 11,
       "norm_label": "servicelocator.cs"
     },
     {
@@ -400,7 +400,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L11",
       "id": "servicelocator_servicelocator",
-      "community": 10,
+      "community": 11,
       "norm_label": "servicelocator"
     },
     {
@@ -409,7 +409,7 @@
       "source_file": "",
       "source_location": "",
       "id": "node",
-      "community": 10,
+      "community": 11,
       "norm_label": "node"
     },
     {
@@ -418,7 +418,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L18",
       "id": "servicelocator_servicelocator_register",
-      "community": 10,
+      "community": 11,
       "norm_label": ".register()"
     },
     {
@@ -427,7 +427,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L32",
       "id": "servicelocator_servicelocator_getservice",
-      "community": 10,
+      "community": 11,
       "norm_label": ".getservice()"
     },
     {
@@ -436,7 +436,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L41",
       "id": "servicelocator_servicelocator_get",
-      "community": 10,
+      "community": 11,
       "norm_label": ".get()"
     },
     {
@@ -445,7 +445,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L52",
       "id": "servicelocator_servicelocator_ready",
-      "community": 10,
+      "community": 11,
       "norm_label": "._ready()"
     },
     {
@@ -454,7 +454,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L1",
       "id": "home_lutz_projects_all_space_gameplay_weapons_projectilemanager_cs",
-      "community": 4,
+      "community": 3,
       "norm_label": "projectilemanager.cs"
     },
     {
@@ -463,7 +463,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L15",
       "id": "projectilemanager_projectilemanager",
-      "community": 4,
+      "community": 3,
       "norm_label": "projectilemanager"
     },
     {
@@ -472,7 +472,7 @@
       "source_file": "",
       "source_location": "",
       "id": "node3d",
-      "community": 4,
+      "community": 3,
       "norm_label": "node3d"
     },
     {
@@ -481,7 +481,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L96",
       "id": "projectilemanager_projectilemanager_ready",
-      "community": 4,
+      "community": 3,
       "norm_label": "._ready()"
     },
     {
@@ -490,7 +490,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L115",
       "id": "projectilemanager_projectilemanager_setup_projectile_visuals",
-      "community": 4,
+      "community": 3,
       "norm_label": "._setup_projectile_visuals()"
     },
     {
@@ -499,7 +499,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L156",
       "id": "projectilemanager_projectilemanager_create_projectile_mesh",
-      "community": 4,
+      "community": 3,
       "norm_label": "._create_projectile_mesh()"
     },
     {
@@ -508,7 +508,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L174",
       "id": "projectilemanager_projectilemanager_create_tracer_mesh",
-      "community": 4,
+      "community": 3,
       "norm_label": "._create_tracer_mesh()"
     },
     {
@@ -517,7 +517,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L193",
       "id": "projectilemanager_projectilemanager_physicsprocess",
-      "community": 4,
+      "community": 3,
       "norm_label": "._physicsprocess()"
     },
     {
@@ -526,7 +526,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L219",
       "id": "projectilemanager_projectilemanager_updateprojectilevisuals",
-      "community": 4,
+      "community": 3,
       "norm_label": ".updateprojectilevisuals()"
     },
     {
@@ -535,7 +535,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L241",
       "id": "projectilemanager_projectilemanager_updatetracervisuals",
-      "community": 4,
+      "community": 3,
       "norm_label": ".updatetracervisuals()"
     },
     {
@@ -544,7 +544,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L273",
       "id": "projectilemanager_projectilemanager_buildtracertransform",
-      "community": 4,
+      "community": 3,
       "norm_label": ".buildtracertransform()"
     },
     {
@@ -553,7 +553,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L291",
       "id": "projectilemanager_projectilemanager_spawntracer",
-      "community": 4,
+      "community": 3,
       "norm_label": ".spawntracer()"
     },
     {
@@ -562,7 +562,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L307",
       "id": "projectilemanager_projectilemanager_tracercolorfor",
-      "community": 4,
+      "community": 3,
       "norm_label": ".tracercolorfor()"
     },
     {
@@ -571,7 +571,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L319",
       "id": "projectilemanager_projectilemanager_updatedumbpool",
-      "community": 4,
+      "community": 3,
       "norm_label": ".updatedumbpool()"
     },
     {
@@ -580,7 +580,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L346",
       "id": "projectilemanager_projectilemanager_processdumbcollisions",
-      "community": 4,
+      "community": 3,
       "norm_label": ".processdumbcollisions()"
     },
     {
@@ -589,7 +589,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L394",
       "id": "projectilemanager_projectilemanager_processhitscanqueue",
-      "community": 4,
+      "community": 3,
       "norm_label": ".processhitscanqueue()"
     },
     {
@@ -598,7 +598,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L449",
       "id": "projectilemanager_projectilemanager_applydamage",
-      "community": 4,
+      "community": 3,
       "norm_label": ".applydamage()"
     },
     {
@@ -607,7 +607,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L467",
       "id": "projectilemanager_projectilemanager_onrequestspawndumb",
-      "community": 4,
+      "community": 3,
       "norm_label": ".onrequestspawndumb()"
     },
     {
@@ -616,7 +616,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L494",
       "id": "projectilemanager_projectilemanager_onrequestfirehitscan",
-      "community": 4,
+      "community": 3,
       "norm_label": ".onrequestfirehitscan()"
     },
     {
@@ -625,7 +625,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L513",
       "id": "projectilemanager_projectilemanager_getorcacheweapon",
-      "community": 4,
+      "community": 3,
       "norm_label": ".getorcacheweapon()"
     },
     {
@@ -634,7 +634,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L559",
       "id": "projectilemanager_projectilemanager_archetypetodamagetype",
-      "community": 4,
+      "community": 3,
       "norm_label": ".archetypetodamagetype()"
     },
     {
@@ -646,9 +646,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "claude_md_project_context",
       "community": 5,
-      "norm_label": "claude.md project context"
+      "norm_label": "claude.md project context",
+      "id": "claude_md_project_context"
     },
     {
       "label": "No 2D Nodes Rule",
@@ -659,9 +659,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "claude_md_no_2d_nodes_rule",
       "community": 5,
-      "norm_label": "no 2d nodes rule"
+      "norm_label": "no 2d nodes rule",
+      "id": "claude_md_no_2d_nodes_rule"
     },
     {
       "label": "No Hardcoded Values \u2014 Tunable Data in JSON",
@@ -672,9 +672,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "claude_md_json_tunables_rule",
       "community": 5,
-      "norm_label": "no hardcoded values \u2014 tunable data in json"
+      "norm_label": "no hardcoded values \u2014 tunable data in json",
+      "id": "claude_md_json_tunables_rule"
     },
     {
       "label": "No Direct Cross-System Calls \u2014 GameEventBus Signals Only",
@@ -685,9 +685,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "claude_md_eventbus_rule",
       "community": 5,
-      "norm_label": "no direct cross-system calls \u2014 gameeventbus signals only"
+      "norm_label": "no direct cross-system calls \u2014 gameeventbus signals only",
+      "id": "claude_md_eventbus_rule"
     },
     {
       "label": "Ship.gd Never Writes Velocity/Position \u2014 Forces to Jolt Only",
@@ -698,9 +698,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "claude_md_ship_forces_rule",
-      "community": 1,
-      "norm_label": "ship.gd never writes velocity/position \u2014 forces to jolt only"
+      "community": 4,
+      "norm_label": "ship.gd never writes velocity/position \u2014 forces to jolt only",
+      "id": "claude_md_ship_forces_rule"
     },
     {
       "label": "Specs Are Authoritative \u2014 Deviations Require Report",
@@ -711,9 +711,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "claude_md_specs_authoritative",
       "community": 5,
-      "norm_label": "specs are authoritative \u2014 deviations require report"
+      "norm_label": "specs are authoritative \u2014 deviations require report",
+      "id": "claude_md_specs_authoritative"
     },
     {
       "label": "One System Per Session \u2014 Do Not Mix Concerns",
@@ -724,9 +724,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "claude_md_one_system_per_session",
       "community": 5,
-      "norm_label": "one system per session \u2014 do not mix concerns"
+      "norm_label": "one system per session \u2014 do not mix concerns",
+      "id": "claude_md_one_system_per_session"
     },
     {
       "label": "All Space \u2014 Top-Down 3D Space Simulation Vision",
@@ -737,9 +737,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "vision_game_concept",
       "community": 19,
-      "norm_label": "all space \u2014 top-down 3d space simulation vision"
+      "norm_label": "all space \u2014 top-down 3d space simulation vision",
+      "id": "vision_game_concept"
     },
     {
       "label": "Core Philosophy: Complexity On Demand",
@@ -750,9 +750,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "vision_core_philosophy",
       "community": 19,
-      "norm_label": "core philosophy: complexity on demand"
+      "norm_label": "core philosophy: complexity on demand",
+      "id": "vision_core_philosophy"
     },
     {
       "label": "Four Phases of Play (Personal Pilot \u2192 Fleet \u2192 Infrastructure \u2192 Galactic)",
@@ -763,9 +763,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "vision_four_phases",
-      "community": 1,
-      "norm_label": "four phases of play (personal pilot \u2192 fleet \u2192 infrastructure \u2192 galactic)"
+      "community": 4,
+      "norm_label": "four phases of play (personal pilot \u2192 fleet \u2192 infrastructure \u2192 galactic)",
+      "id": "vision_four_phases"
     },
     {
       "label": "Combat MVP \u2014 3D Top-Down Space Combat Simulator",
@@ -776,9 +776,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "vision_mvp_combat",
-      "community": 22,
-      "norm_label": "combat mvp \u2014 3d top-down space combat simulator"
+      "community": 23,
+      "norm_label": "combat mvp \u2014 3d top-down space combat simulator",
+      "id": "vision_mvp_combat"
     },
     {
       "label": "Sim-Lite Physics \u2014 Mass, Momentum, Angular Inertia",
@@ -789,9 +789,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "vision_sim_lite_physics",
       "community": 32,
-      "norm_label": "sim-lite physics \u2014 mass, momentum, angular inertia"
+      "norm_label": "sim-lite physics \u2014 mass, momentum, angular inertia",
+      "id": "vision_sim_lite_physics"
     },
     {
       "label": "Streaming Map \u2014 Chunk-Based Seamless World",
@@ -802,9 +802,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "vision_streaming_map",
-      "community": 22,
-      "norm_label": "streaming map \u2014 chunk-based seamless world"
+      "community": 23,
+      "norm_label": "streaming map \u2014 chunk-based seamless world",
+      "id": "vision_streaming_map"
     },
     {
       "label": "Observability From Day One \u2014 PerformanceMonitor",
@@ -815,9 +815,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "vision_observability",
-      "community": 12,
-      "norm_label": "observability from day one \u2014 performancemonitor"
+      "community": 13,
+      "norm_label": "observability from day one \u2014 performancemonitor",
+      "id": "vision_observability"
     },
     {
       "label": "Data-Driven Everything \u2014 JSON Configuration Files",
@@ -828,9 +828,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "vision_data_driven",
       "community": 5,
-      "norm_label": "data-driven everything \u2014 json configuration files"
+      "norm_label": "data-driven everything \u2014 json configuration files",
+      "id": "vision_data_driven"
     },
     {
       "label": "Modularity as Development Forcing Function \u2014 Agent Sessions Stay Focused",
@@ -841,9 +841,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "vision_modularity_rationale",
       "community": 5,
-      "norm_label": "modularity as development forcing function \u2014 agent sessions stay focused"
+      "norm_label": "modularity as development forcing function \u2014 agent sessions stay focused",
+      "id": "vision_modularity_rationale"
     },
     {
       "label": "Fleet Command \u2014 RTS Fleet Control, Escort Queue, Stance System",
@@ -854,9 +854,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_overview",
-      "community": 1,
-      "norm_label": "fleet command \u2014 rts fleet control, escort queue, stance system"
+      "community": 6,
+      "norm_label": "fleet command \u2014 rts fleet control, escort queue, stance system",
+      "id": "fleet_command_overview"
     },
     {
       "label": "Fleet Command Architecture \u2014 InputManager, SelectionState, EscortQueue, FormationController, StanceController",
@@ -867,9 +867,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_architecture",
-      "community": 1,
-      "norm_label": "fleet command architecture \u2014 inputmanager, selectionstate, escortqueue, formationcontroller, stancecontroller"
+      "community": 6,
+      "norm_label": "fleet command architecture \u2014 inputmanager, selectionstate, escortqueue, formationcontroller, stancecontroller",
+      "id": "fleet_command_architecture"
     },
     {
       "label": "InputManager \u2014 Tab Mode Toggle, game_mode_changed Emission, Pilot Input Routing",
@@ -880,9 +880,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_inputmanager",
-      "community": 1,
-      "norm_label": "inputmanager \u2014 tab mode toggle, game_mode_changed emission, pilot input routing"
+      "community": 6,
+      "norm_label": "inputmanager \u2014 tab mode toggle, game_mode_changed emission, pilot input routing",
+      "id": "fleet_command_inputmanager"
     },
     {
       "label": "SelectionState \u2014 Current Selected Ship IDs, Pruned on ship_destroyed",
@@ -893,9 +893,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_selectionstate",
-      "community": 1,
-      "norm_label": "selectionstate \u2014 current selected ship ids, pruned on ship_destroyed"
+      "community": 6,
+      "norm_label": "selectionstate \u2014 current selected ship ids, pruned on ship_destroyed",
+      "id": "fleet_command_selectionstate"
     },
     {
       "label": "EscortQueue \u2014 Ordered Escort Ship IDs, Queue-Shared Stance, Away-on-Orders",
@@ -906,9 +906,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_escortqueue",
-      "community": 1,
-      "norm_label": "escortqueue \u2014 ordered escort ship ids, queue-shared stance, away-on-orders"
+      "community": 6,
+      "norm_label": "escortqueue \u2014 ordered escort ship ids, queue-shared stance, away-on-orders",
+      "id": "fleet_command_escortqueue"
     },
     {
       "label": "StanceController \u2014 Per-Ship Stance for Non-Escort Ships, get_effective_stance()",
@@ -919,9 +919,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_stancecontroller",
-      "community": 1,
-      "norm_label": "stancecontroller \u2014 per-ship stance for non-escort ships, get_effective_stance()"
+      "community": 6,
+      "norm_label": "stancecontroller \u2014 per-ship stance for non-escort ships, get_effective_stance()",
+      "id": "fleet_command_stancecontroller"
     },
     {
       "label": "FormationController \u2014 Pilot-Mode Tick, request_formation_destination Signal",
@@ -932,9 +932,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_formationcontroller",
-      "community": 1,
-      "norm_label": "formationcontroller \u2014 pilot-mode tick, request_formation_destination signal"
+      "community": 6,
+      "norm_label": "formationcontroller \u2014 pilot-mode tick, request_formation_destination signal",
+      "id": "fleet_command_formationcontroller"
     },
     {
       "label": "Right-Click Target Classification \u2014 fleet/enemy/asteroid/empty Dispatch",
@@ -945,9 +945,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_rightclick_dispatch",
       "community": 5,
-      "norm_label": "right-click target classification \u2014 fleet/enemy/asteroid/empty dispatch"
+      "norm_label": "right-click target classification \u2014 fleet/enemy/asteroid/empty dispatch",
+      "id": "fleet_command_rightclick_dispatch"
     },
     {
       "label": "Context Menu \u2014 Stance Submenu (hidden in escort) + Escort Submenu",
@@ -958,9 +958,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_context_menu",
-      "community": 1,
-      "norm_label": "context menu \u2014 stance submenu (hidden in escort) + escort submenu"
+      "community": 6,
+      "norm_label": "context menu \u2014 stance submenu (hidden in escort) + escort submenu",
+      "id": "fleet_command_context_menu"
     },
     {
       "label": "Away-on-Orders Tracking \u2014 Slot Reserved but Empty During Tactical Order",
@@ -971,9 +971,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_away_on_orders",
-      "community": 1,
-      "norm_label": "away-on-orders tracking \u2014 slot reserved but empty during tactical order"
+      "community": 6,
+      "norm_label": "away-on-orders tracking \u2014 slot reserved but empty during tactical order",
+      "id": "fleet_command_away_on_orders"
     },
     {
       "label": "Formation Tick Algorithm \u2014 Pilot Mode, Slot Destination = Player Pos + Offset Rotated by Yaw",
@@ -984,9 +984,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_formation_tick",
       "community": 33,
-      "norm_label": "formation tick algorithm \u2014 pilot mode, slot destination = player pos + offset rotated by yaw"
+      "norm_label": "formation tick algorithm \u2014 pilot mode, slot destination = player pos + offset rotated by yaw",
+      "id": "fleet_command_formation_tick"
     },
     {
       "label": "Defensive Stance Fan-Out \u2014 Escort Queue Member Hit Triggers All Members Attack Attacker",
@@ -997,9 +997,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_defensive_stance",
-      "community": 1,
-      "norm_label": "defensive stance fan-out \u2014 escort queue member hit triggers all members attack attacker"
+      "community": 6,
+      "norm_label": "defensive stance fan-out \u2014 escort queue member hit triggers all members attack attacker",
+      "id": "fleet_command_defensive_stance"
     },
     {
       "label": "Formation JSON \u2014 V-Wing Slots with XZ Offsets in Player Local Frame",
@@ -1010,9 +1010,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_formation_json",
       "community": 5,
-      "norm_label": "formation json \u2014 v-wing slots with xz offsets in player local frame"
+      "norm_label": "formation json \u2014 v-wing slots with xz offsets in player local frame",
+      "id": "fleet_command_formation_json"
     },
     {
       "label": "Stance Enum \u2014 HOLD_FIRE, DEFENSIVE, AGGRESSIVE; default_stance in ship.json",
@@ -1023,9 +1023,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_stance_enum",
-      "community": 1,
-      "norm_label": "stance enum \u2014 hold_fire, defensive, aggressive; default_stance in ship.json"
+      "community": 6,
+      "norm_label": "stance enum \u2014 hold_fire, defensive, aggressive; default_stance in ship.json",
+      "id": "fleet_command_stance_enum"
     },
     {
       "label": "New Fleet Command Signals \u2014 request_tactical_stop, set_stance, escort_queue_changed, ship_damaged, request_formation_destination",
@@ -1036,9 +1036,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fleet_command_new_signals",
       "community": 34,
-      "norm_label": "new fleet command signals \u2014 request_tactical_stop, set_stance, escort_queue_changed, ship_damaged, request_formation_destination"
+      "norm_label": "new fleet command signals \u2014 request_tactical_stop, set_stance, escort_queue_changed, ship_damaged, request_formation_destination",
+      "id": "fleet_command_new_signals"
     },
     {
       "label": "All Space Core Spec \u2014 Top-Down 3D on XZ Plane",
@@ -1049,9 +1049,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_what_is",
       "community": 19,
-      "norm_label": "all space core spec \u2014 top-down 3d on xz plane"
+      "norm_label": "all space core spec \u2014 top-down 3d on xz plane",
+      "id": "core_spec_what_is"
     },
     {
       "label": "Three Gameplay Modes \u2014 Pilot, Tactical, Galactic",
@@ -1062,9 +1062,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_three_modes",
-      "community": 1,
-      "norm_label": "three gameplay modes \u2014 pilot, tactical, galactic"
+      "community": 4,
+      "norm_label": "three gameplay modes \u2014 pilot, tactical, galactic",
+      "id": "core_spec_three_modes"
     },
     {
       "label": "Pilot Mode \u2014 Direct Thrust + Mouse Aim, Close Follow Camera",
@@ -1075,9 +1075,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_pilot_mode",
-      "community": 1,
-      "norm_label": "pilot mode \u2014 direct thrust + mouse aim, close follow camera"
+      "community": 4,
+      "norm_label": "pilot mode \u2014 direct thrust + mouse aim, close follow camera",
+      "id": "core_spec_pilot_mode"
     },
     {
       "label": "Tactical Mode \u2014 Fleet RTS, Drag Select, Right-Click Orders",
@@ -1088,9 +1088,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_tactical_mode",
-      "community": 1,
-      "norm_label": "tactical mode \u2014 fleet rts, drag select, right-click orders"
+      "community": 4,
+      "norm_label": "tactical mode \u2014 fleet rts, drag select, right-click orders",
+      "id": "core_spec_tactical_mode"
     },
     {
       "label": "Unified Ship Input Interface (input_forward, input_strafe, input_aim_target, input_fire)",
@@ -1101,9 +1101,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_unified_input",
-      "community": 1,
-      "norm_label": "unified ship input interface (input_forward, input_strafe, input_aim_target, input_fire)"
+      "community": 4,
+      "norm_label": "unified ship input interface (input_forward, input_strafe, input_aim_target, input_fire)",
+      "id": "core_spec_unified_input"
     },
     {
       "label": "3D Play Plane Contract \u2014 All Entities at Y=0, Vector2 Banned",
@@ -1114,9 +1114,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_xz_plane_contract",
       "community": 5,
-      "norm_label": "3d play plane contract \u2014 all entities at y=0, vector2 banned"
+      "norm_label": "3d play plane contract \u2014 all entities at y=0, vector2 banned",
+      "id": "core_spec_xz_plane_contract"
     },
     {
       "label": "Architecture Rules \u2014 No Hardcoded Values, No Direct Cross-System Refs",
@@ -1127,9 +1127,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_architecture_rules",
       "community": 5,
-      "norm_label": "architecture rules \u2014 no hardcoded values, no direct cross-system refs"
+      "norm_label": "architecture rules \u2014 no hardcoded values, no direct cross-system refs",
+      "id": "core_spec_architecture_rules"
     },
     {
       "label": "Project Structure \u2014 Directory Layout",
@@ -1140,9 +1140,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_project_structure",
       "community": 35,
-      "norm_label": "project structure \u2014 directory layout"
+      "norm_label": "project structure \u2014 directory layout",
+      "id": "core_spec_project_structure"
     },
     {
       "label": "SpaceBody Contract \u2014 mass, velocity, angular_velocity, apply_damage, apply_impulse",
@@ -1153,9 +1153,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_spacebody_contract",
-      "community": 11,
-      "norm_label": "spacebody contract \u2014 mass, velocity, angular_velocity, apply_damage, apply_impulse"
+      "community": 12,
+      "norm_label": "spacebody contract \u2014 mass, velocity, angular_velocity, apply_damage, apply_impulse",
+      "id": "core_spec_spacebody_contract"
     },
     {
       "label": "PerformanceMonitor Contract \u2014 begin/end pairs required on every system",
@@ -1166,9 +1166,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_performance_monitor_contract",
-      "community": 12,
-      "norm_label": "performancemonitor contract \u2014 begin/end pairs required on every system"
+      "community": 13,
+      "norm_label": "performancemonitor contract \u2014 begin/end pairs required on every system",
+      "id": "core_spec_performance_monitor_contract"
     },
     {
       "label": "Canonical Metric Names \u2014 System.method format table",
@@ -1179,9 +1179,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_canonical_metrics",
-      "community": 12,
-      "norm_label": "canonical metric names \u2014 system.method format table"
+      "community": 13,
+      "norm_label": "canonical metric names \u2014 system.method format table",
+      "id": "core_spec_canonical_metrics"
     },
     {
       "label": "Content Architecture \u2014 Folder-Per-Item Under /content/",
@@ -1192,9 +1192,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_content_architecture",
-      "community": 14,
-      "norm_label": "content architecture \u2014 folder-per-item under /content/"
+      "community": 15,
+      "norm_label": "content architecture \u2014 folder-per-item under /content/",
+      "id": "core_spec_content_architecture"
     },
     {
       "label": "One Ship.tscn for All Ship Types \u2014 Configured at Spawn Time",
@@ -1205,9 +1205,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_one_ship_tscn",
-      "community": 23,
-      "norm_label": "one ship.tscn for all ship types \u2014 configured at spawn time"
+      "community": 24,
+      "norm_label": "one ship.tscn for all ship types \u2014 configured at spawn time",
+      "id": "core_spec_one_ship_tscn"
     },
     {
       "label": "Physics Summary \u2014 RigidBody3D + Jolt, Assisted Steering, Thruster Budget",
@@ -1218,9 +1218,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_physics_summary",
-      "community": 1,
-      "norm_label": "physics summary \u2014 rigidbody3d + jolt, assisted steering, thruster budget"
+      "community": 4,
+      "norm_label": "physics summary \u2014 rigidbody3d + jolt, assisted steering, thruster budget",
+      "id": "core_spec_physics_summary"
     },
     {
       "label": "Weapons Summary \u2014 JSON Stats, Damage Types, Heat Per Hardpoint, Power Per Ship",
@@ -1231,9 +1231,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_weapons_summary",
-      "community": 24,
-      "norm_label": "weapons summary \u2014 json stats, damage types, heat per hardpoint, power per ship"
+      "community": 25,
+      "norm_label": "weapons summary \u2014 json stats, damage types, heat per hardpoint, power per ship",
+      "id": "core_spec_weapons_summary"
     },
     {
       "label": "AI Summary \u2014 State Machine IDLE\u2192PURSUE\u2192ENGAGE, JSON Profiles",
@@ -1244,9 +1244,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_ai_summary",
-      "community": 1,
-      "norm_label": "ai summary \u2014 state machine idle\u2192pursue\u2192engage, json profiles"
+      "community": 4,
+      "norm_label": "ai summary \u2014 state machine idle\u2192pursue\u2192engage, json profiles",
+      "id": "core_spec_ai_summary"
     },
     {
       "label": "Camera Summary \u2014 Camera3D Perspective, Height Zoom, Never Child of Ship",
@@ -1257,9 +1257,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_camera_summary",
-      "community": 13,
-      "norm_label": "camera summary \u2014 camera3d perspective, height zoom, never child of ship"
+      "community": 14,
+      "norm_label": "camera summary \u2014 camera3d perspective, height zoom, never child of ship",
+      "id": "core_spec_camera_summary"
     },
     {
       "label": "World Streaming Summary \u2014 Deterministic Chunk Grid, GameEventBus chunk_loaded",
@@ -1270,9 +1270,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_streaming_summary",
-      "community": 25,
-      "norm_label": "world streaming summary \u2014 deterministic chunk grid, gameeventbus chunk_loaded"
+      "community": 26,
+      "norm_label": "world streaming summary \u2014 deterministic chunk grid, gameeventbus chunk_loaded",
+      "id": "core_spec_streaming_summary"
     },
     {
       "label": "Build Order \u2014 15-Step Dependency Sequence",
@@ -1283,9 +1283,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "core_spec_build_order",
       "community": 36,
-      "norm_label": "build order \u2014 15-step dependency sequence"
+      "norm_label": "build order \u2014 15-step dependency sequence",
+      "id": "core_spec_build_order"
     },
     {
       "label": "AI & Patrol Behavior \u2014 State Machine, JSON Profiles, NavigationController",
@@ -1296,9 +1296,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ai_spec_overview",
-      "community": 1,
-      "norm_label": "ai & patrol behavior \u2014 state machine, json profiles, navigationcontroller"
+      "community": 4,
+      "norm_label": "ai & patrol behavior \u2014 state machine, json profiles, navigationcontroller",
+      "id": "ai_spec_overview"
     },
     {
       "label": "AIController State Machine \u2014 IDLE\u2192PURSUE\u2192ENGAGE (FLEE/REGROUP/SEARCH reserved)",
@@ -1309,9 +1309,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ai_spec_state_machine",
-      "community": 1,
-      "norm_label": "aicontroller state machine \u2014 idle\u2192pursue\u2192engage (flee/regroup/search reserved)"
+      "community": 4,
+      "norm_label": "aicontroller state machine \u2014 idle\u2192pursue\u2192engage (flee/regroup/search reserved)",
+      "id": "ai_spec_state_machine"
     },
     {
       "label": "IDLE State \u2014 Wander Within wander_radius of Spawn Position",
@@ -1322,9 +1322,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ai_spec_idle_state",
-      "community": 1,
-      "norm_label": "idle state \u2014 wander within wander_radius of spawn position"
+      "community": 4,
+      "norm_label": "idle state \u2014 wander within wander_radius of spawn position",
+      "id": "ai_spec_idle_state"
     },
     {
       "label": "PURSUE State \u2014 Close on Target at pursue_thrust_fraction, Leash Range Check",
@@ -1335,9 +1335,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ai_spec_pursue_state",
-      "community": 1,
-      "norm_label": "pursue state \u2014 close on target at pursue_thrust_fraction, leash range check"
+      "community": 4,
+      "norm_label": "pursue state \u2014 close on target at pursue_thrust_fraction, leash range check",
+      "id": "ai_spec_pursue_state"
     },
     {
       "label": "ENGAGE State \u2014 Maintain preferred_engage_distance, Orbit via Strafe, Fire When Aligned",
@@ -1348,9 +1348,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ai_spec_engage_state",
-      "community": 1,
-      "norm_label": "engage state \u2014 maintain preferred_engage_distance, orbit via strafe, fire when aligned"
+      "community": 4,
+      "norm_label": "engage state \u2014 maintain preferred_engage_distance, orbit via strafe, fire when aligned",
+      "id": "ai_spec_engage_state"
     },
     {
       "label": "Aim Prediction \u2014 Linear Lead via aim_accuracy Float (0.0\u20131.0 Difficulty Knob)",
@@ -1361,9 +1361,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ai_spec_aim_prediction",
-      "community": 1,
-      "norm_label": "aim prediction \u2014 linear lead via aim_accuracy float (0.0\u20131.0 difficulty knob)"
+      "community": 4,
+      "norm_label": "aim prediction \u2014 linear lead via aim_accuracy float (0.0\u20131.0 difficulty knob)",
+      "id": "ai_spec_aim_prediction"
     },
     {
       "label": "Detection System \u2014 Area3D SphereShape3D, body_entered Sets _player_detected",
@@ -1374,9 +1374,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ai_spec_detection_volume",
-      "community": 1,
-      "norm_label": "detection system \u2014 area3d sphereshape3d, body_entered sets _player_detected"
+      "community": 4,
+      "norm_label": "detection system \u2014 area3d sphereshape3d, body_entered sets _player_detected",
+      "id": "ai_spec_detection_volume"
     },
     {
       "label": "AI Behavior Profile JSON \u2014 ai_profiles.json, all tuning values",
@@ -1387,9 +1387,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ai_spec_behavior_profile_json",
-      "community": 1,
-      "norm_label": "ai behavior profile json \u2014 ai_profiles.json, all tuning values"
+      "community": 4,
+      "norm_label": "ai behavior profile json \u2014 ai_profiles.json, all tuning values",
+      "id": "ai_spec_behavior_profile_json"
     },
     {
       "label": "TRANSITIONS Dictionary \u2014 Data-Driven State Transitions, Not Hardcoded if-chains",
@@ -1400,9 +1400,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ai_spec_transitions_dict",
-      "community": 1,
-      "norm_label": "transitions dictionary \u2014 data-driven state transitions, not hardcoded if-chains"
+      "community": 4,
+      "norm_label": "transitions dictionary \u2014 data-driven state transitions, not hardcoded if-chains",
+      "id": "ai_spec_transitions_dict"
     },
     {
       "label": "Camera System \u2014 Perspective Follow, Cursor-Offset, Height Zoom",
@@ -1413,9 +1413,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "camera_spec_overview",
-      "community": 13,
-      "norm_label": "camera system \u2014 perspective follow, cursor-offset, height zoom"
+      "community": 14,
+      "norm_label": "camera system \u2014 perspective follow, cursor-offset, height zoom",
+      "id": "camera_spec_overview"
     },
     {
       "label": "Rationale: Height Zoom vs FOV Zoom \u2014 Constant Distortion, Natural Feel",
@@ -1426,9 +1426,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "camera_spec_height_zoom_rationale",
-      "community": 13,
-      "norm_label": "rationale: height zoom vs fov zoom \u2014 constant distortion, natural feel"
+      "community": 14,
+      "norm_label": "rationale: height zoom vs fov zoom \u2014 constant distortion, natural feel",
+      "id": "camera_spec_height_zoom_rationale"
     },
     {
       "label": "Camera Is Sibling of Game World \u2014 Never Child of Any Ship",
@@ -1439,9 +1439,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "camera_spec_sibling_architecture",
-      "community": 13,
-      "norm_label": "camera is sibling of game world \u2014 never child of any ship"
+      "community": 14,
+      "norm_label": "camera is sibling of game world \u2014 never child of any ship",
+      "id": "camera_spec_sibling_architecture"
     },
     {
       "label": "Mouse-to-World \u2014 Ray-Plane Intersection Against Y=0 (get_cursor_world_position)",
@@ -1452,9 +1452,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "camera_spec_cursor_world",
       "community": 5,
-      "norm_label": "mouse-to-world \u2014 ray-plane intersection against y=0 (get_cursor_world_position)"
+      "norm_label": "mouse-to-world \u2014 ray-plane intersection against y=0 (get_cursor_world_position)",
+      "id": "camera_spec_cursor_world"
     },
     {
       "label": "Critically Damped Spring Follow \u2014 No Overshoot, No Oscillation, Delta-Time Correct",
@@ -1465,9 +1465,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "camera_spec_spring_follow",
-      "community": 13,
-      "norm_label": "critically damped spring follow \u2014 no overshoot, no oscillation, delta-time correct"
+      "community": 14,
+      "norm_label": "critically damped spring follow \u2014 no overshoot, no oscillation, delta-time correct",
+      "id": "camera_spec_spring_follow"
     },
     {
       "label": "Free-Pan Tactical Mode Extension \u2014 release(), WASD/edge-scroll, set_zoom_limits()",
@@ -1478,9 +1478,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "camera_spec_tactical_extension",
-      "community": 1,
-      "norm_label": "free-pan tactical mode extension \u2014 release(), wasd/edge-scroll, set_zoom_limits()"
+      "community": 6,
+      "norm_label": "free-pan tactical mode extension \u2014 release(), wasd/edge-scroll, set_zoom_limits()",
+      "id": "camera_spec_tactical_extension"
     },
     {
       "label": "ChunkStreamer \u2014 Deterministic Procedural Chunk Streaming, Bounded Memory",
@@ -1491,9 +1491,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "chunk_spec_overview",
-      "community": 25,
-      "norm_label": "chunkstreamer \u2014 deterministic procedural chunk streaming, bounded memory"
+      "community": 26,
+      "norm_label": "chunkstreamer \u2014 deterministic procedural chunk streaming, bounded memory",
+      "id": "chunk_spec_overview"
     },
     {
       "label": "Chunk Coordinate \u2194 World Position \u2014 Vector2i Grid Coord \u2192 Vector3 World Origin",
@@ -1504,9 +1504,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "chunk_spec_coord_to_world",
-      "community": 26,
-      "norm_label": "chunk coordinate \u2194 world position \u2014 vector2i grid coord \u2192 vector3 world origin"
+      "community": 27,
+      "norm_label": "chunk coordinate \u2194 world position \u2014 vector2i grid coord \u2192 vector3 world origin",
+      "id": "chunk_spec_coord_to_world"
     },
     {
       "label": "Deterministic RNG Seeded by Chunk Coord Hash \u2014 Same Coord = Same Content Every Visit",
@@ -1517,9 +1517,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "chunk_spec_deterministic_rng",
-      "community": 26,
-      "norm_label": "deterministic rng seeded by chunk coord hash \u2014 same coord = same content every visit"
+      "community": 27,
+      "norm_label": "deterministic rng seeded by chunk coord hash \u2014 same coord = same content every visit",
+      "id": "chunk_spec_deterministic_rng"
     },
     {
       "label": "Asteroid \u2014 RigidBody3D with Jolt Axis Locks, apply_damage, Debris Spawn on Death",
@@ -1530,9 +1530,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "chunk_spec_asteroid",
-      "community": 11,
-      "norm_label": "asteroid \u2014 rigidbody3d with jolt axis locks, apply_damage, debris spawn on death"
+      "community": 12,
+      "norm_label": "asteroid \u2014 rigidbody3d with jolt axis locks, apply_damage, debris spawn on death",
+      "id": "chunk_spec_asteroid"
     },
     {
       "label": "Debris \u2014 Node3D Visual Only, Manual Velocity Integration, Alpha Fade Timer",
@@ -1543,9 +1543,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "chunk_spec_debris",
       "community": 37,
-      "norm_label": "debris \u2014 node3d visual only, manual velocity integration, alpha fade timer"
+      "norm_label": "debris \u2014 node3d visual only, manual velocity integration, alpha fade timer",
+      "id": "chunk_spec_debris"
     },
     {
       "label": "AI Spawn Point Markers \u2014 Node3D in ai_spawn_points Group, ChunkStreamer Agnostic of AI",
@@ -1556,9 +1556,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "chunk_spec_spawn_points",
       "community": 38,
-      "norm_label": "ai spawn point markers \u2014 node3d in ai_spawn_points group, chunkstreamer agnostic of ai"
+      "norm_label": "ai spawn point markers \u2014 node3d in ai_spawn_points group, chunkstreamer agnostic of ai",
+      "id": "chunk_spec_spawn_points"
     },
     {
       "label": "world_config.json \u2014 chunk_size, load_radius, asteroid_fields, debris tuning",
@@ -1569,9 +1569,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "chunk_spec_world_config_json",
       "community": 5,
-      "norm_label": "world_config.json \u2014 chunk_size, load_radius, asteroid_fields, debris tuning"
+      "norm_label": "world_config.json \u2014 chunk_size, load_radius, asteroid_fields, debris tuning",
+      "id": "chunk_spec_world_config_json"
     },
     {
       "label": "Three Layers \u2014 Input / Ship.gd Force Translation / Jolt Integration",
@@ -1582,9 +1582,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "physics_spec_three_layers",
-      "community": 1,
-      "norm_label": "three layers \u2014 input / ship.gd force translation / jolt integration"
+      "community": 4,
+      "norm_label": "three layers \u2014 input / ship.gd force translation / jolt integration",
+      "id": "physics_spec_three_layers"
     },
     {
       "label": "RigidBody3D Configuration \u2014 gravity_scale 0, axis_lock_linear_y, DAMP_MODE_REPLACE",
@@ -1595,9 +1595,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "physics_spec_rigidbody_config",
       "community": 39,
-      "norm_label": "rigidbody3d configuration \u2014 gravity_scale 0, axis_lock_linear_y, damp_mode_replace"
+      "norm_label": "rigidbody3d configuration \u2014 gravity_scale 0, axis_lock_linear_y, damp_mode_replace",
+      "id": "physics_spec_rigidbody_config"
     },
     {
       "label": "Assisted Steering \u2014 Predicted Stopping Distance Controls Brake vs Accelerate Torque",
@@ -1608,9 +1608,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "physics_spec_assisted_steering",
       "community": 20,
-      "norm_label": "assisted steering \u2014 predicted stopping distance controls brake vs accelerate torque"
+      "norm_label": "assisted steering \u2014 predicted stopping distance controls brake vs accelerate torque",
+      "id": "physics_spec_assisted_steering"
     },
     {
       "label": "Shared Thruster Budget \u2014 Turning Priority Over Translation, Diagonal Clamped to Unit",
@@ -1621,9 +1621,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "physics_spec_thruster_budget",
       "community": 20,
-      "norm_label": "shared thruster budget \u2014 turning priority over translation, diagonal clamped to unit"
+      "norm_label": "shared thruster budget \u2014 turning priority over translation, diagonal clamped to unit",
+      "id": "physics_spec_thruster_budget"
     },
     {
       "label": "Partial Alignment Drag \u2014 alignment_drag_current Per-Frame Reset Pattern, Lateral-Only Bleed",
@@ -1634,9 +1634,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "physics_spec_alignment_drag",
       "community": 20,
-      "norm_label": "partial alignment drag \u2014 alignment_drag_current per-frame reset pattern, lateral-only bleed"
+      "norm_label": "partial alignment drag \u2014 alignment_drag_current per-frame reset pattern, lateral-only bleed",
+      "id": "physics_spec_alignment_drag"
     },
     {
       "label": "Momentum Inheritance \u2014 Projectiles Inherit Ship velocity at Spawn",
@@ -1647,9 +1647,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "physics_spec_momentum_inheritance",
-      "community": 30,
-      "norm_label": "momentum inheritance \u2014 projectiles inherit ship velocity at spawn"
+      "community": 28,
+      "norm_label": "momentum inheritance \u2014 projectiles inherit ship velocity at spawn",
+      "id": "physics_spec_momentum_inheritance"
     },
     {
       "label": "Physics Hull JSON Block \u2014 mass, max_speed, linear_drag, thruster_force, etc.",
@@ -1660,9 +1660,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "physics_spec_hull_json",
       "community": 21,
-      "norm_label": "physics hull json block \u2014 mass, max_speed, linear_drag, thruster_force, etc."
+      "norm_label": "physics hull json block \u2014 mass, max_speed, linear_drag, thruster_force, etc.",
+      "id": "physics_spec_hull_json"
     },
     {
       "label": "Ship System \u2014 One Ship.tscn, Data-Driven Assembly from ship.json + parts.glb",
@@ -1673,9 +1673,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_overview",
-      "community": 23,
-      "norm_label": "ship system \u2014 one ship.tscn, data-driven assembly from ship.json + parts.glb"
+      "community": 24,
+      "norm_label": "ship system \u2014 one ship.tscn, data-driven assembly from ship.json + parts.glb",
+      "id": "ship_spec_overview"
     },
     {
       "label": "Ship Three Layers \u2014 Class (what it is) / Variant (discoverable config) / Loadout (player customizes)",
@@ -1686,9 +1686,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_three_layers",
-      "community": 17,
-      "norm_label": "ship three layers \u2014 class (what it is) / variant (discoverable config) / loadout (player customizes)"
+      "community": 18,
+      "norm_label": "ship three layers \u2014 class (what it is) / variant (discoverable config) / loadout (player customizes)",
+      "id": "ship_spec_three_layers"
     },
     {
       "label": "ShipFactory \u2014 spawn_ship(), Stat Resolution, Part Assembly, Hardpoint Discovery, Color Material",
@@ -1699,9 +1699,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_shipfactory",
-      "community": 14,
-      "norm_label": "shipfactory \u2014 spawn_ship(), stat resolution, part assembly, hardpoint discovery, color material"
+      "community": 15,
+      "norm_label": "shipfactory \u2014 spawn_ship(), stat resolution, part assembly, hardpoint discovery, color material",
+      "id": "ship_spec_shipfactory"
     },
     {
       "label": "Hardpoint Empty Naming \u2014 HardpointEmpty_{part}_{id}_{size} Uniqueness Convention",
@@ -1712,9 +1712,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_hardpoint_empty_naming",
       "community": 40,
-      "norm_label": "hardpoint empty naming \u2014 hardpointempty_{part}_{id}_{size} uniqueness convention"
+      "norm_label": "hardpoint empty naming \u2014 hardpointempty_{part}_{id}_{size} uniqueness convention",
+      "id": "ship_spec_hardpoint_empty_naming"
     },
     {
       "label": "ship.json Schema \u2014 base_stats, variants, part_stats, hardpoint_types, module_slots, default_loadout",
@@ -1725,9 +1725,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_ship_json_schema",
-      "community": 17,
-      "norm_label": "ship.json schema \u2014 base_stats, variants, part_stats, hardpoint_types, module_slots, default_loadout"
+      "community": 18,
+      "norm_label": "ship.json schema \u2014 base_stats, variants, part_stats, hardpoint_types, module_slots, default_loadout",
+      "id": "ship_spec_ship_json_schema"
     },
     {
       "label": "factions.json \u2014 color_scheme (primary/trim/accent/glow) + name_vocabulary",
@@ -1738,9 +1738,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_factions_json",
-      "community": 27,
-      "norm_label": "factions.json \u2014 color_scheme (primary/trim/accent/glow) + name_vocabulary"
+      "community": 29,
+      "norm_label": "factions.json \u2014 color_scheme (primary/trim/accent/glow) + name_vocabulary",
+      "id": "ship_spec_factions_json"
     },
     {
       "label": "Vertex Color Shader \u2014 R=Primary, G=Trim, B=Accent, A=Glow; Shared Material Per Ship",
@@ -1751,9 +1751,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_colorization",
-      "community": 27,
-      "norm_label": "vertex color shader \u2014 r=primary, g=trim, b=accent, a=glow; shared material per ship"
+      "community": 29,
+      "norm_label": "vertex color shader \u2014 r=primary, g=trim, b=accent, a=glow; shared material per ship",
+      "id": "ship_spec_colorization"
     },
     {
       "label": "ContentRegistry \u2014 Scans /content at Startup, Indexes Ships/Weapons/Modules by Folder",
@@ -1764,9 +1764,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_contentregistry",
-      "community": 14,
-      "norm_label": "contentregistry \u2014 scans /content at startup, indexes ships/weapons/modules by folder"
+      "community": 15,
+      "norm_label": "contentregistry \u2014 scans /content at startup, indexes ships/weapons/modules by folder",
+      "id": "ship_spec_contentregistry"
     },
     {
       "label": "PlayerState \u2014 Tracks Active Player Ship, Emits player_ship_changed",
@@ -1777,9 +1777,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_playerstate",
-      "community": 14,
-      "norm_label": "playerstate \u2014 tracks active player ship, emits player_ship_changed"
+      "community": 15,
+      "norm_label": "playerstate \u2014 tracks active player ship, emits player_ship_changed",
+      "id": "ship_spec_playerstate"
     },
     {
       "label": "Stat Resolution \u2014 base_stats + additive part_stat deltas Applied Once at Spawn",
@@ -1790,9 +1790,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_stat_resolution",
-      "community": 17,
-      "norm_label": "stat resolution \u2014 base_stats + additive part_stat deltas applied once at spawn"
+      "community": 18,
+      "norm_label": "stat resolution \u2014 base_stats + additive part_stat deltas applied once at spawn",
+      "id": "ship_spec_stat_resolution"
     },
     {
       "label": "Blueprint Discovery System \u2014 variant_id Added to Save Data on Reverse Engineering",
@@ -1803,9 +1803,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "ship_spec_blueprint_discovery",
-      "community": 17,
-      "norm_label": "blueprint discovery system \u2014 variant_id added to save data on reverse engineering"
+      "community": 18,
+      "norm_label": "blueprint discovery system \u2014 variant_id added to save data on reverse engineering",
+      "id": "ship_spec_blueprint_discovery"
     },
     {
       "label": "Weapons & Projectiles \u2014 Data-Driven, Dual Heat/Power Resources, Dual Pool",
@@ -1816,9 +1816,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_overview",
-      "community": 24,
-      "norm_label": "weapons & projectiles \u2014 data-driven, dual heat/power resources, dual pool"
+      "community": 25,
+      "norm_label": "weapons & projectiles \u2014 data-driven, dual heat/power resources, dual pool",
+      "id": "weapons_spec_overview"
     },
     {
       "label": "Hardpoint Types \u2014 fixed (~5\u00b0), gimbal (~25\u00b0), partial_turret (~120\u00b0), full_turret (360\u00b0)",
@@ -1829,9 +1829,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_hardpoint_types",
-      "community": 28,
-      "norm_label": "hardpoint types \u2014 fixed (~5\u00b0), gimbal (~25\u00b0), partial_turret (~120\u00b0), full_turret (360\u00b0)"
+      "community": 30,
+      "norm_label": "hardpoint types \u2014 fixed (~5\u00b0), gimbal (~25\u00b0), partial_turret (~120\u00b0), full_turret (360\u00b0)",
+      "id": "weapons_spec_hardpoint_types"
     },
     {
       "label": "Aim Direction Algorithm \u2014 slerp-Clamp to Arc for Gimbal/Partial Turret, Unconstrained Full Turret",
@@ -1842,9 +1842,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_aim_algorithm",
-      "community": 28,
-      "norm_label": "aim direction algorithm \u2014 slerp-clamp to arc for gimbal/partial turret, unconstrained full turret"
+      "community": 30,
+      "norm_label": "aim direction algorithm \u2014 slerp-clamp to arc for gimbal/partial turret, unconstrained full turret",
+      "id": "weapons_spec_aim_algorithm"
     },
     {
       "label": "Fire Groups \u2014 Many-to-Many Hardpoint to Group, 1-Based JSON \u2192 0-Based Internal",
@@ -1855,9 +1855,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_fire_groups",
-      "community": 1,
-      "norm_label": "fire groups \u2014 many-to-many hardpoint to group, 1-based json \u2192 0-based internal"
+      "community": 4,
+      "norm_label": "fire groups \u2014 many-to-many hardpoint to group, 1-based json \u2192 0-based internal",
+      "id": "weapons_spec_fire_groups"
     },
     {
       "label": "Weapon Archetypes \u2014 Ballistic, Energy Beam, Energy Pulse, Dumb Missile, Guided Missile",
@@ -1868,9 +1868,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_archetypes",
-      "community": 29,
-      "norm_label": "weapon archetypes \u2014 ballistic, energy beam, energy pulse, dumb missile, guided missile"
+      "community": 31,
+      "norm_label": "weapon archetypes \u2014 ballistic, energy beam, energy pulse, dumb missile, guided missile",
+      "id": "weapons_spec_archetypes"
     },
     {
       "label": "Heat System \u2014 Per-Hardpoint heat_current, Overheat Lockout, Passive Cooling",
@@ -1881,9 +1881,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_heat_system",
-      "community": 29,
-      "norm_label": "heat system \u2014 per-hardpoint heat_current, overheat lockout, passive cooling"
+      "community": 31,
+      "norm_label": "heat system \u2014 per-hardpoint heat_current, overheat lockout, passive cooling",
+      "id": "weapons_spec_heat_system"
     },
     {
       "label": "Power System \u2014 Per-Ship Shared Pool, Brownout Stops Energy Weapons + Shield Regen",
@@ -1894,9 +1894,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_power_system",
-      "community": 11,
-      "norm_label": "power system \u2014 per-ship shared pool, brownout stops energy weapons + shield regen"
+      "community": 12,
+      "norm_label": "power system \u2014 per-ship shared pool, brownout stops energy weapons + shield regen",
+      "id": "weapons_spec_power_system"
     },
     {
       "label": "Shield System \u2014 shield_hp, regen_delay, regen_power_draw; Regen Pauses on Hit",
@@ -1907,9 +1907,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_shield_system",
-      "community": 11,
-      "norm_label": "shield system \u2014 shield_hp, regen_delay, regen_power_draw; regen pauses on hit"
+      "community": 12,
+      "norm_label": "shield system \u2014 shield_hp, regen_delay, regen_power_draw; regen pauses on hit",
+      "id": "weapons_spec_shield_system"
     },
     {
       "label": "ProjectileManager C# \u2014 Dumb Pool (DumbProjectile struct), Hitscan, Swept Raycast",
@@ -1920,9 +1920,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_projectile_manager",
-      "community": 30,
-      "norm_label": "projectilemanager c# \u2014 dumb pool (dumbprojectile struct), hitscan, swept raycast"
+      "community": 28,
+      "norm_label": "projectilemanager c# \u2014 dumb pool (dumbprojectile struct), hitscan, swept raycast",
+      "id": "weapons_spec_projectile_manager"
     },
     {
       "label": "GuidedProjectilePool GDScript \u2014 Missile Steering via slerp, track_cursor/auto_lock/click_lock",
@@ -1933,9 +1933,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_guided_pool",
-      "community": 14,
-      "norm_label": "guidedprojectilepool gdscript \u2014 missile steering via slerp, track_cursor/auto_lock/click_lock"
+      "community": 15,
+      "norm_label": "guidedprojectilepool gdscript \u2014 missile steering via slerp, track_cursor/auto_lock/click_lock",
+      "id": "weapons_spec_guided_pool"
     },
     {
       "label": "Damage Resolution Pipeline \u2014 Shield Absorption \u2192 Hull \u2192 Component Split via component_damage_ratio",
@@ -1946,9 +1946,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_damage_pipeline",
-      "community": 11,
-      "norm_label": "damage resolution pipeline \u2014 shield absorption \u2192 hull \u2192 component split via component_damage_ratio"
+      "community": 12,
+      "norm_label": "damage resolution pipeline \u2014 shield absorption \u2192 hull \u2192 component split via component_damage_ratio",
+      "id": "weapons_spec_damage_pipeline"
     },
     {
       "label": "Damage Type Matrix \u2014 ballistic 0.4\u00d7/1.5\u00d7, energy_beam 1.8\u00d7/0.5\u00d7, missile 0.6\u00d7/1.4\u00d7",
@@ -1959,9 +1959,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_damage_type_matrix",
-      "community": 11,
-      "norm_label": "damage type matrix \u2014 ballistic 0.4\u00d7/1.5\u00d7, energy_beam 1.8\u00d7/0.5\u00d7, missile 0.6\u00d7/1.4\u00d7"
+      "community": 12,
+      "norm_label": "damage type matrix \u2014 ballistic 0.4\u00d7/1.5\u00d7, energy_beam 1.8\u00d7/0.5\u00d7, missile 0.6\u00d7/1.4\u00d7",
+      "id": "weapons_spec_damage_type_matrix"
     },
     {
       "label": "weapon.json Schema \u2014 archetype, stats (damage, fire_rate, heat_per_shot, muzzle_speed, etc.)",
@@ -1972,9 +1972,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "weapons_spec_weapon_json",
-      "community": 11,
-      "norm_label": "weapon.json schema \u2014 archetype, stats (damage, fire_rate, heat_per_shot, muzzle_speed, etc.)"
+      "community": 12,
+      "norm_label": "weapon.json schema \u2014 archetype, stats (damage, fire_rate, heat_per_shot, muzzle_speed, etc.)",
+      "id": "weapons_spec_weapon_json"
     },
     {
       "label": "NavigationController \u2014 Flight Computer: Destination to input_forward/input_strafe",
@@ -1985,9 +1985,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "nav_spec_overview",
-      "community": 1,
-      "norm_label": "navigationcontroller \u2014 flight computer: destination to input_forward/input_strafe"
+      "community": 4,
+      "norm_label": "navigationcontroller \u2014 flight computer: destination to input_forward/input_strafe",
+      "id": "nav_spec_overview"
     },
     {
       "label": "NavigationController Is a Tool, Not an Actor \u2014 No _physics_process, Called Explicitly",
@@ -1998,9 +1998,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "nav_spec_tool_not_actor",
-      "community": 1,
-      "norm_label": "navigationcontroller is a tool, not an actor \u2014 no _physics_process, called explicitly"
+      "community": 4,
+      "norm_label": "navigationcontroller is a tool, not an actor \u2014 no _physics_process, called explicitly",
+      "id": "nav_spec_tool_not_actor"
     },
     {
       "label": "Braking Decision Algorithm \u2014 Predicted Stop Distance vs Remaining Distance",
@@ -2011,9 +2011,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "nav_spec_braking_algorithm",
       "community": 21,
-      "norm_label": "braking decision algorithm \u2014 predicted stop distance vs remaining distance"
+      "norm_label": "braking decision algorithm \u2014 predicted stop distance vs remaining distance",
+      "id": "nav_spec_braking_algorithm"
     },
     {
       "label": "Project World-Space Thrust onto Ship Axes \u2014 Correct Regardless of Facing",
@@ -2024,9 +2024,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "nav_spec_project_onto_axes",
       "community": 21,
-      "norm_label": "project world-space thrust onto ship axes \u2014 correct regardless of facing"
+      "norm_label": "project world-space thrust onto ship axes \u2014 correct regardless of facing",
+      "id": "nav_spec_project_onto_axes"
     },
     {
       "label": "Thrust Fraction Scaling \u2014 AI Expresses Intent (patrol vs pursue speed)",
@@ -2037,9 +2037,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "nav_spec_thrust_fraction",
       "community": 41,
-      "norm_label": "thrust fraction scaling \u2014 ai expresses intent (patrol vs pursue speed)"
+      "norm_label": "thrust fraction scaling \u2014 ai expresses intent (patrol vs pursue speed)",
+      "id": "nav_spec_thrust_fraction"
     },
     {
       "label": "Arrival Behavior \u2014 Zero Thrust Within arrival_distance, Residual Drift Intentional",
@@ -2050,9 +2050,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "nav_spec_arrival_behavior",
       "community": 42,
-      "norm_label": "arrival behavior \u2014 zero thrust within arrival_distance, residual drift intentional"
+      "norm_label": "arrival behavior \u2014 zero thrust within arrival_distance, residual drift intentional",
+      "id": "nav_spec_arrival_behavior"
     },
     {
       "label": "DriveMode Enum \u2014 EXTERNAL / TACTICAL_ORDER / FORMATION Self-Drive (Phase 14)",
@@ -2063,9 +2063,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "nav_spec_drive_mode",
       "community": 43,
-      "norm_label": "drivemode enum \u2014 external / tactical_order / formation self-drive (phase 14)"
+      "norm_label": "drivemode enum \u2014 external / tactical_order / formation self-drive (phase 14)",
+      "id": "nav_spec_drive_mode"
     },
     {
       "label": "PerformanceMonitor \u2014 Lightweight Always-On Observability Service",
@@ -2076,9 +2076,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "perf_spec_overview",
-      "community": 12,
-      "norm_label": "performancemonitor \u2014 lightweight always-on observability service"
+      "community": 13,
+      "norm_label": "performancemonitor \u2014 lightweight always-on observability service",
+      "id": "perf_spec_overview"
     },
     {
       "label": "PerformanceMonitor API \u2014 begin/end Timing, set_count, get_avg_ms, get_peak_ms",
@@ -2089,9 +2089,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "perf_spec_api",
-      "community": 12,
-      "norm_label": "performancemonitor api \u2014 begin/end timing, set_count, get_avg_ms, get_peak_ms"
+      "community": 13,
+      "norm_label": "performancemonitor api \u2014 begin/end timing, set_count, get_avg_ms, get_peak_ms",
+      "id": "perf_spec_api"
     },
     {
       "label": "Godot Custom Monitors Registered in GameBootstrap to Avoid Duplicate Registration",
@@ -2102,9 +2102,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "perf_spec_custom_monitors",
       "community": 44,
-      "norm_label": "godot custom monitors registered in gamebootstrap to avoid duplicate registration"
+      "norm_label": "godot custom monitors registered in gamebootstrap to avoid duplicate registration",
+      "id": "perf_spec_custom_monitors"
     },
     {
       "label": "F3 In-Game Debug Overlay \u2014 CanvasLayer, Monospace Font, Frame Budget Display",
@@ -2115,9 +2115,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "perf_spec_f3_overlay",
-      "community": 12,
-      "norm_label": "f3 in-game debug overlay \u2014 canvaslayer, monospace font, frame budget display"
+      "community": 13,
+      "norm_label": "f3 in-game debug overlay \u2014 canvaslayer, monospace font, frame budget display",
+      "id": "perf_spec_f3_overlay"
     },
     {
       "label": "Rationale: PerformanceMonitor Built First \u2014 Metrics From Day One Avoids Retrofitting",
@@ -2128,9 +2128,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "perf_spec_built_first_rationale",
-      "community": 12,
-      "norm_label": "rationale: performancemonitor built first \u2014 metrics from day one avoids retrofitting"
+      "community": 13,
+      "norm_label": "rationale: performancemonitor built first \u2014 metrics from day one avoids retrofitting",
+      "id": "perf_spec_built_first_rationale"
     },
     {
       "label": "SVG application icon 128\u00d7128 (Godot-style brand mark)",
@@ -2141,9 +2141,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_svg_document",
-      "community": 15,
-      "norm_label": "svg application icon 128\u00d7128 (godot-style brand mark)"
+      "community": 16,
+      "norm_label": "svg application icon 128\u00d7128 (godot-style brand mark)",
+      "id": "icon_svg_document"
     },
     {
       "label": "Rounded rectangle frame (#363d52 fill, #212532 stroke, rx=14)",
@@ -2154,9 +2154,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_rounded_panel",
-      "community": 15,
-      "norm_label": "rounded rectangle frame (#363d52 fill, #212532 stroke, rx=14)"
+      "community": 16,
+      "norm_label": "rounded rectangle frame (#363d52 fill, #212532 stroke, rx=14)",
+      "id": "icon_rounded_panel"
     },
     {
       "label": "Scaled path group: robot head, gear crown, blue face plate (#478cbf), white gear outline",
@@ -2167,9 +2167,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_mascot_vector_group",
-      "community": 15,
-      "norm_label": "scaled path group: robot head, gear crown, blue face plate (#478cbf), white gear outline"
+      "community": 16,
+      "norm_label": "scaled path group: robot head, gear crown, blue face plate (#478cbf), white gear outline",
+      "id": "icon_mascot_vector_group"
     },
     {
       "label": "Eye layer: two dark gray circles (#414042) for pupils",
@@ -2180,9 +2180,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_ocular_detail_group",
-      "community": 15,
-      "norm_label": "eye layer: two dark gray circles (#414042) for pupils"
+      "community": 16,
+      "norm_label": "eye layer: two dark gray circles (#414042) for pupils",
+      "id": "icon_ocular_detail_group"
     },
     {
       "label": "Semantic association: standard Godot Engine editor / project joystick-robot logo",
@@ -2193,9 +2193,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "icon_godot_mark_association",
-      "community": 15,
-      "norm_label": "semantic association: standard godot engine editor / project joystick-robot logo"
+      "community": 16,
+      "norm_label": "semantic association: standard godot engine editor / project joystick-robot logo",
+      "id": "icon_godot_mark_association"
     },
     {
       "label": "Fighter Base Color diffuse (albedo) texture map",
@@ -2206,9 +2206,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_diffuse_texture_map",
-      "community": 8,
-      "norm_label": "fighter base color diffuse (albedo) texture map"
+      "community": 9,
+      "norm_label": "fighter base color diffuse (albedo) texture map",
+      "id": "fighter_base_color_diffuse_texture_map"
     },
     {
       "label": "Neutral dark gray base color field (~#444444)",
@@ -2219,9 +2219,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_neutral_gray_field",
-      "community": 8,
-      "norm_label": "neutral dark gray base color field (~#444444)"
+      "community": 9,
+      "norm_label": "neutral dark gray base color field (~#444444)",
+      "id": "fighter_base_color_neutral_gray_field"
     },
     {
       "label": "Bright red accent paint on hull markings",
@@ -2232,9 +2232,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_red_accent_paint",
-      "community": 8,
-      "norm_label": "bright red accent paint on hull markings"
+      "community": 9,
+      "norm_label": "bright red accent paint on hull markings",
+      "id": "fighter_base_color_red_accent_paint"
     },
     {
       "label": "Tall vertical red stripe UV island (rounded ends)",
@@ -2245,9 +2245,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_vertical_stripe_island",
-      "community": 8,
-      "norm_label": "tall vertical red stripe uv island (rounded ends)"
+      "community": 9,
+      "norm_label": "tall vertical red stripe uv island (rounded ends)",
+      "id": "fighter_base_color_vertical_stripe_island"
     },
     {
       "label": "Symmetric angled chevron or open-diamond trim pair",
@@ -2258,9 +2258,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_chevron_trim_islands",
-      "community": 8,
-      "norm_label": "symmetric angled chevron or open-diamond trim pair"
+      "community": 9,
+      "norm_label": "symmetric angled chevron or open-diamond trim pair",
+      "id": "fighter_base_color_chevron_trim_islands"
     },
     {
       "label": "Small horizontal arc or crescent marking (irregular top edge)",
@@ -2271,9 +2271,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_arc_crescent_island",
-      "community": 8,
-      "norm_label": "small horizontal arc or crescent marking (irregular top edge)"
+      "community": 9,
+      "norm_label": "small horizontal arc or crescent marking (irregular top edge)",
+      "id": "fighter_base_color_arc_crescent_island"
     },
     {
       "label": "Solid circular red island (upper-right)",
@@ -2284,9 +2284,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_circular_solid_island",
-      "community": 8,
-      "norm_label": "solid circular red island (upper-right)"
+      "community": 9,
+      "norm_label": "solid circular red island (upper-right)",
+      "id": "fighter_base_color_circular_solid_island"
     },
     {
       "label": "UV island layout on a single base-color sheet",
@@ -2297,9 +2297,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_uv_island_sheet",
-      "community": 8,
-      "norm_label": "uv island layout on a single base-color sheet"
+      "community": 9,
+      "norm_label": "uv island layout on a single base-color sheet",
+      "id": "fighter_base_color_uv_island_sheet"
     },
     {
       "label": "Minimal high-contrast sci-fi vehicle livery (gray + red)",
@@ -2310,9 +2310,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_minimal_high_contrast_livery",
-      "community": 8,
-      "norm_label": "minimal high-contrast sci-fi vehicle livery (gray + red)"
+      "community": 9,
+      "norm_label": "minimal high-contrast sci-fi vehicle livery (gray + red)",
+      "id": "fighter_base_color_minimal_high_contrast_livery"
     },
     {
       "label": "Fighter Base Color texture (Blender albedo map)",
@@ -2323,9 +2323,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_albedo_texture_file",
-      "community": 16,
-      "norm_label": "fighter base color texture (blender albedo map)"
+      "community": 17,
+      "norm_label": "fighter base color texture (blender albedo map)",
+      "id": "fighter_base_color_albedo_texture_file"
     },
     {
       "label": "Uniform dark charcoal gray surface (~#444444 RGB)",
@@ -2336,9 +2336,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_uniform_charcoal_surface",
-      "community": 16,
-      "norm_label": "uniform dark charcoal gray surface (~#444444 rgb)"
+      "community": 17,
+      "norm_label": "uniform dark charcoal gray surface (~#444444 rgb)",
+      "id": "fighter_base_color_uniform_charcoal_surface"
     },
     {
       "label": "Featureless albedo (no gradients, noise, or markings)",
@@ -2349,9 +2349,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_minimal_featureless_albedo",
-      "community": 16,
-      "norm_label": "featureless albedo (no gradients, noise, or markings)"
+      "community": 17,
+      "norm_label": "featureless albedo (no gradients, noise, or markings)",
+      "id": "fighter_base_color_minimal_featureless_albedo"
     },
     {
       "label": "Neutral base layer for PBR (detail likely in roughness/normal/metallic)",
@@ -2362,9 +2362,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_neutral_pbr_foundation",
-      "community": 16,
-      "norm_label": "neutral base layer for pbr (detail likely in roughness/normal/metallic)"
+      "community": 17,
+      "norm_label": "neutral base layer for pbr (detail likely in roughness/normal/metallic)",
+      "id": "fighter_base_color_neutral_pbr_foundation"
     },
     {
       "label": "Dark utilitarian / industrial hull color direction",
@@ -2375,9 +2375,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "fighter_base_color_dark_utilitarian_palette",
-      "community": 16,
-      "norm_label": "dark utilitarian / industrial hull color direction"
+      "community": 17,
+      "norm_label": "dark utilitarian / industrial hull color direction",
+      "id": "fighter_base_color_dark_utilitarian_palette"
     },
     {
       "label": "Base color (albedo) texture map",
@@ -2388,9 +2388,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "model_fighter_base_color_albedo_texture_map",
-      "community": 6,
-      "norm_label": "base color (albedo) texture map"
+      "community": 7,
+      "norm_label": "base color (albedo) texture map",
+      "id": "model_fighter_base_color_albedo_texture_map"
     },
     {
       "label": "Axum-class fighter surface livery",
@@ -2401,9 +2401,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "model_fighter_base_color_axum_fighter_subject",
-      "community": 6,
-      "norm_label": "axum-class fighter surface livery"
+      "community": 7,
+      "norm_label": "axum-class fighter surface livery",
+      "id": "model_fighter_base_color_axum_fighter_subject"
     },
     {
       "label": "Primary hull base color (matte dark gray field)",
@@ -2414,9 +2414,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "model_fighter_base_color_dark_gray_hull",
-      "community": 6,
-      "norm_label": "primary hull base color (matte dark gray field)"
+      "community": 7,
+      "norm_label": "primary hull base color (matte dark gray field)",
+      "id": "model_fighter_base_color_dark_gray_hull"
     },
     {
       "label": "Accent marking color (high-chroma red)",
@@ -2427,9 +2427,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "model_fighter_base_color_bright_red_markings",
-      "community": 6,
-      "norm_label": "accent marking color (high-chroma red)"
+      "community": 7,
+      "norm_label": "accent marking color (high-chroma red)",
+      "id": "model_fighter_base_color_bright_red_markings"
     },
     {
       "label": "Tall vertical stripe with rounded ends",
@@ -2440,9 +2440,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "model_fighter_base_color_vertical_stripe",
-      "community": 6,
-      "norm_label": "tall vertical stripe with rounded ends"
+      "community": 7,
+      "norm_label": "tall vertical stripe with rounded ends",
+      "id": "model_fighter_base_color_vertical_stripe"
     },
     {
       "label": "Solid circular red hull mark",
@@ -2453,9 +2453,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "model_fighter_base_color_circular_element",
-      "community": 6,
-      "norm_label": "solid circular red hull mark"
+      "community": 7,
+      "norm_label": "solid circular red hull mark",
+      "id": "model_fighter_base_color_circular_element"
     },
     {
       "label": "Crescent or jagged-bottom red marking",
@@ -2466,9 +2466,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "model_fighter_base_color_crescent_element",
-      "community": 6,
-      "norm_label": "crescent or jagged-bottom red marking"
+      "community": 7,
+      "norm_label": "crescent or jagged-bottom red marking",
+      "id": "model_fighter_base_color_crescent_element"
     },
     {
       "label": "Mirrored angled line pairs (lower layout)",
@@ -2479,9 +2479,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "model_fighter_base_color_symmetrical_angled_pairs",
-      "community": 6,
-      "norm_label": "mirrored angled line pairs (lower layout)"
+      "community": 7,
+      "norm_label": "mirrored angled line pairs (lower layout)",
+      "id": "model_fighter_base_color_symmetrical_angled_pairs"
     },
     {
       "label": "Minimalist high-contrast industrial sci-fi look",
@@ -2492,9 +2492,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "model_fighter_base_color_minimalist_industrial_style",
-      "community": 6,
-      "norm_label": "minimalist high-contrast industrial sci-fi look"
+      "community": 7,
+      "norm_label": "minimalist high-contrast industrial sci-fi look",
+      "id": "model_fighter_base_color_minimalist_industrial_style"
     },
     {
       "label": "UV island layout (flat painted regions for wrapped mesh)",
@@ -2505,9 +2505,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "model_fighter_base_color_uv_shell_layout",
-      "community": 6,
-      "norm_label": "uv island layout (flat painted regions for wrapped mesh)"
+      "community": 7,
+      "norm_label": "uv island layout (flat painted regions for wrapped mesh)",
+      "id": "model_fighter_base_color_uv_shell_layout"
     },
     {
       "label": "Quick Rules",
@@ -2518,9 +2518,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_quick_rules",
       "community": 5,
-      "norm_label": "quick rules"
+      "norm_label": "quick rules",
+      "id": "agents_quick_rules"
     },
     {
       "label": "Session End Protocol",
@@ -2531,9 +2531,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agents_session_end_protocol",
       "community": 0,
-      "norm_label": "session end protocol"
+      "norm_label": "session end protocol",
+      "id": "agents_session_end_protocol"
     },
     {
       "label": "Decisions Log",
@@ -2544,9 +2544,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log",
       "community": 0,
-      "norm_label": "decisions log"
+      "norm_label": "decisions log",
+      "id": "decisions_log"
     },
     {
       "label": "2026-04-16 Pre-implementation Spec Audit",
@@ -2557,9 +2557,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_16_spec_audit",
       "community": 0,
-      "norm_label": "2026-04-16 pre-implementation spec audit"
+      "norm_label": "2026-04-16 pre-implementation spec audit",
+      "id": "decisions_log_decision_2026_04_16_spec_audit"
     },
     {
       "label": "2026-04-17 Physics Spec Authoritative for Hull Fields",
@@ -2570,9 +2570,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_17_physics_spec_auth",
       "community": 0,
-      "norm_label": "2026-04-17 physics spec authoritative for hull fields"
+      "norm_label": "2026-04-17 physics spec authoritative for hull fields",
+      "id": "decisions_log_decision_2026_04_17_physics_spec_auth"
     },
     {
       "label": "2026-04-17 input_forward Positive = Forward",
@@ -2583,9 +2583,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_17_input_forward_sign",
       "community": 0,
-      "norm_label": "2026-04-17 input_forward positive = forward"
+      "norm_label": "2026-04-17 input_forward positive = forward",
+      "id": "decisions_log_decision_2026_04_17_input_forward_sign"
     },
     {
       "label": "2026-04-17 NavigationController Monitor Registration",
@@ -2596,9 +2596,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_17_nav_monitor_registration",
       "community": 0,
-      "norm_label": "2026-04-17 navigationcontroller monitor registration"
+      "norm_label": "2026-04-17 navigationcontroller monitor registration",
+      "id": "decisions_log_decision_2026_04_17_nav_monitor_registration"
     },
     {
       "label": "2026-04-17 Custom Monitor Registration Moved to GameBootstrap",
@@ -2609,9 +2609,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_17_monitor_gamebootstrap",
       "community": 0,
-      "norm_label": "2026-04-17 custom monitor registration moved to gamebootstrap"
+      "norm_label": "2026-04-17 custom monitor registration moved to gamebootstrap",
+      "id": "decisions_log_decision_2026_04_17_monitor_gamebootstrap"
     },
     {
       "label": "2026-04-17 NavigationController Tuning Flat Schema",
@@ -2622,9 +2622,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_17_nav_flat_schema",
       "community": 0,
-      "norm_label": "2026-04-17 navigationcontroller tuning flat schema"
+      "norm_label": "2026-04-17 navigationcontroller tuning flat schema",
+      "id": "decisions_log_decision_2026_04_17_nav_flat_schema"
     },
     {
       "label": "2026-04-17 ProjectileManager Extends Node3D",
@@ -2635,9 +2635,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_17_projectilemanager_node3d",
       "community": 0,
-      "norm_label": "2026-04-17 projectilemanager extends node3d"
+      "norm_label": "2026-04-17 projectilemanager extends node3d",
+      "id": "decisions_log_decision_2026_04_17_projectilemanager_node3d"
     },
     {
       "label": "2026-04-17 DumbProjectile Struct Stores Combat Values",
@@ -2648,9 +2648,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_17_dumbprojectile_struct",
       "community": 0,
-      "norm_label": "2026-04-17 dumbprojectile struct stores combat values"
+      "norm_label": "2026-04-17 dumbprojectile struct stores combat values",
+      "id": "decisions_log_decision_2026_04_17_dumbprojectile_struct"
     },
     {
       "label": "2026-04-17 Hitscan Queued for Physics Tick",
@@ -2661,9 +2661,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_17_hitscan_physics_tick",
       "community": 0,
-      "norm_label": "2026-04-17 hitscan queued for physics tick"
+      "norm_label": "2026-04-17 hitscan queued for physics tick",
+      "id": "decisions_log_decision_2026_04_17_hitscan_physics_tick"
     },
     {
       "label": "2026-04-17 Fire Group 1-Based JSON 0-Based Internal",
@@ -2674,9 +2674,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_17_fire_group_indexing",
       "community": 0,
-      "norm_label": "2026-04-17 fire group 1-based json 0-based internal"
+      "norm_label": "2026-04-17 fire group 1-based json 0-based internal",
+      "id": "decisions_log_decision_2026_04_17_fire_group_indexing"
     },
     {
       "label": "2026-04-18 GuidedProjectilePool Implementation",
@@ -2687,9 +2687,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_18_guided_projectile_pool",
       "community": 0,
-      "norm_label": "2026-04-18 guidedprojectilepool implementation"
+      "norm_label": "2026-04-18 guidedprojectilepool implementation",
+      "id": "decisions_log_decision_2026_04_18_guided_projectile_pool"
     },
     {
       "label": "2026-04-18 GuidedProjectilePool Shadowing and Type Fixes",
@@ -2700,9 +2700,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_18_guided_shadowing_fix",
       "community": 0,
-      "norm_label": "2026-04-18 guidedprojectilepool shadowing and type fixes"
+      "norm_label": "2026-04-18 guidedprojectilepool shadowing and type fixes",
+      "id": "decisions_log_decision_2026_04_18_guided_shadowing_fix"
     },
     {
       "label": "2026-04-18 ShipFactory + Ship Visual Assembly",
@@ -2713,9 +2713,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_18_shipfactory_visual_assembly",
       "community": 0,
-      "norm_label": "2026-04-18 shipfactory + ship visual assembly"
+      "norm_label": "2026-04-18 shipfactory + ship visual assembly",
+      "id": "decisions_log_decision_2026_04_18_shipfactory_visual_assembly"
     },
     {
       "label": "2026-04-18 Hardpoint Empty Naming Includes Part Name",
@@ -2726,9 +2726,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_18_hardpoint_naming",
       "community": 0,
-      "norm_label": "2026-04-18 hardpoint empty naming includes part name"
+      "norm_label": "2026-04-18 hardpoint empty naming includes part name",
+      "id": "decisions_log_decision_2026_04_18_hardpoint_naming"
     },
     {
       "label": "2026-04-19 GameCamera Pilot Mode",
@@ -2739,9 +2739,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_19_gamecamera_pilot",
       "community": 0,
-      "norm_label": "2026-04-19 gamecamera pilot mode"
+      "norm_label": "2026-04-19 gamecamera pilot mode",
+      "id": "decisions_log_decision_2026_04_19_gamecamera_pilot"
     },
     {
       "label": "2026-04-19 AIController + NavigationController Integration",
@@ -2752,9 +2752,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_19_ai_nav_integration",
       "community": 0,
-      "norm_label": "2026-04-19 aicontroller + navigationcontroller integration"
+      "norm_label": "2026-04-19 aicontroller + navigationcontroller integration",
+      "id": "decisions_log_decision_2026_04_19_ai_nav_integration"
     },
     {
       "label": "2026-04-19 Pilot Loop Integration Test Scene",
@@ -2765,9 +2765,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_19_pilot_loop_test",
       "community": 0,
-      "norm_label": "2026-04-19 pilot loop integration test scene"
+      "norm_label": "2026-04-19 pilot loop integration test scene",
+      "id": "decisions_log_decision_2026_04_19_pilot_loop_test"
     },
     {
       "label": "2026-04-19 Tactical Mode Camera + Input Layer",
@@ -2778,9 +2778,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_19_tactical_camera_input",
       "community": 0,
-      "norm_label": "2026-04-19 tactical mode camera + input layer"
+      "norm_label": "2026-04-19 tactical mode camera + input layer",
+      "id": "decisions_log_decision_2026_04_19_tactical_camera_input"
     },
     {
       "label": "2026-04-20 Fleet Command RTS Layer",
@@ -2791,9 +2791,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_20_fleet_command",
       "community": 0,
-      "norm_label": "2026-04-20 fleet command rts layer"
+      "norm_label": "2026-04-20 fleet command rts layer",
+      "id": "decisions_log_decision_2026_04_20_fleet_command"
     },
     {
       "label": "2026-04-21 ChunkStreamer + Asteroid + Debris",
@@ -2804,9 +2804,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_21_chunkstreamer",
       "community": 0,
-      "norm_label": "2026-04-21 chunkstreamer + asteroid + debris"
+      "norm_label": "2026-04-21 chunkstreamer + asteroid + debris",
+      "id": "decisions_log_decision_2026_04_21_chunkstreamer"
     },
     {
       "label": "2026-04-21 GameEventBus Signal Audit",
@@ -2817,9 +2817,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "decisions_log_decision_2026_04_21_gameeventbus_audit",
       "community": 0,
-      "norm_label": "2026-04-21 gameeventbus signal audit"
+      "norm_label": "2026-04-21 gameeventbus signal audit",
+      "id": "decisions_log_decision_2026_04_21_gameeventbus_audit"
     },
     {
       "label": "GameEventBus Signal Contract",
@@ -2830,9 +2830,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_gameeventbus_signal_contract",
       "community": 0,
-      "norm_label": "gameeventbus signal contract"
+      "norm_label": "gameeventbus signal contract",
+      "id": "feature_spec_gameeventbus_signal_contract"
     },
     {
       "label": "GameEventBus Combat Signals",
@@ -2843,9 +2843,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_gameeventbus_combat_signals",
       "community": 0,
-      "norm_label": "gameeventbus combat signals"
+      "norm_label": "gameeventbus combat signals",
+      "id": "feature_spec_gameeventbus_combat_signals"
     },
     {
       "label": "GameEventBus Tactical Order Signals",
@@ -2856,9 +2856,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_gameeventbus_tactical_signals",
       "community": 0,
-      "norm_label": "gameeventbus tactical order signals"
+      "norm_label": "gameeventbus tactical order signals",
+      "id": "feature_spec_gameeventbus_tactical_signals"
     },
     {
       "label": "Agent Brief Project Context",
@@ -2869,9 +2869,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agent_brief_project",
       "community": 0,
-      "norm_label": "agent brief project context"
+      "norm_label": "agent brief project context",
+      "id": "agent_brief_project"
     },
     {
       "label": "Agent Brief Build Status",
@@ -2882,9 +2882,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agent_brief_build_status",
       "community": 0,
-      "norm_label": "agent brief build status"
+      "norm_label": "agent brief build status",
+      "id": "agent_brief_build_status"
     },
     {
       "label": "Non-Negotiable Architecture Rules",
@@ -2895,9 +2895,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agent_brief_architecture_rules",
       "community": 5,
-      "norm_label": "non-negotiable architecture rules"
+      "norm_label": "non-negotiable architecture rules",
+      "id": "agent_brief_architecture_rules"
     },
     {
       "label": "Deviation Protocol",
@@ -2908,9 +2908,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "agent_brief_deviation_protocol",
       "community": 0,
-      "norm_label": "deviation protocol"
+      "norm_label": "deviation protocol",
+      "id": "agent_brief_deviation_protocol"
     },
     {
       "label": "Development Guide",
@@ -2921,9 +2921,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "development_guide",
       "community": 0,
-      "norm_label": "development guide"
+      "norm_label": "development guide",
+      "id": "development_guide"
     },
     {
       "label": "Development Guide Build Order",
@@ -2934,9 +2934,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "development_guide_build_order",
       "community": 0,
-      "norm_label": "development guide build order"
+      "norm_label": "development guide build order",
+      "id": "development_guide_build_order"
     },
     {
       "label": "Opus vs Sonnet Model Rules",
@@ -2947,9 +2947,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "development_guide_model_rules",
       "community": 0,
-      "norm_label": "opus vs sonnet model rules"
+      "norm_label": "opus vs sonnet model rules",
+      "id": "development_guide_model_rules"
     },
     {
       "label": "Session Checklist",
@@ -2960,9 +2960,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "development_guide_session_checklist",
       "community": 0,
-      "norm_label": "session checklist"
+      "norm_label": "session checklist",
+      "id": "development_guide_session_checklist"
     },
     {
       "label": "Star Field System Specification",
@@ -2973,9 +2973,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_star_field_spec",
-      "community": 18,
-      "norm_label": "star field system specification"
+      "community": 22,
+      "norm_label": "star field system specification",
+      "id": "feature_spec_star_field_spec"
     },
     {
       "label": "Graph Report Summary",
@@ -2986,22 +2986,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "graph_report_summary",
-      "community": 31,
-      "norm_label": "graph report summary"
-    },
-    {
-      "label": "Graph HTML Visualization",
-      "file_type": "code",
-      "source_file": "graphify-out/graph.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "graph_html_visualization",
-      "community": 31,
-      "norm_label": "graph html visualization"
+      "community": 45,
+      "norm_label": "graph report summary",
+      "id": "graph_report_summary"
     },
     {
       "label": "Godot AI Addon README",
@@ -3012,35 +2999,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "godot_ai_readme",
-      "community": 45,
-      "norm_label": "godot ai addon readme"
-    },
-    {
-      "label": "core/GameEventBus.gd",
-      "file_type": "code",
-      "source_file": "core/GameEventBus.gd",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "core_gameeventbus_gd",
-      "community": 0,
-      "norm_label": "core/gameeventbus.gd"
-    },
-    {
-      "label": "data/world_config.json",
-      "file_type": "code",
-      "source_file": "data/world_config.json",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "data_world_config_json",
-      "community": 18,
-      "norm_label": "data/world_config.json"
+      "community": 46,
+      "norm_label": "godot ai addon readme",
+      "id": "godot_ai_readme"
     },
     {
       "label": "feature_spec-physics_and_movement.md",
@@ -3051,9 +3012,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_physics_and_movement",
       "community": 0,
-      "norm_label": "feature_spec-physics_and_movement.md"
+      "norm_label": "feature_spec-physics_and_movement.md",
+      "id": "feature_spec_physics_and_movement"
     },
     {
       "label": "feature_spec-ship_system.md",
@@ -3064,9 +3025,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_ship_system",
       "community": 0,
-      "norm_label": "feature_spec-ship_system.md"
+      "norm_label": "feature_spec-ship_system.md",
+      "id": "feature_spec_ship_system"
     },
     {
       "label": "feature_spec-weapons_and_projectiles.md",
@@ -3077,9 +3038,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_weapons_and_projectiles",
       "community": 0,
-      "norm_label": "feature_spec-weapons_and_projectiles.md"
+      "norm_label": "feature_spec-weapons_and_projectiles.md",
+      "id": "feature_spec_weapons_and_projectiles"
     },
     {
       "label": "feature_spec-nav_controller.md",
@@ -3090,9 +3051,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_nav_controller",
       "community": 0,
-      "norm_label": "feature_spec-nav_controller.md"
+      "norm_label": "feature_spec-nav_controller.md",
+      "id": "feature_spec_nav_controller"
     },
     {
       "label": "feature_spec-camera_system.md",
@@ -3103,9 +3064,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_camera_system",
       "community": 0,
-      "norm_label": "feature_spec-camera_system.md"
+      "norm_label": "feature_spec-camera_system.md",
+      "id": "feature_spec_camera_system"
     },
     {
       "label": "feature_spec-fleet_command.md",
@@ -3116,9 +3077,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_fleet_command",
       "community": 0,
-      "norm_label": "feature_spec-fleet_command.md"
+      "norm_label": "feature_spec-fleet_command.md",
+      "id": "feature_spec_fleet_command"
     },
     {
       "label": "feature_spec-chunk_streamer.md",
@@ -3129,9 +3090,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_chunk_streamer",
       "community": 0,
-      "norm_label": "feature_spec-chunk_streamer.md"
+      "norm_label": "feature_spec-chunk_streamer.md",
+      "id": "feature_spec_chunk_streamer"
     },
     {
       "label": "feature_spec-ai_patrol_behavior.md",
@@ -3142,9 +3103,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_ai_patrol_behavior",
       "community": 0,
-      "norm_label": "feature_spec-ai_patrol_behavior.md"
+      "norm_label": "feature_spec-ai_patrol_behavior.md",
+      "id": "feature_spec_ai_patrol_behavior"
     },
     {
       "label": "feature_spec-performance_monitor.md",
@@ -3155,9 +3116,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "feature_spec_performance_monitor",
       "community": 0,
-      "norm_label": "feature_spec-performance_monitor.md"
+      "norm_label": "feature_spec-performance_monitor.md",
+      "id": "feature_spec_performance_monitor"
     },
     {
       "label": "No Direct Cross-System Calls Rule",
@@ -3168,9 +3129,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "no_direct_cross_system_calls",
       "community": 0,
-      "norm_label": "no direct cross-system calls rule"
+      "norm_label": "no direct cross-system calls rule",
+      "id": "no_direct_cross_system_calls"
     },
     {
       "label": "Specs Are Authoritative Rule",
@@ -3181,9 +3142,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "specs_authoritative",
       "community": 0,
-      "norm_label": "specs are authoritative rule"
+      "norm_label": "specs are authoritative rule",
+      "id": "specs_authoritative"
     },
     {
       "label": "No Hardcoded Values Rule",
@@ -3194,9 +3155,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "no_hardcoded_values",
-      "community": 18,
-      "norm_label": "no hardcoded values rule"
+      "community": 22,
+      "norm_label": "no hardcoded values rule",
+      "id": "no_hardcoded_values"
     },
     {
       "label": "No 2D Nodes Rule",
@@ -3207,9 +3168,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "no_2d_nodes",
-      "community": 18,
-      "norm_label": "no 2d nodes rule"
+      "community": 22,
+      "norm_label": "no 2d nodes rule",
+      "id": "no_2d_nodes"
     },
     {
       "label": "Debug Grid Texture",
@@ -3220,9 +3181,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "grid_debug_grid",
-      "community": 46,
-      "norm_label": "debug grid texture"
+      "community": 47,
+      "norm_label": "debug grid texture",
+      "id": "grid_debug_grid"
     },
     {
       "label": "Engineer Character Variant 1 - Welding Repair",
@@ -3233,9 +3194,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_1_character",
-      "community": 9,
-      "norm_label": "engineer character variant 1 - welding repair"
+      "community": 10,
+      "norm_label": "engineer character variant 1 - welding repair",
+      "id": "crew_engineer_1_character"
     },
     {
       "label": "Engineer Character Variant 2 - Cylindrical Machinery Welding",
@@ -3246,9 +3207,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_2_character",
-      "community": 9,
-      "norm_label": "engineer character variant 2 - cylindrical machinery welding"
+      "community": 10,
+      "norm_label": "engineer character variant 2 - cylindrical machinery welding",
+      "id": "crew_engineer_2_character"
     },
     {
       "label": "Engineer Character Variant 3 - Tool Repair",
@@ -3259,9 +3220,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_3_character",
-      "community": 9,
-      "norm_label": "engineer character variant 3 - tool repair"
+      "community": 10,
+      "norm_label": "engineer character variant 3 - tool repair",
+      "id": "crew_engineer_3_character"
     },
     {
       "label": "Engineer Character Variant 4 - Diagnostic Tablet",
@@ -3272,9 +3233,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_4_character",
-      "community": 9,
-      "norm_label": "engineer character variant 4 - diagnostic tablet"
+      "community": 10,
+      "norm_label": "engineer character variant 4 - diagnostic tablet",
+      "id": "crew_engineer_4_character"
     },
     {
       "label": "Pixel Art Visual Style",
@@ -3285,9 +3246,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_1_pixel_art_style",
-      "community": 9,
-      "norm_label": "pixel art visual style"
+      "community": 10,
+      "norm_label": "pixel art visual style",
+      "id": "crew_engineer_1_pixel_art_style"
     },
     {
       "label": "Sci-Fi Industrial Environment Theme",
@@ -3298,9 +3259,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_1_scifi_industrial_theme",
-      "community": 9,
-      "norm_label": "sci-fi industrial environment theme"
+      "community": 10,
+      "norm_label": "sci-fi industrial environment theme",
+      "id": "crew_engineer_1_scifi_industrial_theme"
     },
     {
       "label": "Engineer Crew Role",
@@ -3311,9 +3272,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_1_engineer_role",
-      "community": 9,
-      "norm_label": "engineer crew role"
+      "community": 10,
+      "norm_label": "engineer crew role",
+      "id": "crew_engineer_1_engineer_role"
     },
     {
       "label": "Repair Activity with Energy Tool",
@@ -3324,9 +3285,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_1_repair_activity",
-      "community": 9,
-      "norm_label": "repair activity with energy tool"
+      "community": 10,
+      "norm_label": "repair activity with energy tool",
+      "id": "crew_engineer_1_repair_activity"
     },
     {
       "label": "Diagnostic Tablet Activity",
@@ -3337,9 +3298,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_4_diagnostic_activity",
-      "community": 9,
-      "norm_label": "diagnostic tablet activity"
+      "community": 10,
+      "norm_label": "diagnostic tablet activity",
+      "id": "crew_engineer_4_diagnostic_activity"
     },
     {
       "label": "Female Engineer in Orange Jumpsuit",
@@ -3350,9 +3311,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_5_character",
-      "community": 2,
-      "norm_label": "female engineer in orange jumpsuit"
+      "community": 1,
+      "norm_label": "female engineer in orange jumpsuit",
+      "id": "crew_engineer_5_character"
     },
     {
       "label": "Female Engineer in Tan Jumpsuit",
@@ -3363,9 +3324,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_6_character",
-      "community": 2,
-      "norm_label": "female engineer in tan jumpsuit"
+      "community": 1,
+      "norm_label": "female engineer in tan jumpsuit",
+      "id": "crew_engineer_6_character"
     },
     {
       "label": "Engineer in White EVA Suit",
@@ -3376,9 +3337,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_7_character",
-      "community": 2,
-      "norm_label": "engineer in white eva suit"
+      "community": 1,
+      "norm_label": "engineer in white eva suit",
+      "id": "crew_engineer_7_character"
     },
     {
       "label": "Blue Android Technician",
@@ -3389,9 +3350,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_8_character",
-      "community": 2,
-      "norm_label": "blue android technician"
+      "community": 1,
+      "norm_label": "blue android technician",
+      "id": "crew_engineer_8_character"
     },
     {
       "label": "Astronaut in Advanced Spacesuit",
@@ -3402,9 +3363,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_9_character",
-      "community": 2,
-      "norm_label": "astronaut in advanced spacesuit"
+      "community": 1,
+      "norm_label": "astronaut in advanced spacesuit",
+      "id": "crew_engineer_9_character"
     },
     {
       "label": "Tablet Device",
@@ -3415,9 +3376,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "tablet_device",
-      "community": 2,
-      "norm_label": "tablet device"
+      "community": 1,
+      "norm_label": "tablet device",
+      "id": "tablet_device"
     },
     {
       "label": "Holographic Interface",
@@ -3428,9 +3389,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "holographic_interface",
-      "community": 2,
-      "norm_label": "holographic interface"
+      "community": 1,
+      "norm_label": "holographic interface",
+      "id": "holographic_interface"
     },
     {
       "label": "Industrial Reactor Array",
@@ -3441,9 +3402,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "industrial_reactor_array",
-      "community": 2,
-      "norm_label": "industrial reactor array"
+      "community": 1,
+      "norm_label": "industrial reactor array",
+      "id": "industrial_reactor_array"
     },
     {
       "label": "Industrial Machinery Corridor",
@@ -3454,9 +3415,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "industrial_machinery_corridor",
-      "community": 2,
-      "norm_label": "industrial machinery corridor"
+      "community": 1,
+      "norm_label": "industrial machinery corridor",
+      "id": "industrial_machinery_corridor"
     },
     {
       "label": "Circular Engine Turbine",
@@ -3467,9 +3428,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "circular_engine_turbine",
-      "community": 2,
-      "norm_label": "circular engine turbine"
+      "community": 1,
+      "norm_label": "circular engine turbine",
+      "id": "circular_engine_turbine"
     },
     {
       "label": "Massive Circular Data Display",
@@ -3480,9 +3441,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "massive_circular_data_display",
-      "community": 2,
-      "norm_label": "massive circular data display"
+      "community": 1,
+      "norm_label": "massive circular data display",
+      "id": "massive_circular_data_display"
     },
     {
       "label": "Star Map Hologram",
@@ -3493,9 +3454,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "star_map_hologram",
-      "community": 2,
-      "norm_label": "star map hologram"
+      "community": 1,
+      "norm_label": "star map hologram",
+      "id": "star_map_hologram"
     },
     {
       "label": "Engine Room Environment",
@@ -3506,9 +3467,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "engine_room_environment",
-      "community": 2,
-      "norm_label": "engine room environment"
+      "community": 1,
+      "norm_label": "engine room environment",
+      "id": "engine_room_environment"
     },
     {
       "label": "Industrial Corridor Environment",
@@ -3519,9 +3480,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "industrial_corridor_environment",
-      "community": 2,
-      "norm_label": "industrial corridor environment"
+      "community": 1,
+      "norm_label": "industrial corridor environment",
+      "id": "industrial_corridor_environment"
     },
     {
       "label": "Cleanroom Environment",
@@ -3532,9 +3493,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "cleanroom_environment",
-      "community": 2,
-      "norm_label": "cleanroom environment"
+      "community": 1,
+      "norm_label": "cleanroom environment",
+      "id": "cleanroom_environment"
     },
     {
       "label": "Circular Data Center Environment",
@@ -3545,9 +3506,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "circular_data_center_environment",
-      "community": 2,
-      "norm_label": "circular data center environment"
+      "community": 1,
+      "norm_label": "circular data center environment",
+      "id": "circular_data_center_environment"
     },
     {
       "label": "Navigation Room Environment",
@@ -3558,9 +3519,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "navigation_room_environment",
-      "community": 2,
-      "norm_label": "navigation room environment"
+      "community": 1,
+      "norm_label": "navigation room environment",
+      "id": "navigation_room_environment"
     },
     {
       "label": "Tactical Harness Gear",
@@ -3571,9 +3532,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "tactical_harness_gear",
-      "community": 2,
-      "norm_label": "tactical harness gear"
+      "community": 1,
+      "norm_label": "tactical harness gear",
+      "id": "tactical_harness_gear"
     },
     {
       "label": "Backpack Gear",
@@ -3584,9 +3545,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "backpack_gear",
-      "community": 2,
-      "norm_label": "backpack gear"
+      "community": 1,
+      "norm_label": "backpack gear",
+      "id": "backpack_gear"
     },
     {
       "label": "EVA Suit",
@@ -3597,9 +3558,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "eva_suit",
-      "community": 2,
-      "norm_label": "eva suit"
+      "community": 1,
+      "norm_label": "eva suit",
+      "id": "eva_suit"
     },
     {
       "label": "Advanced Spacesuit",
@@ -3610,9 +3571,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "advanced_spacesuit",
-      "community": 2,
-      "norm_label": "advanced spacesuit"
+      "community": 1,
+      "norm_label": "advanced spacesuit",
+      "id": "advanced_spacesuit"
     },
     {
       "label": "Pixel Art Style",
@@ -3623,9 +3584,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "pixel_art_style",
-      "community": 2,
-      "norm_label": "pixel art style"
+      "community": 1,
+      "norm_label": "pixel art style",
+      "id": "pixel_art_style"
     },
     {
       "label": "Green-skinned Engineer with Holographic Tablet",
@@ -3636,9 +3597,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_10_character",
-      "community": 7,
-      "norm_label": "green-skinned engineer with holographic tablet"
+      "community": 8,
+      "norm_label": "green-skinned engineer with holographic tablet",
+      "id": "crew_engineer_10_character"
     },
     {
       "label": "Blue-skinned Engineer with Energy Sphere",
@@ -3649,9 +3610,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_11_character",
-      "community": 7,
-      "norm_label": "blue-skinned engineer with energy sphere"
+      "community": 8,
+      "norm_label": "blue-skinned engineer with energy sphere",
+      "id": "crew_engineer_11_character"
     },
     {
       "label": "Dark-skinned Engineer with Ring Interface",
@@ -3662,9 +3623,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_engineer_12_character",
-      "community": 7,
-      "norm_label": "dark-skinned engineer with ring interface"
+      "community": 8,
+      "norm_label": "dark-skinned engineer with ring interface",
+      "id": "crew_engineer_12_character"
     },
     {
       "label": "Navigator at Star Chart Console",
@@ -3675,9 +3636,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_navigator_12_character",
-      "community": 7,
-      "norm_label": "navigator at star chart console"
+      "community": 8,
+      "norm_label": "navigator at star chart console",
+      "id": "crew_navigator_12_character"
     },
     {
       "label": "White-haired Navigator Observing Cosmos",
@@ -3688,9 +3649,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_navigator_1_character",
-      "community": 7,
-      "norm_label": "white-haired navigator observing cosmos"
+      "community": 8,
+      "norm_label": "white-haired navigator observing cosmos",
+      "id": "crew_navigator_1_character"
     },
     {
       "label": "Engineer Role",
@@ -3701,9 +3662,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "engineer_role",
-      "community": 7,
-      "norm_label": "engineer role"
+      "community": 8,
+      "norm_label": "engineer role",
+      "id": "engineer_role"
     },
     {
       "label": "Navigator Role",
@@ -3714,9 +3675,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "navigator_role",
-      "community": 2,
-      "norm_label": "navigator role"
+      "community": 1,
+      "norm_label": "navigator role",
+      "id": "navigator_role"
     },
     {
       "label": "Holographic Technology",
@@ -3727,9 +3688,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "holographic_technology",
-      "community": 7,
-      "norm_label": "holographic technology"
+      "community": 8,
+      "norm_label": "holographic technology",
+      "id": "holographic_technology"
     },
     {
       "label": "Cosmic Navigation",
@@ -3740,9 +3701,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "cosmic_navigation",
-      "community": 7,
-      "norm_label": "cosmic navigation"
+      "community": 8,
+      "norm_label": "cosmic navigation",
+      "id": "cosmic_navigation"
     },
     {
       "label": "Futuristic Spaceship Interior",
@@ -3753,9 +3714,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "futuristic_spaceship_interior",
-      "community": 7,
-      "norm_label": "futuristic spaceship interior"
+      "community": 8,
+      "norm_label": "futuristic spaceship interior",
+      "id": "futuristic_spaceship_interior"
     },
     {
       "label": "Glitch Pixel Art Style",
@@ -3766,9 +3727,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "glitch_pixel_art_style",
-      "community": 7,
-      "norm_label": "glitch pixel art style"
+      "community": 8,
+      "norm_label": "glitch pixel art style",
+      "id": "glitch_pixel_art_style"
     },
     {
       "label": "Cyborg Navigator with White Hair and Cyan Glow",
@@ -3779,9 +3740,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_navigator_13_portrait",
-      "community": 2,
-      "norm_label": "cyborg navigator with white hair and cyan glow"
+      "community": 1,
+      "norm_label": "cyborg navigator with white hair and cyan glow",
+      "id": "crew_navigator_13_portrait"
     },
     {
       "label": "Scarred Navigator with Blue Hair in Flight Suit",
@@ -3792,9 +3753,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_navigator_3_portrait",
-      "community": 2,
-      "norm_label": "scarred navigator with blue hair in flight suit"
+      "community": 1,
+      "norm_label": "scarred navigator with blue hair in flight suit",
+      "id": "crew_navigator_3_portrait"
     },
     {
       "label": "Navigator with Headset at Red-lit Console",
@@ -3805,9 +3766,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_navigator_2_portrait",
-      "community": 2,
-      "norm_label": "navigator with headset at red-lit console"
+      "community": 1,
+      "norm_label": "navigator with headset at red-lit console",
+      "id": "crew_navigator_2_portrait"
     },
     {
       "label": "Navigator with Dreadlocks and Cybernetic Hand",
@@ -3818,9 +3779,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_navigator_4_portrait",
-      "community": 2,
-      "norm_label": "navigator with dreadlocks and cybernetic hand"
+      "community": 1,
+      "norm_label": "navigator with dreadlocks and cybernetic hand",
+      "id": "crew_navigator_4_portrait"
     },
     {
       "label": "Navigator in Yellow Uniform with Star Trek Insignia",
@@ -3831,9 +3792,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_navigator_5_portrait",
-      "community": 2,
-      "norm_label": "navigator in yellow uniform with star trek insignia"
+      "community": 1,
+      "norm_label": "navigator in yellow uniform with star trek insignia",
+      "id": "crew_navigator_5_portrait"
     },
     {
       "label": "Spaceship Bridge Setting",
@@ -3844,9 +3805,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "spaceship_bridge",
-      "community": 2,
-      "norm_label": "spaceship bridge setting"
+      "community": 1,
+      "norm_label": "spaceship bridge setting",
+      "id": "spaceship_bridge"
     },
     {
       "label": "Cybernetic Augmentation",
@@ -3857,9 +3818,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "cybernetic_augmentation",
-      "community": 2,
-      "norm_label": "cybernetic augmentation"
+      "community": 1,
+      "norm_label": "cybernetic augmentation",
+      "id": "cybernetic_augmentation"
     },
     {
       "label": "Star Trek Uniform Homage",
@@ -3870,9 +3831,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "star_trek_uniform",
-      "community": 2,
-      "norm_label": "star trek uniform homage"
+      "community": 1,
+      "norm_label": "star trek uniform homage",
+      "id": "star_trek_uniform"
     },
     {
       "label": "Navigator Character 6 - Star Map Navigator",
@@ -3883,9 +3844,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_navigator_6",
-      "community": 3,
-      "norm_label": "navigator character 6 - star map navigator"
+      "community": 2,
+      "norm_label": "navigator character 6 - star map navigator",
+      "id": "crew_navigator_6"
     },
     {
       "label": "Navigator Character 7 - Dark Lit Navigator",
@@ -3896,9 +3857,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_navigator_7",
-      "community": 3,
-      "norm_label": "navigator character 7 - dark lit navigator"
+      "community": 2,
+      "norm_label": "navigator character 7 - dark lit navigator",
+      "id": "crew_navigator_7"
     },
     {
       "label": "Captain Character 1 - Blonde Captain on Throne",
@@ -3909,9 +3870,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_captain_1",
-      "community": 3,
-      "norm_label": "captain character 1 - blonde captain on throne"
+      "community": 2,
+      "norm_label": "captain character 1 - blonde captain on throne",
+      "id": "crew_captain_1"
     },
     {
       "label": "Soldier Character 1 - Purple Hair Rifle Soldier",
@@ -3922,9 +3883,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_soldier_1",
-      "community": 3,
-      "norm_label": "soldier character 1 - purple hair rifle soldier"
+      "community": 2,
+      "norm_label": "soldier character 1 - purple hair rifle soldier",
+      "id": "crew_soldier_1"
     },
     {
       "label": "Soldier Character 2 - Blonde Knife Soldier",
@@ -3935,9 +3896,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_soldier_2",
-      "community": 3,
-      "norm_label": "soldier character 2 - blonde knife soldier"
+      "community": 2,
+      "norm_label": "soldier character 2 - blonde knife soldier",
+      "id": "crew_soldier_2"
     },
     {
       "label": "Captain Character 2 - Red Lit Captain",
@@ -3948,9 +3909,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_captain_2",
-      "community": 3,
-      "norm_label": "captain character 2 - red lit captain"
+      "community": 2,
+      "norm_label": "captain character 2 - red lit captain",
+      "id": "crew_captain_2"
     },
     {
       "label": "Captain Character 3 - Purple Hair Captain",
@@ -3961,9 +3922,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_captain_3",
-      "community": 3,
-      "norm_label": "captain character 3 - purple hair captain"
+      "community": 2,
+      "norm_label": "captain character 3 - purple hair captain",
+      "id": "crew_captain_3"
     },
     {
       "label": "Captain Character 4 - White Hair Orange Eye Captain",
@@ -3974,9 +3935,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_captain_4",
-      "community": 3,
-      "norm_label": "captain character 4 - white hair orange eye captain"
+      "community": 2,
+      "norm_label": "captain character 4 - white hair orange eye captain",
+      "id": "crew_captain_4"
     },
     {
       "label": "Captain Character 5 - Silver Hair Green Hologram Captain",
@@ -3987,9 +3948,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_captain_5",
-      "community": 3,
-      "norm_label": "captain character 5 - silver hair green hologram captain"
+      "community": 2,
+      "norm_label": "captain character 5 - silver hair green hologram captain",
+      "id": "crew_captain_5"
     },
     {
       "label": "Random Crew Character 1 - Silver Hair Bottle Holder",
@@ -4000,9 +3961,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_random_1",
-      "community": 3,
-      "norm_label": "random crew character 1 - silver hair bottle holder"
+      "community": 2,
+      "norm_label": "random crew character 1 - silver hair bottle holder",
+      "id": "crew_random_1"
     },
     {
       "label": "Random Crew Character 2 - Red Hair Nebula Crew",
@@ -4013,9 +3974,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_random_2",
-      "community": 3,
-      "norm_label": "random crew character 2 - red hair nebula crew"
+      "community": 2,
+      "norm_label": "random crew character 2 - red hair nebula crew",
+      "id": "crew_random_2"
     },
     {
       "label": "Random Crew Character 3 - Blue Hair Action Pose Crew",
@@ -4026,9 +3987,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_random_3",
-      "community": 3,
-      "norm_label": "random crew character 3 - blue hair action pose crew"
+      "community": 2,
+      "norm_label": "random crew character 3 - blue hair action pose crew",
+      "id": "crew_random_3"
     },
     {
       "label": "Pilot Character 1 - Dark Hair Ship Watcher",
@@ -4039,9 +4000,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_pilot_1",
-      "community": 3,
-      "norm_label": "pilot character 1 - dark hair ship watcher"
+      "community": 2,
+      "norm_label": "pilot character 1 - dark hair ship watcher",
+      "id": "crew_pilot_1"
     },
     {
       "label": "Pilot Character 2 - Pink Hair Goggle Pilot",
@@ -4052,9 +4013,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_pilot_2",
-      "community": 3,
-      "norm_label": "pilot character 2 - pink hair goggle pilot"
+      "community": 2,
+      "norm_label": "pilot character 2 - pink hair goggle pilot",
+      "id": "crew_pilot_2"
     },
     {
       "label": "Pilot Character 3 - Dark Hair Red Sun Pilot",
@@ -4065,9 +4026,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_pilot_3",
-      "community": 3,
-      "norm_label": "pilot character 3 - dark hair red sun pilot"
+      "community": 2,
+      "norm_label": "pilot character 3 - dark hair red sun pilot",
+      "id": "crew_pilot_3"
     },
     {
       "label": "Pilot Character 4 - Curly Hair Hologram Pilot",
@@ -4078,9 +4039,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_pilot_4",
-      "community": 3,
-      "norm_label": "pilot character 4 - curly hair hologram pilot"
+      "community": 2,
+      "norm_label": "pilot character 4 - curly hair hologram pilot",
+      "id": "crew_pilot_4"
     },
     {
       "label": "Pilot Character 5 - Bun Hair Space Battle Pilot",
@@ -4091,9 +4052,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_pilot_5",
-      "community": 3,
-      "norm_label": "pilot character 5 - bun hair space battle pilot"
+      "community": 2,
+      "norm_label": "pilot character 5 - bun hair space battle pilot",
+      "id": "crew_pilot_5"
     },
     {
       "label": "Pilot Character 6 - Pink Highlight Red Sun Pilot",
@@ -4104,9 +4065,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "crew_pilot_6",
-      "community": 3,
-      "norm_label": "pilot character 6 - pink highlight red sun pilot"
+      "community": 2,
+      "norm_label": "pilot character 6 - pink highlight red sun pilot",
+      "id": "crew_pilot_6"
     },
     {
       "label": "Navigator Role",
@@ -4117,9 +4078,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "role_navigator",
-      "community": 3,
-      "norm_label": "navigator role"
+      "community": 2,
+      "norm_label": "navigator role",
+      "id": "role_navigator"
     },
     {
       "label": "Captain Role",
@@ -4130,9 +4091,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "role_captain",
-      "community": 3,
-      "norm_label": "captain role"
+      "community": 2,
+      "norm_label": "captain role",
+      "id": "role_captain"
     },
     {
       "label": "Soldier Role",
@@ -4143,9 +4104,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "role_soldier",
-      "community": 3,
-      "norm_label": "soldier role"
+      "community": 2,
+      "norm_label": "soldier role",
+      "id": "role_soldier"
     },
     {
       "label": "Random Crew Role",
@@ -4156,9 +4117,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "role_random_crew",
-      "community": 3,
-      "norm_label": "random crew role"
+      "community": 2,
+      "norm_label": "random crew role",
+      "id": "role_random_crew"
     },
     {
       "label": "Pilot Role",
@@ -4169,9 +4130,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "role_pilot",
-      "community": 3,
-      "norm_label": "pilot role"
+      "community": 2,
+      "norm_label": "pilot role",
+      "id": "role_pilot"
     },
     {
       "label": "Sci-Fi Anime Art Style",
@@ -4182,9 +4143,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "concept_sci_fi_anime_art",
-      "community": 3,
-      "norm_label": "sci-fi anime art style"
+      "community": 2,
+      "norm_label": "sci-fi anime art style",
+      "id": "concept_sci_fi_anime_art"
     },
     {
       "label": "Spaceship Interior Setting",
@@ -4195,9 +4156,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "concept_spaceship_interior",
-      "community": 3,
-      "norm_label": "spaceship interior setting"
+      "community": 2,
+      "norm_label": "spaceship interior setting",
+      "id": "concept_spaceship_interior"
     },
     {
       "label": "Holographic Display UI Elements",
@@ -4208,9 +4169,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "concept_holographic_ui",
-      "community": 3,
-      "norm_label": "holographic display ui elements"
+      "community": 2,
+      "norm_label": "holographic display ui elements",
+      "id": "concept_holographic_ui"
     }
   ],
   "links": [
@@ -4305,8 +4266,8 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L98",
       "weight": 1.0,
-      "_src": "projectilemanager_projectilemanager_ready",
-      "_tgt": "servicelocator_servicelocator_get",
+      "_src": "servicelocator_servicelocator_get",
+      "_tgt": "projectilemanager_projectilemanager_ready",
       "source": "servicelocator_servicelocator_get",
       "target": "projectilemanager_projectilemanager_ready"
     },
@@ -4833,8 +4794,8 @@
       "source_file": "docs/core_spec.md",
       "source_location": "\u00a76",
       "weight": 1.0,
-      "_src": "core_spec_xz_plane_contract",
-      "_tgt": "claude_md_no_2d_nodes_rule",
+      "_src": "claude_md_no_2d_nodes_rule",
+      "_tgt": "core_spec_xz_plane_contract",
       "source": "claude_md_no_2d_nodes_rule",
       "target": "core_spec_xz_plane_contract"
     },
@@ -4857,8 +4818,8 @@
       "source_file": "docs/All_Space_Project_Vision.md",
       "source_location": "\u00a7Design Principles",
       "weight": 1.0,
-      "_src": "vision_data_driven",
-      "_tgt": "claude_md_json_tunables_rule",
+      "_src": "claude_md_json_tunables_rule",
+      "_tgt": "vision_data_driven",
       "source": "claude_md_json_tunables_rule",
       "target": "vision_data_driven"
     },
@@ -4869,8 +4830,8 @@
       "source_file": "docs/feature_spec-chunk_streamer.md",
       "source_location": "\u00a7JSON Data Format",
       "weight": 1.0,
-      "_src": "chunk_spec_world_config_json",
-      "_tgt": "claude_md_json_tunables_rule",
+      "_src": "claude_md_json_tunables_rule",
+      "_tgt": "chunk_spec_world_config_json",
       "source": "claude_md_json_tunables_rule",
       "target": "chunk_spec_world_config_json"
     },
@@ -4893,8 +4854,8 @@
       "source_file": "docs/All_Space_Project_Vision.md",
       "source_location": "\u00a7Design Principles",
       "weight": 1.0,
-      "_src": "vision_modularity_rationale",
-      "_tgt": "claude_md_one_system_per_session",
+      "_src": "claude_md_one_system_per_session",
+      "_tgt": "vision_modularity_rationale",
       "source": "claude_md_one_system_per_session",
       "target": "vision_modularity_rationale"
     },
@@ -4905,8 +4866,8 @@
       "source_file": "docs/All_Space_Project_Vision.md",
       "source_location": "\u00a7Core Philosophy",
       "weight": 1.0,
-      "_src": "vision_core_philosophy",
-      "_tgt": "vision_game_concept",
+      "_src": "vision_game_concept",
+      "_tgt": "vision_core_philosophy",
       "source": "vision_game_concept",
       "target": "vision_core_philosophy"
     },
@@ -4917,8 +4878,8 @@
       "source_file": "docs/core_spec.md",
       "source_location": "\u00a71",
       "weight": 1.0,
-      "_src": "core_spec_what_is",
-      "_tgt": "vision_game_concept",
+      "_src": "vision_game_concept",
+      "_tgt": "core_spec_what_is",
       "source": "vision_game_concept",
       "target": "core_spec_what_is"
     },
@@ -4977,8 +4938,8 @@
       "source_file": "docs/feature_spec-camera_system.md",
       "source_location": "\u00a7Future Extension Points \u2014 free-pan tactical view",
       "weight": 1.0,
-      "_src": "camera_spec_tactical_extension",
-      "_tgt": "fleet_command_overview",
+      "_src": "fleet_command_overview",
+      "_tgt": "camera_spec_tactical_extension",
       "source": "fleet_command_overview",
       "target": "camera_spec_tactical_extension"
     },
@@ -5049,8 +5010,8 @@
       "source_file": "docs/feature_spec-fleet_command.md",
       "source_location": "\u00a74.6",
       "weight": 1.0,
-      "_src": "fleet_command_formationcontroller",
-      "_tgt": "fleet_command_escortqueue",
+      "_src": "fleet_command_escortqueue",
+      "_tgt": "fleet_command_formationcontroller",
       "source": "fleet_command_escortqueue",
       "target": "fleet_command_formationcontroller"
     },
@@ -5061,8 +5022,8 @@
       "source_file": "docs/feature_spec-fleet_command.md",
       "source_location": "\u00a74.8",
       "weight": 1.0,
-      "_src": "fleet_command_defensive_stance",
-      "_tgt": "fleet_command_escortqueue",
+      "_src": "fleet_command_escortqueue",
+      "_tgt": "fleet_command_defensive_stance",
       "source": "fleet_command_escortqueue",
       "target": "fleet_command_defensive_stance"
     },
@@ -5073,8 +5034,8 @@
       "source_file": "docs/feature_spec-fleet_command.md",
       "source_location": "\u00a73.4 get_effective_stance reads EscortQueue.get_stance()",
       "weight": 1.0,
-      "_src": "fleet_command_stancecontroller",
-      "_tgt": "fleet_command_escortqueue",
+      "_src": "fleet_command_escortqueue",
+      "_tgt": "fleet_command_stancecontroller",
       "source": "fleet_command_escortqueue",
       "target": "fleet_command_stancecontroller"
     },
@@ -5109,8 +5070,8 @@
       "source_file": "docs/feature_spec-fleet_command.md",
       "source_location": "\u00a74.3 context menu emits add/remove escort signals",
       "weight": 1.0,
-      "_src": "fleet_command_context_menu",
-      "_tgt": "fleet_command_escortqueue",
+      "_src": "fleet_command_escortqueue",
+      "_tgt": "fleet_command_context_menu",
       "source": "fleet_command_escortqueue",
       "target": "fleet_command_context_menu"
     },
@@ -5133,8 +5094,8 @@
       "source_file": "docs/feature_spec-fleet_command.md",
       "source_location": "\u00a74.3 context menu emits set_stance signal",
       "weight": 1.0,
-      "_src": "fleet_command_context_menu",
-      "_tgt": "fleet_command_stancecontroller",
+      "_src": "fleet_command_stancecontroller",
+      "_tgt": "fleet_command_context_menu",
       "source": "fleet_command_stancecontroller",
       "target": "fleet_command_context_menu"
     },
@@ -5205,8 +5166,8 @@
       "source_file": "docs/feature_spec-ai_patrol_behavior.md",
       "source_location": "\u00a7Architecture \u2014 AIController sets input_*",
       "weight": 1.0,
-      "_src": "ai_spec_overview",
-      "_tgt": "core_spec_unified_input",
+      "_src": "core_spec_unified_input",
+      "_tgt": "ai_spec_overview",
       "source": "core_spec_unified_input",
       "target": "ai_spec_overview"
     },
@@ -5217,8 +5178,8 @@
       "source_file": "docs/feature_spec-physics_and_movement.md",
       "source_location": "\u00a7Three Layers Input Layer",
       "weight": 1.0,
-      "_src": "physics_spec_three_layers",
-      "_tgt": "core_spec_unified_input",
+      "_src": "core_spec_unified_input",
+      "_tgt": "physics_spec_three_layers",
       "source": "core_spec_unified_input",
       "target": "physics_spec_three_layers"
     },
@@ -5229,8 +5190,8 @@
       "source_file": "docs/feature_spec-weapons_and_projectiles.md",
       "source_location": "\u00a74.2 reads ship.input_fire",
       "weight": 1.0,
-      "_src": "weapons_spec_fire_groups",
-      "_tgt": "core_spec_unified_input",
+      "_src": "core_spec_unified_input",
+      "_tgt": "weapons_spec_fire_groups",
       "source": "core_spec_unified_input",
       "target": "weapons_spec_fire_groups"
     },
@@ -5241,8 +5202,8 @@
       "source_file": "docs/feature_spec-nav_controller.md",
       "source_location": "\u00a71 \u2014 writes input_forward and input_strafe",
       "weight": 1.0,
-      "_src": "nav_spec_overview",
-      "_tgt": "core_spec_unified_input",
+      "_src": "core_spec_unified_input",
+      "_tgt": "nav_spec_overview",
       "source": "core_spec_unified_input",
       "target": "nav_spec_overview"
     },
@@ -5253,8 +5214,8 @@
       "source_file": "docs/feature_spec-camera_system.md",
       "source_location": "\u00a7Mouse-to-World \u2014 Y=0 plane intersection",
       "weight": 1.0,
-      "_src": "camera_spec_cursor_world",
-      "_tgt": "core_spec_xz_plane_contract",
+      "_src": "core_spec_xz_plane_contract",
+      "_tgt": "camera_spec_cursor_world",
       "source": "core_spec_xz_plane_contract",
       "target": "camera_spec_cursor_world"
     },
@@ -5313,8 +5274,8 @@
       "source_file": "docs/feature_spec-ship_system.md",
       "source_location": "\u00a71 Design Goals",
       "weight": 1.0,
-      "_src": "ship_spec_overview",
-      "_tgt": "core_spec_one_ship_tscn",
+      "_src": "core_spec_one_ship_tscn",
+      "_tgt": "ship_spec_overview",
       "source": "core_spec_one_ship_tscn",
       "target": "ship_spec_overview"
     },
@@ -5385,8 +5346,8 @@
       "source_file": "docs/feature_spec-camera_system.md",
       "source_location": "\u00a7Architecture",
       "weight": 1.0,
-      "_src": "camera_spec_sibling_architecture",
-      "_tgt": "core_spec_camera_summary",
+      "_src": "core_spec_camera_summary",
+      "_tgt": "camera_spec_sibling_architecture",
       "source": "core_spec_camera_summary",
       "target": "camera_spec_sibling_architecture"
     },
@@ -5493,8 +5454,8 @@
       "source_file": "docs/feature_spec-ai_patrol_behavior.md",
       "source_location": "\u00a7Detection System _player_detected sets transition",
       "weight": 1.0,
-      "_src": "ai_spec_detection_volume",
-      "_tgt": "ai_spec_state_machine",
+      "_src": "ai_spec_state_machine",
+      "_tgt": "ai_spec_detection_volume",
       "source": "ai_spec_state_machine",
       "target": "ai_spec_detection_volume"
     },
@@ -5517,8 +5478,8 @@
       "source_file": "docs/feature_spec-camera_system.md",
       "source_location": "\u00a7Why Perspective + Height Zoom",
       "weight": 1.0,
-      "_src": "camera_spec_height_zoom_rationale",
-      "_tgt": "camera_spec_overview",
+      "_src": "camera_spec_overview",
+      "_tgt": "camera_spec_height_zoom_rationale",
       "source": "camera_spec_overview",
       "target": "camera_spec_height_zoom_rationale"
     },
@@ -5529,8 +5490,8 @@
       "source_file": "docs/feature_spec-camera_system.md",
       "source_location": "\u00a7Critically Damped Spring Follow",
       "weight": 1.0,
-      "_src": "camera_spec_spring_follow",
-      "_tgt": "camera_spec_overview",
+      "_src": "camera_spec_overview",
+      "_tgt": "camera_spec_spring_follow",
       "source": "camera_spec_overview",
       "target": "camera_spec_spring_follow"
     },
@@ -5541,8 +5502,8 @@
       "source_file": "docs/feature_spec-chunk_streamer.md",
       "source_location": "\u00a7Chunk Generation seeded by hash(coord)",
       "weight": 1.0,
-      "_src": "chunk_spec_deterministic_rng",
-      "_tgt": "chunk_spec_coord_to_world",
+      "_src": "chunk_spec_coord_to_world",
+      "_tgt": "chunk_spec_deterministic_rng",
       "source": "chunk_spec_coord_to_world",
       "target": "chunk_spec_deterministic_rng"
     },
@@ -5577,8 +5538,8 @@
       "source_file": "docs/feature_spec-physics_and_movement.md",
       "source_location": "\u00a7Full Per-Frame Pipeline",
       "weight": 1.0,
-      "_src": "physics_spec_alignment_drag",
-      "_tgt": "physics_spec_thruster_budget",
+      "_src": "physics_spec_thruster_budget",
+      "_tgt": "physics_spec_alignment_drag",
       "source": "physics_spec_thruster_budget",
       "target": "physics_spec_alignment_drag"
     },
@@ -5589,8 +5550,8 @@
       "source_file": "docs/feature_spec-weapons_and_projectiles.md",
       "source_location": "\u00a77 inherited velocity from ship at spawn",
       "weight": 1.0,
-      "_src": "weapons_spec_projectile_manager",
-      "_tgt": "physics_spec_momentum_inheritance",
+      "_src": "physics_spec_momentum_inheritance",
+      "_tgt": "weapons_spec_projectile_manager",
       "source": "physics_spec_momentum_inheritance",
       "target": "weapons_spec_projectile_manager"
     },
@@ -5625,8 +5586,8 @@
       "source_file": "docs/feature_spec-ship_system.md",
       "source_location": "\u00a710 Blueprint unlocks variant_id",
       "weight": 0.8,
-      "_src": "ship_spec_blueprint_discovery",
-      "_tgt": "ship_spec_three_layers",
+      "_src": "ship_spec_three_layers",
+      "_tgt": "ship_spec_blueprint_discovery",
       "source": "ship_spec_three_layers",
       "target": "ship_spec_blueprint_discovery"
     },
@@ -5661,8 +5622,8 @@
       "source_file": "docs/feature_spec-ship_system.md",
       "source_location": "\u00a78 Stat Resolution reads base_stats + part_stats",
       "weight": 1.0,
-      "_src": "ship_spec_stat_resolution",
-      "_tgt": "ship_spec_ship_json_schema",
+      "_src": "ship_spec_ship_json_schema",
+      "_tgt": "ship_spec_stat_resolution",
       "source": "ship_spec_ship_json_schema",
       "target": "ship_spec_stat_resolution"
     },
@@ -5673,8 +5634,8 @@
       "source_file": "docs/feature_spec-ship_system.md",
       "source_location": "\u00a711 Color Resolution reads faction color_scheme",
       "weight": 1.0,
-      "_src": "ship_spec_colorization",
-      "_tgt": "ship_spec_factions_json",
+      "_src": "ship_spec_factions_json",
+      "_tgt": "ship_spec_colorization",
       "source": "ship_spec_factions_json",
       "target": "ship_spec_colorization"
     },
@@ -5685,8 +5646,8 @@
       "source_file": "docs/feature_spec-weapons_and_projectiles.md",
       "source_location": "\u00a78 track_cursor queries PlayerState.get_active_ship()",
       "weight": 1.0,
-      "_src": "weapons_spec_guided_pool",
-      "_tgt": "ship_spec_playerstate",
+      "_src": "ship_spec_playerstate",
+      "_tgt": "weapons_spec_guided_pool",
       "source": "ship_spec_playerstate",
       "target": "weapons_spec_guided_pool"
     },
@@ -5709,8 +5670,8 @@
       "source_file": "docs/feature_spec-weapons_and_projectiles.md",
       "source_location": "\u00a76 Heat System applies to hardpoints of all archetypes",
       "weight": 1.0,
-      "_src": "weapons_spec_heat_system",
-      "_tgt": "weapons_spec_archetypes",
+      "_src": "weapons_spec_archetypes",
+      "_tgt": "weapons_spec_heat_system",
       "source": "weapons_spec_archetypes",
       "target": "weapons_spec_heat_system"
     },
@@ -5733,8 +5694,8 @@
       "source_file": "docs/feature_spec-weapons_and_projectiles.md",
       "source_location": "\u00a79 step 3 shield absorption",
       "weight": 1.0,
-      "_src": "weapons_spec_damage_pipeline",
-      "_tgt": "weapons_spec_shield_system",
+      "_src": "weapons_spec_shield_system",
+      "_tgt": "weapons_spec_damage_pipeline",
       "source": "weapons_spec_shield_system",
       "target": "weapons_spec_damage_pipeline"
     },
@@ -5769,8 +5730,8 @@
       "source_file": "docs/feature_spec-nav_controller.md",
       "source_location": "\u00a71",
       "weight": 1.0,
-      "_src": "nav_spec_tool_not_actor",
-      "_tgt": "nav_spec_overview",
+      "_src": "nav_spec_overview",
+      "_tgt": "nav_spec_tool_not_actor",
       "source": "nav_spec_overview",
       "target": "nav_spec_tool_not_actor"
     },
@@ -5793,8 +5754,8 @@
       "source_file": "docs/feature_spec-performance_monitor.md",
       "source_location": "\u00a7Overview",
       "weight": 1.0,
-      "_src": "perf_spec_built_first_rationale",
-      "_tgt": "perf_spec_overview",
+      "_src": "perf_spec_overview",
+      "_tgt": "perf_spec_built_first_rationale",
       "source": "perf_spec_overview",
       "target": "perf_spec_built_first_rationale"
     },
@@ -5817,8 +5778,8 @@
       "source_file": "docs/feature_spec-performance_monitor.md",
       "source_location": "\u00a7In-Game Debug Overlay calls get_avg_ms / get_count",
       "weight": 1.0,
-      "_src": "perf_spec_f3_overlay",
-      "_tgt": "perf_spec_api",
+      "_src": "perf_spec_api",
+      "_tgt": "perf_spec_f3_overlay",
       "source": "perf_spec_api",
       "target": "perf_spec_f3_overlay"
     },
@@ -5925,8 +5886,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_minimal_high_contrast_livery",
-      "_tgt": "fighter_base_color_diffuse_texture_map",
+      "_src": "fighter_base_color_diffuse_texture_map",
+      "_tgt": "fighter_base_color_minimal_high_contrast_livery",
       "source": "fighter_base_color_diffuse_texture_map",
       "target": "fighter_base_color_minimal_high_contrast_livery"
     },
@@ -5949,8 +5910,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_vertical_stripe_island",
-      "_tgt": "fighter_base_color_neutral_gray_field",
+      "_src": "fighter_base_color_neutral_gray_field",
+      "_tgt": "fighter_base_color_vertical_stripe_island",
       "source": "fighter_base_color_neutral_gray_field",
       "target": "fighter_base_color_vertical_stripe_island"
     },
@@ -5961,8 +5922,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_chevron_trim_islands",
-      "_tgt": "fighter_base_color_neutral_gray_field",
+      "_src": "fighter_base_color_neutral_gray_field",
+      "_tgt": "fighter_base_color_chevron_trim_islands",
       "source": "fighter_base_color_neutral_gray_field",
       "target": "fighter_base_color_chevron_trim_islands"
     },
@@ -5973,8 +5934,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_arc_crescent_island",
-      "_tgt": "fighter_base_color_neutral_gray_field",
+      "_src": "fighter_base_color_neutral_gray_field",
+      "_tgt": "fighter_base_color_arc_crescent_island",
       "source": "fighter_base_color_neutral_gray_field",
       "target": "fighter_base_color_arc_crescent_island"
     },
@@ -5985,8 +5946,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_circular_solid_island",
-      "_tgt": "fighter_base_color_neutral_gray_field",
+      "_src": "fighter_base_color_neutral_gray_field",
+      "_tgt": "fighter_base_color_circular_solid_island",
       "source": "fighter_base_color_neutral_gray_field",
       "target": "fighter_base_color_circular_solid_island"
     },
@@ -5997,8 +5958,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_minimal_high_contrast_livery",
-      "_tgt": "fighter_base_color_neutral_gray_field",
+      "_src": "fighter_base_color_neutral_gray_field",
+      "_tgt": "fighter_base_color_minimal_high_contrast_livery",
       "source": "fighter_base_color_neutral_gray_field",
       "target": "fighter_base_color_minimal_high_contrast_livery"
     },
@@ -6009,8 +5970,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_vertical_stripe_island",
-      "_tgt": "fighter_base_color_red_accent_paint",
+      "_src": "fighter_base_color_red_accent_paint",
+      "_tgt": "fighter_base_color_vertical_stripe_island",
       "source": "fighter_base_color_red_accent_paint",
       "target": "fighter_base_color_vertical_stripe_island"
     },
@@ -6021,8 +5982,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_chevron_trim_islands",
-      "_tgt": "fighter_base_color_red_accent_paint",
+      "_src": "fighter_base_color_red_accent_paint",
+      "_tgt": "fighter_base_color_chevron_trim_islands",
       "source": "fighter_base_color_red_accent_paint",
       "target": "fighter_base_color_chevron_trim_islands"
     },
@@ -6033,8 +5994,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_arc_crescent_island",
-      "_tgt": "fighter_base_color_red_accent_paint",
+      "_src": "fighter_base_color_red_accent_paint",
+      "_tgt": "fighter_base_color_arc_crescent_island",
       "source": "fighter_base_color_red_accent_paint",
       "target": "fighter_base_color_arc_crescent_island"
     },
@@ -6045,8 +6006,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_circular_solid_island",
-      "_tgt": "fighter_base_color_red_accent_paint",
+      "_src": "fighter_base_color_red_accent_paint",
+      "_tgt": "fighter_base_color_circular_solid_island",
       "source": "fighter_base_color_red_accent_paint",
       "target": "fighter_base_color_circular_solid_island"
     },
@@ -6057,8 +6018,8 @@
       "source_file": "assets/blender/Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "fighter_base_color_minimal_high_contrast_livery",
-      "_tgt": "fighter_base_color_red_accent_paint",
+      "_src": "fighter_base_color_red_accent_paint",
+      "_tgt": "fighter_base_color_minimal_high_contrast_livery",
       "source": "fighter_base_color_red_accent_paint",
       "target": "fighter_base_color_minimal_high_contrast_livery"
     },
@@ -6249,8 +6210,8 @@
       "source_file": "content/ships/axum-fighter-1/model_Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "model_fighter_base_color_symmetrical_angled_pairs",
-      "_tgt": "model_fighter_base_color_axum_fighter_subject",
+      "_src": "model_fighter_base_color_axum_fighter_subject",
+      "_tgt": "model_fighter_base_color_symmetrical_angled_pairs",
       "source": "model_fighter_base_color_axum_fighter_subject",
       "target": "model_fighter_base_color_symmetrical_angled_pairs"
     },
@@ -6261,8 +6222,8 @@
       "source_file": "content/ships/axum-fighter-1/model_Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "model_fighter_base_color_vertical_stripe",
-      "_tgt": "model_fighter_base_color_axum_fighter_subject",
+      "_src": "model_fighter_base_color_axum_fighter_subject",
+      "_tgt": "model_fighter_base_color_vertical_stripe",
       "source": "model_fighter_base_color_axum_fighter_subject",
       "target": "model_fighter_base_color_vertical_stripe"
     },
@@ -6273,8 +6234,8 @@
       "source_file": "content/ships/axum-fighter-1/model_Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "model_fighter_base_color_bright_red_markings",
-      "_tgt": "model_fighter_base_color_axum_fighter_subject",
+      "_src": "model_fighter_base_color_axum_fighter_subject",
+      "_tgt": "model_fighter_base_color_bright_red_markings",
       "source": "model_fighter_base_color_axum_fighter_subject",
       "target": "model_fighter_base_color_bright_red_markings"
     },
@@ -6297,8 +6258,8 @@
       "source_file": "content/ships/axum-fighter-1/model_Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "model_fighter_base_color_vertical_stripe",
-      "_tgt": "model_fighter_base_color_bright_red_markings",
+      "_src": "model_fighter_base_color_bright_red_markings",
+      "_tgt": "model_fighter_base_color_vertical_stripe",
       "source": "model_fighter_base_color_bright_red_markings",
       "target": "model_fighter_base_color_vertical_stripe"
     },
@@ -6309,8 +6270,8 @@
       "source_file": "content/ships/axum-fighter-1/model_Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "model_fighter_base_color_circular_element",
-      "_tgt": "model_fighter_base_color_bright_red_markings",
+      "_src": "model_fighter_base_color_bright_red_markings",
+      "_tgt": "model_fighter_base_color_circular_element",
       "source": "model_fighter_base_color_bright_red_markings",
       "target": "model_fighter_base_color_circular_element"
     },
@@ -6321,8 +6282,8 @@
       "source_file": "content/ships/axum-fighter-1/model_Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "model_fighter_base_color_crescent_element",
-      "_tgt": "model_fighter_base_color_bright_red_markings",
+      "_src": "model_fighter_base_color_bright_red_markings",
+      "_tgt": "model_fighter_base_color_crescent_element",
       "source": "model_fighter_base_color_bright_red_markings",
       "target": "model_fighter_base_color_crescent_element"
     },
@@ -6333,8 +6294,8 @@
       "source_file": "content/ships/axum-fighter-1/model_Fighter Base Color.png",
       "source_location": null,
       "weight": 1.0,
-      "_src": "model_fighter_base_color_symmetrical_angled_pairs",
-      "_tgt": "model_fighter_base_color_bright_red_markings",
+      "_src": "model_fighter_base_color_bright_red_markings",
+      "_tgt": "model_fighter_base_color_symmetrical_angled_pairs",
       "source": "model_fighter_base_color_bright_red_markings",
       "target": "model_fighter_base_color_symmetrical_angled_pairs"
     },
@@ -6645,8 +6606,8 @@
       "source_file": "docs/agent_brief.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "agent_brief_project",
-      "_tgt": "decisions_log",
+      "_src": "decisions_log",
+      "_tgt": "agent_brief_project",
       "source": "decisions_log",
       "target": "agent_brief_project"
     },
@@ -6987,18 +6948,6 @@
       "target": "feature_spec_gameeventbus_signal_contract"
     },
     {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/feature_spec-game_event_bus_signals.md",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "feature_spec_gameeventbus_signal_contract",
-      "_tgt": "core_gameeventbus_gd",
-      "source": "feature_spec_gameeventbus_signal_contract",
-      "target": "core_gameeventbus_gd"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -7053,8 +7002,8 @@
       "source_file": "docs/development_guide.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "development_guide_build_order",
-      "_tgt": "agent_brief_build_status",
+      "_src": "agent_brief_build_status",
+      "_tgt": "development_guide_build_order",
       "source": "agent_brief_build_status",
       "target": "development_guide_build_order"
     },
@@ -7077,8 +7026,8 @@
       "source_file": "docs/development_guide.md",
       "source_location": null,
       "weight": 1.0,
-      "_src": "development_guide_session_checklist",
-      "_tgt": "agent_brief_deviation_protocol",
+      "_src": "agent_brief_deviation_protocol",
+      "_tgt": "development_guide_session_checklist",
       "source": "agent_brief_deviation_protocol",
       "target": "development_guide_session_checklist"
     },
@@ -7119,18 +7068,6 @@
       "target": "development_guide_session_checklist"
     },
     {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/feature_spec-star_field.md",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "feature_spec_star_field_spec",
-      "_tgt": "data_world_config_json",
-      "source": "feature_spec_star_field_spec",
-      "target": "data_world_config_json"
-    },
-    {
       "relation": "rationale_for",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
@@ -7153,18 +7090,6 @@
       "_tgt": "no_2d_nodes",
       "source": "feature_spec_star_field_spec",
       "target": "no_2d_nodes"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "graphify-out/GRAPH_REPORT.md",
-      "source_location": null,
-      "weight": 1.0,
-      "_src": "graph_report_summary",
-      "_tgt": "graph_html_visualization",
-      "source": "graph_report_summary",
-      "target": "graph_html_visualization"
     },
     {
       "relation": "conceptually_related_to",
@@ -7785,8 +7710,8 @@
       "source_file": "images/crew/crew-engineer-5.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "engine_room_environment",
-      "_tgt": "industrial_reactor_array",
+      "_src": "industrial_reactor_array",
+      "_tgt": "engine_room_environment",
       "source": "industrial_reactor_array",
       "target": "engine_room_environment"
     },
@@ -7809,8 +7734,8 @@
       "source_file": "images/crew/crew-engineer-6.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "industrial_corridor_environment",
-      "_tgt": "industrial_machinery_corridor",
+      "_src": "industrial_machinery_corridor",
+      "_tgt": "industrial_corridor_environment",
       "source": "industrial_machinery_corridor",
       "target": "industrial_corridor_environment"
     },
@@ -7821,8 +7746,8 @@
       "source_file": "images/crew/crew-engineer-7.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "cleanroom_environment",
-      "_tgt": "circular_engine_turbine",
+      "_src": "circular_engine_turbine",
+      "_tgt": "cleanroom_environment",
       "source": "circular_engine_turbine",
       "target": "cleanroom_environment"
     },
@@ -7845,8 +7770,8 @@
       "source_file": "images/crew/crew-engineer-8.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "circular_data_center_environment",
-      "_tgt": "massive_circular_data_display",
+      "_src": "massive_circular_data_display",
+      "_tgt": "circular_data_center_environment",
       "source": "massive_circular_data_display",
       "target": "circular_data_center_environment"
     },
@@ -7857,8 +7782,8 @@
       "source_file": "images/crew/crew-engineer-9.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "navigation_room_environment",
-      "_tgt": "star_map_hologram",
+      "_src": "star_map_hologram",
+      "_tgt": "navigation_room_environment",
       "source": "star_map_hologram",
       "target": "navigation_room_environment"
     },
@@ -7917,8 +7842,8 @@
       "source_file": "images/crew/crew-navigator-13.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "crew_navigator_13_portrait",
-      "_tgt": "pixel_art_style",
+      "_src": "pixel_art_style",
+      "_tgt": "crew_navigator_13_portrait",
       "source": "pixel_art_style",
       "target": "crew_navigator_13_portrait"
     },
@@ -7929,8 +7854,8 @@
       "source_file": "images/crew/crew-navigator-3.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "crew_navigator_3_portrait",
-      "_tgt": "pixel_art_style",
+      "_src": "pixel_art_style",
+      "_tgt": "crew_navigator_3_portrait",
       "source": "pixel_art_style",
       "target": "crew_navigator_3_portrait"
     },
@@ -7941,8 +7866,8 @@
       "source_file": "images/crew/crew-navigator-2.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "crew_navigator_2_portrait",
-      "_tgt": "pixel_art_style",
+      "_src": "pixel_art_style",
+      "_tgt": "crew_navigator_2_portrait",
       "source": "pixel_art_style",
       "target": "crew_navigator_2_portrait"
     },
@@ -7953,8 +7878,8 @@
       "source_file": "images/crew/crew-navigator-4.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "crew_navigator_4_portrait",
-      "_tgt": "pixel_art_style",
+      "_src": "pixel_art_style",
+      "_tgt": "crew_navigator_4_portrait",
       "source": "pixel_art_style",
       "target": "crew_navigator_4_portrait"
     },
@@ -7965,8 +7890,8 @@
       "source_file": "images/crew/crew-navigator-5.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "crew_navigator_5_portrait",
-      "_tgt": "pixel_art_style",
+      "_src": "pixel_art_style",
+      "_tgt": "crew_navigator_5_portrait",
       "source": "pixel_art_style",
       "target": "crew_navigator_5_portrait"
     },
@@ -8217,8 +8142,8 @@
       "source_file": "images/crew/crew-navigator-13.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "crew_navigator_13_portrait",
-      "_tgt": "navigator_role",
+      "_src": "navigator_role",
+      "_tgt": "crew_navigator_13_portrait",
       "source": "navigator_role",
       "target": "crew_navigator_13_portrait"
     },
@@ -8229,8 +8154,8 @@
       "source_file": "images/crew/crew-navigator-3.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "crew_navigator_3_portrait",
-      "_tgt": "navigator_role",
+      "_src": "navigator_role",
+      "_tgt": "crew_navigator_3_portrait",
       "source": "navigator_role",
       "target": "crew_navigator_3_portrait"
     },
@@ -8241,8 +8166,8 @@
       "source_file": "images/crew/crew-navigator-2.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "crew_navigator_2_portrait",
-      "_tgt": "navigator_role",
+      "_src": "navigator_role",
+      "_tgt": "crew_navigator_2_portrait",
       "source": "navigator_role",
       "target": "crew_navigator_2_portrait"
     },
@@ -8253,8 +8178,8 @@
       "source_file": "images/crew/crew-navigator-4.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "crew_navigator_4_portrait",
-      "_tgt": "navigator_role",
+      "_src": "navigator_role",
+      "_tgt": "crew_navigator_4_portrait",
       "source": "navigator_role",
       "target": "crew_navigator_4_portrait"
     },
@@ -8265,8 +8190,8 @@
       "source_file": "images/crew/crew-navigator-5.jpeg",
       "source_location": null,
       "weight": 1.0,
-      "_src": "crew_navigator_5_portrait",
-      "_tgt": "navigator_role",
+      "_src": "navigator_role",
+      "_tgt": "crew_navigator_5_portrait",
       "source": "navigator_role",
       "target": "crew_navigator_5_portrait"
     },

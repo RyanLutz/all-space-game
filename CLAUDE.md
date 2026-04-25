@@ -14,6 +14,7 @@ on this project correctly.
 - Ship.gd never writes velocity or position to produce motion — forces to Jolt only.
 - Specs are authoritative. Deviations require a written report before any code.
 - One system per session. Do not mix concerns.
+- **graphify-first recon:** Before exploring the codebase manually, check if `graphify-out/` exists. If it does, read `graphify-out/GRAPH_REPORT.md` and query `graphify-out/graph.json` first. Only fall back to manual `glob`/`grep`/`read` if the graph is missing or stale.
 
 ## On Session End
 

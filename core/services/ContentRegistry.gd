@@ -8,6 +8,7 @@ class_name ContentRegistry
 var ships: Dictionary = {}
 var weapons: Dictionary = {}
 var modules: Dictionary = {}
+var effects: Dictionary = {}
 var _factions: Dictionary = {}
 var _ai_profiles: Dictionary = {}
 
@@ -22,13 +23,14 @@ func _ready() -> void:
 	_scan_directory("res://content/ships", ships, "ship.json")
 	_scan_directory("res://content/weapons", weapons, "weapon.json")
 	_scan_directory("res://content/modules", modules, "module.json")
+	_scan_directory("res://content/effects", effects, "effect.json")
 	_load_factions("res://data/factions.json")
 	_load_ai_profiles("res://data/ai_profiles.json")
 
 	_perf.end("ContentRegistry.load")
 
-	print("[ContentRegistry] Loaded: %d ships, %d weapons, %d modules, %d factions, %d AI profiles" % [
-		ships.size(), weapons.size(), modules.size(), _factions.size(), _ai_profiles.size()
+	print("[ContentRegistry] Loaded: %d ships, %d weapons, %d modules, %d effects, %d factions, %d AI profiles" % [
+		ships.size(), weapons.size(), modules.size(), effects.size(), _factions.size(), _ai_profiles.size()
 	])
 
 
@@ -100,6 +102,20 @@ func get_weapon(id: String) -> Dictionary:
 
 func get_module(id: String) -> Dictionary:
 	return modules.get(id, {})
+
+
+func get_effect(id: String) -> Dictionary:
+	return effects.get(id, {})
+
+
+func get_all_ids(category: String) -> Array:
+	match category:
+		"ships": return ships.keys()
+		"weapons": return weapons.keys()
+		"modules": return modules.keys()
+		"effects": return effects.keys()
+		_:
+			return []
 
 
 func get_faction(id: String) -> Dictionary:
