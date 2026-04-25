@@ -110,6 +110,7 @@ func spawn_ship(
 
 	# Add to scene tree
 	get_tree().get_root().add_child.call_deferred(ship)
+	_event_bus.emit_signal.call_deferred("ship_spawned", ship)
 
 	print("[ShipFactory] Spawned %s (%s) for %s at %s" % [display_name, variant_id, faction, pos])
 	return ship

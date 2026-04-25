@@ -20,6 +20,7 @@ signal request_spawn_guided(position: Vector3, velocity: Vector3,
 							owner_id: int)
 
 # ─── Ship State ─────────────────────────────────────────────────────────────────
+signal ship_spawned(ship: Node)
 signal shield_depleted(ship: Node)
 signal hull_critical(ship: Node, percent: float)
 signal power_depleted(ship: Node)

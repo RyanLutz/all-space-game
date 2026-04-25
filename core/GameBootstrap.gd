@@ -21,6 +21,7 @@ func _ready() -> void:
 	_register_game_event_bus()
 	_register_player_state()
 	_register_projectile_manager()
+	_register_vfx_manager()
 	_register_custom_monitors()
 	print("[GameBootstrap] All core services registered.")
 
@@ -59,6 +60,13 @@ func _register_projectile_manager() -> void:
 	_service_locator.Register("ProjectileManager", pm)
 
 
+func _register_vfx_manager() -> void:
+	var vfx = preload("res://gameplay/vfx/VFXManager.gd").new()
+	vfx.name = "VFXManager"
+	add_child(vfx)
+	_service_locator.Register("VFXManager", vfx)
+
+
 ## All Godot debugger custom monitors are registered here, once, to avoid
 ## duplicate-registration errors when systems with multiple instances each try
 ## to register their own monitor in _ready(). Per-call instrumentation
@@ -86,3 +94,9 @@ func _register_custom_monitors() -> void:
 		func(): return perf.get_avg_ms("ShipFactory.assemble"))
 	Performance.add_custom_monitor("AllSpace/content_load_ms",
 		func(): return perf.get_avg_ms("ContentRegistry.load"))
+	Performance.add_custom_monitor("AllSpace/vfx_active",
+		func(): return perf.get_count("VFXManager.active_effects"))
+	Performance.add_custom_monitor("AllSpace/vfx_pool_reclaim_ms",
+		func(): return perf.get_avg_ms("VFXManager.pool_reclaim"))
+	Performance.add_custom_monitor("AllSpace/vfx_explosion_spawn_ms",
+		func(): return perf.get_avg_ms("VFXManager.explosion_spawn"))
