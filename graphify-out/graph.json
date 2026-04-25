@@ -391,7 +391,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L1",
       "id": "core_services_servicelocator_cs",
-      "community": 11,
+      "community": 2,
       "norm_label": "servicelocator.cs"
     },
     {
@@ -400,7 +400,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L11",
       "id": "servicelocator_servicelocator",
-      "community": 11,
+      "community": 2,
       "norm_label": "servicelocator"
     },
     {
@@ -409,7 +409,7 @@
       "source_file": "",
       "source_location": "",
       "id": "node",
-      "community": 11,
+      "community": 2,
       "norm_label": "node"
     },
     {
@@ -418,7 +418,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L18",
       "id": "servicelocator_servicelocator_register",
-      "community": 11,
+      "community": 2,
       "norm_label": ".register()"
     },
     {
@@ -427,7 +427,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L32",
       "id": "servicelocator_servicelocator_getservice",
-      "community": 11,
+      "community": 2,
       "norm_label": ".getservice()"
     },
     {
@@ -436,7 +436,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L41",
       "id": "servicelocator_servicelocator_get",
-      "community": 11,
+      "community": 2,
       "norm_label": ".get()"
     },
     {
@@ -445,7 +445,7 @@
       "source_file": "core/services/ServiceLocator.cs",
       "source_location": "L52",
       "id": "servicelocator_servicelocator_ready",
-      "community": 11,
+      "community": 2,
       "norm_label": "._ready()"
     },
     {
@@ -454,7 +454,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L1",
       "id": "home_lutz_projects_all_space_gameplay_weapons_projectilemanager_cs",
-      "community": 3,
+      "community": 2,
       "norm_label": "projectilemanager.cs"
     },
     {
@@ -463,7 +463,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L15",
       "id": "projectilemanager_projectilemanager",
-      "community": 3,
+      "community": 2,
       "norm_label": "projectilemanager"
     },
     {
@@ -472,7 +472,7 @@
       "source_file": "",
       "source_location": "",
       "id": "node3d",
-      "community": 3,
+      "community": 2,
       "norm_label": "node3d"
     },
     {
@@ -481,7 +481,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L96",
       "id": "projectilemanager_projectilemanager_ready",
-      "community": 3,
+      "community": 2,
       "norm_label": "._ready()"
     },
     {
@@ -490,7 +490,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L115",
       "id": "projectilemanager_projectilemanager_setup_projectile_visuals",
-      "community": 3,
+      "community": 2,
       "norm_label": "._setup_projectile_visuals()"
     },
     {
@@ -499,7 +499,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L156",
       "id": "projectilemanager_projectilemanager_create_projectile_mesh",
-      "community": 3,
+      "community": 2,
       "norm_label": "._create_projectile_mesh()"
     },
     {
@@ -508,7 +508,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L174",
       "id": "projectilemanager_projectilemanager_create_tracer_mesh",
-      "community": 3,
+      "community": 2,
       "norm_label": "._create_tracer_mesh()"
     },
     {
@@ -517,7 +517,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L193",
       "id": "projectilemanager_projectilemanager_physicsprocess",
-      "community": 3,
+      "community": 2,
       "norm_label": "._physicsprocess()"
     },
     {
@@ -526,7 +526,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L219",
       "id": "projectilemanager_projectilemanager_updateprojectilevisuals",
-      "community": 3,
+      "community": 2,
       "norm_label": ".updateprojectilevisuals()"
     },
     {
@@ -535,7 +535,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L241",
       "id": "projectilemanager_projectilemanager_updatetracervisuals",
-      "community": 3,
+      "community": 2,
       "norm_label": ".updatetracervisuals()"
     },
     {
@@ -544,7 +544,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L273",
       "id": "projectilemanager_projectilemanager_buildtracertransform",
-      "community": 3,
+      "community": 2,
       "norm_label": ".buildtracertransform()"
     },
     {
@@ -553,7 +553,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L291",
       "id": "projectilemanager_projectilemanager_spawntracer",
-      "community": 3,
+      "community": 2,
       "norm_label": ".spawntracer()"
     },
     {
@@ -562,7 +562,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L307",
       "id": "projectilemanager_projectilemanager_tracercolorfor",
-      "community": 3,
+      "community": 2,
       "norm_label": ".tracercolorfor()"
     },
     {
@@ -571,7 +571,7 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L319",
       "id": "projectilemanager_projectilemanager_updatedumbpool",
-      "community": 3,
+      "community": 2,
       "norm_label": ".updatedumbpool()"
     },
     {
@@ -580,61 +580,70 @@
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
       "source_location": "L346",
       "id": "projectilemanager_projectilemanager_processdumbcollisions",
-      "community": 3,
+      "community": 2,
       "norm_label": ".processdumbcollisions()"
     },
     {
       "label": ".ProcessHitscanQueue()",
       "file_type": "code",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L394",
+      "source_location": "L395",
       "id": "projectilemanager_projectilemanager_processhitscanqueue",
-      "community": 3,
+      "community": 2,
       "norm_label": ".processhitscanqueue()"
+    },
+    {
+      "label": ".GetSurfaceType()",
+      "file_type": "code",
+      "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
+      "source_location": "L452",
+      "id": "projectilemanager_projectilemanager_getsurfacetype",
+      "community": 2,
+      "norm_label": ".getsurfacetype()"
     },
     {
       "label": ".ApplyDamage()",
       "file_type": "code",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L449",
+      "source_location": "L464",
       "id": "projectilemanager_projectilemanager_applydamage",
-      "community": 3,
+      "community": 2,
       "norm_label": ".applydamage()"
     },
     {
       "label": ".OnRequestSpawnDumb()",
       "file_type": "code",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L467",
+      "source_location": "L487",
       "id": "projectilemanager_projectilemanager_onrequestspawndumb",
-      "community": 3,
+      "community": 2,
       "norm_label": ".onrequestspawndumb()"
     },
     {
       "label": ".OnRequestFireHitscan()",
       "file_type": "code",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L494",
+      "source_location": "L514",
       "id": "projectilemanager_projectilemanager_onrequestfirehitscan",
-      "community": 3,
+      "community": 2,
       "norm_label": ".onrequestfirehitscan()"
     },
     {
       "label": ".GetOrCacheWeapon()",
       "file_type": "code",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L513",
+      "source_location": "L533",
       "id": "projectilemanager_projectilemanager_getorcacheweapon",
-      "community": 3,
+      "community": 2,
       "norm_label": ".getorcacheweapon()"
     },
     {
       "label": ".ArchetypeToDamageType()",
       "file_type": "code",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L559",
+      "source_location": "L579",
       "id": "projectilemanager_projectilemanager_archetypetodamagetype",
-      "community": 3,
+      "community": 2,
       "norm_label": ".archetypetodamagetype()"
     },
     {
@@ -737,7 +746,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 19,
+      "community": 18,
       "norm_label": "all space \u2014 top-down 3d space simulation vision",
       "id": "vision_game_concept"
     },
@@ -750,7 +759,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 19,
+      "community": 18,
       "norm_label": "core philosophy: complexity on demand",
       "id": "vision_core_philosophy"
     },
@@ -776,7 +785,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 22,
       "norm_label": "combat mvp \u2014 3d top-down space combat simulator",
       "id": "vision_mvp_combat"
     },
@@ -789,7 +798,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 31,
       "norm_label": "sim-lite physics \u2014 mass, momentum, angular inertia",
       "id": "vision_sim_lite_physics"
     },
@@ -802,7 +811,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 22,
       "norm_label": "streaming map \u2014 chunk-based seamless world",
       "id": "vision_streaming_map"
     },
@@ -815,7 +824,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 12,
       "norm_label": "observability from day one \u2014 performancemonitor",
       "id": "vision_observability"
     },
@@ -984,7 +993,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 33,
+      "community": 32,
       "norm_label": "formation tick algorithm \u2014 pilot mode, slot destination = player pos + offset rotated by yaw",
       "id": "fleet_command_formation_tick"
     },
@@ -1036,7 +1045,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 34,
+      "community": 33,
       "norm_label": "new fleet command signals \u2014 request_tactical_stop, set_stance, escort_queue_changed, ship_damaged, request_formation_destination",
       "id": "fleet_command_new_signals"
     },
@@ -1049,7 +1058,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 19,
+      "community": 18,
       "norm_label": "all space core spec \u2014 top-down 3d on xz plane",
       "id": "core_spec_what_is"
     },
@@ -1140,7 +1149,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 34,
       "norm_label": "project structure \u2014 directory layout",
       "id": "core_spec_project_structure"
     },
@@ -1153,7 +1162,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 11,
       "norm_label": "spacebody contract \u2014 mass, velocity, angular_velocity, apply_damage, apply_impulse",
       "id": "core_spec_spacebody_contract"
     },
@@ -1166,7 +1175,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 12,
       "norm_label": "performancemonitor contract \u2014 begin/end pairs required on every system",
       "id": "core_spec_performance_monitor_contract"
     },
@@ -1179,7 +1188,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 12,
       "norm_label": "canonical metric names \u2014 system.method format table",
       "id": "core_spec_canonical_metrics"
     },
@@ -1192,7 +1201,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 13,
       "norm_label": "content architecture \u2014 folder-per-item under /content/",
       "id": "core_spec_content_architecture"
     },
@@ -1205,7 +1214,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 24,
+      "community": 23,
       "norm_label": "one ship.tscn for all ship types \u2014 configured at spawn time",
       "id": "core_spec_one_ship_tscn"
     },
@@ -1231,7 +1240,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 25,
+      "community": 27,
       "norm_label": "weapons summary \u2014 json stats, damage types, heat per hardpoint, power per ship",
       "id": "core_spec_weapons_summary"
     },
@@ -1270,7 +1279,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 26,
+      "community": 24,
       "norm_label": "world streaming summary \u2014 deterministic chunk grid, gameeventbus chunk_loaded",
       "id": "core_spec_streaming_summary"
     },
@@ -1283,7 +1292,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 36,
+      "community": 35,
       "norm_label": "build order \u2014 15-step dependency sequence",
       "id": "core_spec_build_order"
     },
@@ -1491,7 +1500,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 26,
+      "community": 24,
       "norm_label": "chunkstreamer \u2014 deterministic procedural chunk streaming, bounded memory",
       "id": "chunk_spec_overview"
     },
@@ -1504,7 +1513,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 27,
+      "community": 25,
       "norm_label": "chunk coordinate \u2194 world position \u2014 vector2i grid coord \u2192 vector3 world origin",
       "id": "chunk_spec_coord_to_world"
     },
@@ -1517,7 +1526,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 27,
+      "community": 25,
       "norm_label": "deterministic rng seeded by chunk coord hash \u2014 same coord = same content every visit",
       "id": "chunk_spec_deterministic_rng"
     },
@@ -1530,7 +1539,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 11,
       "norm_label": "asteroid \u2014 rigidbody3d with jolt axis locks, apply_damage, debris spawn on death",
       "id": "chunk_spec_asteroid"
     },
@@ -1543,7 +1552,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 37,
+      "community": 36,
       "norm_label": "debris \u2014 node3d visual only, manual velocity integration, alpha fade timer",
       "id": "chunk_spec_debris"
     },
@@ -1556,7 +1565,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 38,
+      "community": 37,
       "norm_label": "ai spawn point markers \u2014 node3d in ai_spawn_points group, chunkstreamer agnostic of ai",
       "id": "chunk_spec_spawn_points"
     },
@@ -1595,7 +1604,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 39,
+      "community": 38,
       "norm_label": "rigidbody3d configuration \u2014 gravity_scale 0, axis_lock_linear_y, damp_mode_replace",
       "id": "physics_spec_rigidbody_config"
     },
@@ -1608,7 +1617,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 20,
+      "community": 19,
       "norm_label": "assisted steering \u2014 predicted stopping distance controls brake vs accelerate torque",
       "id": "physics_spec_assisted_steering"
     },
@@ -1621,7 +1630,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 20,
+      "community": 19,
       "norm_label": "shared thruster budget \u2014 turning priority over translation, diagonal clamped to unit",
       "id": "physics_spec_thruster_budget"
     },
@@ -1634,7 +1643,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 20,
+      "community": 19,
       "norm_label": "partial alignment drag \u2014 alignment_drag_current per-frame reset pattern, lateral-only bleed",
       "id": "physics_spec_alignment_drag"
     },
@@ -1647,7 +1656,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 30,
       "norm_label": "momentum inheritance \u2014 projectiles inherit ship velocity at spawn",
       "id": "physics_spec_momentum_inheritance"
     },
@@ -1660,7 +1669,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "physics hull json block \u2014 mass, max_speed, linear_drag, thruster_force, etc.",
       "id": "physics_spec_hull_json"
     },
@@ -1673,7 +1682,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 24,
+      "community": 23,
       "norm_label": "ship system \u2014 one ship.tscn, data-driven assembly from ship.json + parts.glb",
       "id": "ship_spec_overview"
     },
@@ -1686,7 +1695,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 17,
       "norm_label": "ship three layers \u2014 class (what it is) / variant (discoverable config) / loadout (player customizes)",
       "id": "ship_spec_three_layers"
     },
@@ -1699,7 +1708,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 13,
       "norm_label": "shipfactory \u2014 spawn_ship(), stat resolution, part assembly, hardpoint discovery, color material",
       "id": "ship_spec_shipfactory"
     },
@@ -1712,7 +1721,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 40,
+      "community": 39,
       "norm_label": "hardpoint empty naming \u2014 hardpointempty_{part}_{id}_{size} uniqueness convention",
       "id": "ship_spec_hardpoint_empty_naming"
     },
@@ -1725,7 +1734,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 17,
       "norm_label": "ship.json schema \u2014 base_stats, variants, part_stats, hardpoint_types, module_slots, default_loadout",
       "id": "ship_spec_ship_json_schema"
     },
@@ -1738,7 +1747,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 29,
+      "community": 26,
       "norm_label": "factions.json \u2014 color_scheme (primary/trim/accent/glow) + name_vocabulary",
       "id": "ship_spec_factions_json"
     },
@@ -1751,7 +1760,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 29,
+      "community": 26,
       "norm_label": "vertex color shader \u2014 r=primary, g=trim, b=accent, a=glow; shared material per ship",
       "id": "ship_spec_colorization"
     },
@@ -1764,7 +1773,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 13,
       "norm_label": "contentregistry \u2014 scans /content at startup, indexes ships/weapons/modules by folder",
       "id": "ship_spec_contentregistry"
     },
@@ -1777,7 +1786,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 13,
       "norm_label": "playerstate \u2014 tracks active player ship, emits player_ship_changed",
       "id": "ship_spec_playerstate"
     },
@@ -1790,7 +1799,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 17,
       "norm_label": "stat resolution \u2014 base_stats + additive part_stat deltas applied once at spawn",
       "id": "ship_spec_stat_resolution"
     },
@@ -1803,7 +1812,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 17,
       "norm_label": "blueprint discovery system \u2014 variant_id added to save data on reverse engineering",
       "id": "ship_spec_blueprint_discovery"
     },
@@ -1816,7 +1825,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 25,
+      "community": 27,
       "norm_label": "weapons & projectiles \u2014 data-driven, dual heat/power resources, dual pool",
       "id": "weapons_spec_overview"
     },
@@ -1829,7 +1838,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 30,
+      "community": 28,
       "norm_label": "hardpoint types \u2014 fixed (~5\u00b0), gimbal (~25\u00b0), partial_turret (~120\u00b0), full_turret (360\u00b0)",
       "id": "weapons_spec_hardpoint_types"
     },
@@ -1842,7 +1851,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 30,
+      "community": 28,
       "norm_label": "aim direction algorithm \u2014 slerp-clamp to arc for gimbal/partial turret, unconstrained full turret",
       "id": "weapons_spec_aim_algorithm"
     },
@@ -1868,7 +1877,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 31,
+      "community": 29,
       "norm_label": "weapon archetypes \u2014 ballistic, energy beam, energy pulse, dumb missile, guided missile",
       "id": "weapons_spec_archetypes"
     },
@@ -1881,7 +1890,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 31,
+      "community": 29,
       "norm_label": "heat system \u2014 per-hardpoint heat_current, overheat lockout, passive cooling",
       "id": "weapons_spec_heat_system"
     },
@@ -1894,7 +1903,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 11,
       "norm_label": "power system \u2014 per-ship shared pool, brownout stops energy weapons + shield regen",
       "id": "weapons_spec_power_system"
     },
@@ -1907,7 +1916,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 11,
       "norm_label": "shield system \u2014 shield_hp, regen_delay, regen_power_draw; regen pauses on hit",
       "id": "weapons_spec_shield_system"
     },
@@ -1920,7 +1929,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 30,
       "norm_label": "projectilemanager c# \u2014 dumb pool (dumbprojectile struct), hitscan, swept raycast",
       "id": "weapons_spec_projectile_manager"
     },
@@ -1933,7 +1942,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 13,
       "norm_label": "guidedprojectilepool gdscript \u2014 missile steering via slerp, track_cursor/auto_lock/click_lock",
       "id": "weapons_spec_guided_pool"
     },
@@ -1946,7 +1955,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 11,
       "norm_label": "damage resolution pipeline \u2014 shield absorption \u2192 hull \u2192 component split via component_damage_ratio",
       "id": "weapons_spec_damage_pipeline"
     },
@@ -1959,7 +1968,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 11,
       "norm_label": "damage type matrix \u2014 ballistic 0.4\u00d7/1.5\u00d7, energy_beam 1.8\u00d7/0.5\u00d7, missile 0.6\u00d7/1.4\u00d7",
       "id": "weapons_spec_damage_type_matrix"
     },
@@ -1972,7 +1981,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 11,
       "norm_label": "weapon.json schema \u2014 archetype, stats (damage, fire_rate, heat_per_shot, muzzle_speed, etc.)",
       "id": "weapons_spec_weapon_json"
     },
@@ -2011,7 +2020,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "braking decision algorithm \u2014 predicted stop distance vs remaining distance",
       "id": "nav_spec_braking_algorithm"
     },
@@ -2024,7 +2033,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "project world-space thrust onto ship axes \u2014 correct regardless of facing",
       "id": "nav_spec_project_onto_axes"
     },
@@ -2037,7 +2046,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 41,
+      "community": 40,
       "norm_label": "thrust fraction scaling \u2014 ai expresses intent (patrol vs pursue speed)",
       "id": "nav_spec_thrust_fraction"
     },
@@ -2050,7 +2059,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 42,
+      "community": 41,
       "norm_label": "arrival behavior \u2014 zero thrust within arrival_distance, residual drift intentional",
       "id": "nav_spec_arrival_behavior"
     },
@@ -2063,7 +2072,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 43,
+      "community": 42,
       "norm_label": "drivemode enum \u2014 external / tactical_order / formation self-drive (phase 14)",
       "id": "nav_spec_drive_mode"
     },
@@ -2076,7 +2085,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 12,
       "norm_label": "performancemonitor \u2014 lightweight always-on observability service",
       "id": "perf_spec_overview"
     },
@@ -2089,7 +2098,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 12,
       "norm_label": "performancemonitor api \u2014 begin/end timing, set_count, get_avg_ms, get_peak_ms",
       "id": "perf_spec_api"
     },
@@ -2102,7 +2111,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 44,
+      "community": 43,
       "norm_label": "godot custom monitors registered in gamebootstrap to avoid duplicate registration",
       "id": "perf_spec_custom_monitors"
     },
@@ -2115,7 +2124,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 12,
       "norm_label": "f3 in-game debug overlay \u2014 canvaslayer, monospace font, frame budget display",
       "id": "perf_spec_f3_overlay"
     },
@@ -2128,7 +2137,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 12,
       "norm_label": "rationale: performancemonitor built first \u2014 metrics from day one avoids retrofitting",
       "id": "perf_spec_built_first_rationale"
     },
@@ -2141,7 +2150,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 15,
       "norm_label": "svg application icon 128\u00d7128 (godot-style brand mark)",
       "id": "icon_svg_document"
     },
@@ -2154,7 +2163,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 15,
       "norm_label": "rounded rectangle frame (#363d52 fill, #212532 stroke, rx=14)",
       "id": "icon_rounded_panel"
     },
@@ -2167,7 +2176,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 15,
       "norm_label": "scaled path group: robot head, gear crown, blue face plate (#478cbf), white gear outline",
       "id": "icon_mascot_vector_group"
     },
@@ -2180,7 +2189,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 15,
       "norm_label": "eye layer: two dark gray circles (#414042) for pupils",
       "id": "icon_ocular_detail_group"
     },
@@ -2193,7 +2202,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 15,
       "norm_label": "semantic association: standard godot engine editor / project joystick-robot logo",
       "id": "icon_godot_mark_association"
     },
@@ -2323,7 +2332,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 16,
       "norm_label": "fighter base color texture (blender albedo map)",
       "id": "fighter_base_color_albedo_texture_file"
     },
@@ -2336,7 +2345,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 16,
       "norm_label": "uniform dark charcoal gray surface (~#444444 rgb)",
       "id": "fighter_base_color_uniform_charcoal_surface"
     },
@@ -2349,7 +2358,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 16,
       "norm_label": "featureless albedo (no gradients, noise, or markings)",
       "id": "fighter_base_color_minimal_featureless_albedo"
     },
@@ -2362,7 +2371,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 16,
       "norm_label": "neutral base layer for pbr (detail likely in roughness/normal/metallic)",
       "id": "fighter_base_color_neutral_pbr_foundation"
     },
@@ -2375,7 +2384,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 16,
       "norm_label": "dark utilitarian / industrial hull color direction",
       "id": "fighter_base_color_dark_utilitarian_palette"
     },
@@ -2973,7 +2982,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 22,
+      "community": 21,
       "norm_label": "star field system specification",
       "id": "feature_spec_star_field_spec"
     },
@@ -2986,7 +2995,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 45,
+      "community": 44,
       "norm_label": "graph report summary",
       "id": "graph_report_summary"
     },
@@ -2999,7 +3008,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 46,
+      "community": 45,
       "norm_label": "godot ai addon readme",
       "id": "godot_ai_readme"
     },
@@ -3155,7 +3164,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 22,
+      "community": 21,
       "norm_label": "no hardcoded values rule",
       "id": "no_hardcoded_values"
     },
@@ -3168,7 +3177,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 22,
+      "community": 21,
       "norm_label": "no 2d nodes rule",
       "id": "no_2d_nodes"
     },
@@ -3181,7 +3190,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 47,
+      "community": 46,
       "norm_label": "debug grid texture",
       "id": "grid_debug_grid"
     },
@@ -3844,7 +3853,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "navigator character 6 - star map navigator",
       "id": "crew_navigator_6"
     },
@@ -3857,7 +3866,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "navigator character 7 - dark lit navigator",
       "id": "crew_navigator_7"
     },
@@ -3870,7 +3879,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "captain character 1 - blonde captain on throne",
       "id": "crew_captain_1"
     },
@@ -3883,7 +3892,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "soldier character 1 - purple hair rifle soldier",
       "id": "crew_soldier_1"
     },
@@ -3896,7 +3905,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "soldier character 2 - blonde knife soldier",
       "id": "crew_soldier_2"
     },
@@ -3909,7 +3918,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "captain character 2 - red lit captain",
       "id": "crew_captain_2"
     },
@@ -3922,7 +3931,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "captain character 3 - purple hair captain",
       "id": "crew_captain_3"
     },
@@ -3935,7 +3944,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "captain character 4 - white hair orange eye captain",
       "id": "crew_captain_4"
     },
@@ -3948,7 +3957,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "captain character 5 - silver hair green hologram captain",
       "id": "crew_captain_5"
     },
@@ -3961,7 +3970,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "random crew character 1 - silver hair bottle holder",
       "id": "crew_random_1"
     },
@@ -3974,7 +3983,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "random crew character 2 - red hair nebula crew",
       "id": "crew_random_2"
     },
@@ -3987,7 +3996,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "random crew character 3 - blue hair action pose crew",
       "id": "crew_random_3"
     },
@@ -4000,7 +4009,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "pilot character 1 - dark hair ship watcher",
       "id": "crew_pilot_1"
     },
@@ -4013,7 +4022,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "pilot character 2 - pink hair goggle pilot",
       "id": "crew_pilot_2"
     },
@@ -4026,7 +4035,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "pilot character 3 - dark hair red sun pilot",
       "id": "crew_pilot_3"
     },
@@ -4039,7 +4048,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "pilot character 4 - curly hair hologram pilot",
       "id": "crew_pilot_4"
     },
@@ -4052,7 +4061,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "pilot character 5 - bun hair space battle pilot",
       "id": "crew_pilot_5"
     },
@@ -4065,7 +4074,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "pilot character 6 - pink highlight red sun pilot",
       "id": "crew_pilot_6"
     },
@@ -4078,7 +4087,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "navigator role",
       "id": "role_navigator"
     },
@@ -4091,7 +4100,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "captain role",
       "id": "role_captain"
     },
@@ -4104,7 +4113,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "soldier role",
       "id": "role_soldier"
     },
@@ -4117,7 +4126,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "random crew role",
       "id": "role_random_crew"
     },
@@ -4130,7 +4139,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "pilot role",
       "id": "role_pilot"
     },
@@ -4143,7 +4152,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "sci-fi anime art style",
       "id": "concept_sci_fi_anime_art"
     },
@@ -4156,7 +4165,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "spaceship interior setting",
       "id": "concept_spaceship_interior"
     },
@@ -4169,7 +4178,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "holographic display ui elements",
       "id": "concept_holographic_ui"
     }
@@ -4270,6 +4279,18 @@
       "_tgt": "projectilemanager_projectilemanager_ready",
       "source": "servicelocator_servicelocator_get",
       "target": "projectilemanager_projectilemanager_ready"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
+      "source_location": "L455",
+      "weight": 1.0,
+      "_src": "servicelocator_servicelocator_get",
+      "_tgt": "projectilemanager_projectilemanager_getsurfacetype",
+      "source": "servicelocator_servicelocator_get",
+      "target": "projectilemanager_projectilemanager_getsurfacetype"
     },
     {
       "relation": "contains",
@@ -4443,7 +4464,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L394",
+      "source_location": "L395",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager",
       "_tgt": "projectilemanager_projectilemanager_processhitscanqueue",
@@ -4455,7 +4476,19 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L449",
+      "source_location": "L452",
+      "weight": 1.0,
+      "_src": "projectilemanager_projectilemanager",
+      "_tgt": "projectilemanager_projectilemanager_getsurfacetype",
+      "source": "projectilemanager_projectilemanager",
+      "target": "projectilemanager_projectilemanager_getsurfacetype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
+      "source_location": "L464",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager",
       "_tgt": "projectilemanager_projectilemanager_applydamage",
@@ -4467,7 +4500,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L467",
+      "source_location": "L487",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager",
       "_tgt": "projectilemanager_projectilemanager_onrequestspawndumb",
@@ -4479,7 +4512,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L494",
+      "source_location": "L514",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager",
       "_tgt": "projectilemanager_projectilemanager_onrequestfirehitscan",
@@ -4491,7 +4524,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L513",
+      "source_location": "L533",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager",
       "_tgt": "projectilemanager_projectilemanager_getorcacheweapon",
@@ -4503,7 +4536,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L559",
+      "source_location": "L579",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager",
       "_tgt": "projectilemanager_projectilemanager_archetypetodamagetype",
@@ -4623,7 +4656,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L441",
+      "source_location": "L444",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager_processhitscanqueue",
       "_tgt": "projectilemanager_projectilemanager_spawntracer",
@@ -4635,7 +4668,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L441",
+      "source_location": "L444",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager_processhitscanqueue",
       "_tgt": "projectilemanager_projectilemanager_tracercolorfor",
@@ -4647,7 +4680,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L384",
+      "source_location": "L385",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager_processdumbcollisions",
       "_tgt": "projectilemanager_projectilemanager_applydamage",
@@ -4659,7 +4692,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L429",
+      "source_location": "L432",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager_processhitscanqueue",
       "_tgt": "projectilemanager_projectilemanager_applydamage",
@@ -4671,7 +4704,19 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L470",
+      "source_location": "L476",
+      "weight": 1.0,
+      "_src": "projectilemanager_projectilemanager_applydamage",
+      "_tgt": "projectilemanager_projectilemanager_getsurfacetype",
+      "source": "projectilemanager_projectilemanager_getsurfacetype",
+      "target": "projectilemanager_projectilemanager_applydamage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
+      "source_location": "L490",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager_onrequestspawndumb",
       "_tgt": "projectilemanager_projectilemanager_getorcacheweapon",
@@ -4683,7 +4728,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L497",
+      "source_location": "L517",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager_onrequestfirehitscan",
       "_tgt": "projectilemanager_projectilemanager_getorcacheweapon",
@@ -4695,7 +4740,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs",
-      "source_location": "L552",
+      "source_location": "L572",
       "weight": 1.0,
       "_src": "projectilemanager_projectilemanager_getorcacheweapon",
       "_tgt": "projectilemanager_projectilemanager_archetypetodamagetype",
