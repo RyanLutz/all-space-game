@@ -88,6 +88,7 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 14 | Fleet Command — selection, orders, stance, escort queue | Implemented |
 | 15 | ChunkStreamer + Asteroid + Debris | Implemented |
 | 16 | GameEventBus signal audit | Implemented |
+| 17 | Combat VFX System (Session 1: VFX core + pools; Session 2: local players) | In progress |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 
@@ -156,7 +157,15 @@ The most recent decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-04-21 — Phase 16: GameEventBus signal audit** —
+1. **2026-04-25 — Phase 17 Session 2: Combat VFX local players** —
+   MuzzleFlashPlayer.gd (local GPUParticles3D per weapon, Muzzle-marker positioned),
+   BeamRenderer.gd (BoxMesh stretched by look_at + scale.z, StandardMaterial3D placeholder),
+   ShieldEffectPlayer.gd (drives shield_ripple.gdshader uniforms on parent ShieldMesh),
+   assets/shaders/shield_ripple.gdshader (expanding ring ripple, blend_add).
+   ShipFactory gains MuzzleFlashPlayer on every weapon, BeamRenderer on energy_beam weapons,
+   _create_shield_mesh() for ships with shield_max > 0. Ship.gd gains shield_mesh reference.
+   No deviations.
+2. **2026-04-21 — Phase 16: GameEventBus signal audit** —
    Reconciled spec with code after phases 12-15. Added 12 undocumented signals to spec
    (tactical stop/stance/escort, context menu, escort & formation, ship_damaged, debug_toggled).
    Fixed queue_mode parameter on tactical move/attack/mine. Updated all emitter/listener

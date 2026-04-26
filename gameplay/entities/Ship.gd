@@ -39,6 +39,9 @@ var input_strafe: float = 0.0       # -1.0 to 1.0
 var input_aim_target: Vector3 = Vector3.ZERO  # world-space aim point (Y = 0)
 var input_fire: Array[bool] = [false, false, false]
 
+# ─── VFX references (set by ShipFactory) ─────────────────────────────────────
+var shield_mesh: MeshInstance3D = null
+
 # ─── Cached services ─────────────────────────────────────────────────────────
 var _perf: Node
 var _event_bus: Node

@@ -537,3 +537,32 @@ through phases 12-15). No code changes needed.
 - None. Spec-only update to match existing code.
 
 Spec updated: yes — feature_spec-game_event_bus_signals.md fully rewritten
+
+## 2026-04-25 — Phase 17 Session 2: Local Effect Players
+
+Agent:   Claude Sonnet 4.6 (Claude Code)
+System:  Combat VFX
+Spec:    feature_spec-combat_vfx.md §3, §4
+Problem: Session 2 scope — create local effect players attached at assembly time.
+
+Decision:
+- Created MuzzleFlashPlayer.gd: local GPUParticles3D per weapon; pool_size==0 disables.
+  Discovers Muzzle marker in parent for correct world-space positioning at play().
+- Created BeamRenderer.gd: local BoxMesh on BeamRenderer node; look_at(to) + scale.z=length
+  stretches beam along direction. Placeholder uses StandardMaterial3D emission.
+  ShaderMaterial/u_time_offset wired but guarded for art-pass shader upgrade.
+- Created ShieldEffectPlayer.gd: reads ShaderMaterial from parent MeshInstance3D;
+  play_hit() sets u_hit_origin and u_hit_time (engine uptime matches TIME in shader).
+- Created assets/shaders/shield_ripple.gdshader: expanding ring ripple via TIME - u_hit_time;
+  local-space vertex position passed through varying; blend_add + depth_draw_never.
+- Modified ShipFactory._attach_weapon(): appends MuzzleFlashPlayer to every weapon model;
+  appends BeamRenderer to energy_beam archetype weapons only.
+- Added ShipFactory._create_shield_mesh(): creates ShieldMesh (SphereMesh) + ShieldEffectPlayer
+  under ShipVisual for ships with shield_max > 0. Radius heuristic: pow(mass/1000, 0.33)*4.
+  Skips if shader file missing (push_warning). Sets ship.shield_mesh reference.
+- Modified Ship.gd: added var shield_mesh: MeshInstance3D = null for VFXManager lookup.
+
+### Deviations
+- None. All implementation follows phase_plan-combat_vfx.md Session 2 spec.
+
+Spec updated: no — spec unchanged; build status updated in agent_brief.md

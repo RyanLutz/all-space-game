@@ -73,14 +73,22 @@ func spawn_ship(
 	var discovered := _discover_hardpoints(ship_visual)
 	_configure_hardpoints(ship, discovered, class_data, loadout)
 
-	# 6. Resolve name
+	var ship_script: Ship = ship as Ship
+
+	# 6. Shield mesh — only for ships with shields
+	if resolved_stats.get("shield_max", 0.0) > 0.0:
+		var class_effects: Dictionary = class_data.get("effects", {})
+		_create_shield_mesh(ship_script, ship_visual,
+				class_effects.get("shield_hit", ""),
+				resolved_stats.get("mass", 1000.0))
+
+	# 7. Resolve name
 	var display_name := _resolve_display_name(variant_data, class_data["class"], faction, variant_id)
 
-	# 7. Apply color material
+	# 8. Apply color material
 	_apply_color_material(ship, class_data, faction)
 
-	# 8. Apply resolved stats
-	var ship_script: Ship = ship as Ship
+	# 9. Apply resolved stats
 	ship_script.initialize_stats(resolved_stats)
 
 	# Set identity
@@ -92,7 +100,7 @@ func spawn_ship(
 
 	_perf.end("ShipFactory.assemble")
 
-	# 9. Identity and groups
+	# 10. Identity and groups
 	if is_player:
 		ship.add_to_group("player")
 		ship.add_to_group("player_fleet")
@@ -291,6 +299,20 @@ func _attach_weapon(hp_node: Node3D, hardpoint: HardpointComponent, weapon_id: S
 	# Link hardpoint and weapon
 	hardpoint.set_weapon_model(weapon_model, weapon_component)
 
+	# MuzzleFlashPlayer — always; graceful no-op if effect_id is empty
+	var effects: Dictionary = weapon_data.get("effects", {})
+	var muzzle_player := MuzzleFlashPlayer.new()
+	muzzle_player.name = "MuzzleFlashPlayer"
+	muzzle_player.effect_id = effects.get("muzzle_flash", "")
+	weapon_model.add_child(muzzle_player)
+
+	# BeamRenderer — energy_beam archetype only
+	if weapon_data.get("archetype", "") == "energy_beam":
+		var beam_renderer := BeamRenderer.new()
+		beam_renderer.name = "BeamRenderer"
+		beam_renderer.effect_id = effects.get("beam", "")
+		weapon_model.add_child(beam_renderer)
+
 
 # ─── Name Resolution ────────────────────────────────────────────────────────
 
@@ -390,3 +412,44 @@ func _hex_to_color(hex: String) -> Color:
 			hex.substr(4, 2).hex_to_int() / 255.0
 		)
 	return Color.GRAY
+
+
+# ─── Shield Mesh Creation ────────────────────────────────────────────────────
+
+func _create_shield_mesh(ship: Ship, ship_visual: Node3D,
+		shield_hit_effect_id: String, mass: float) -> void:
+	var shader: Shader = load("res://assets/shaders/shield_ripple.gdshader")
+	if shader == null:
+		push_warning("ShipFactory: shield_ripple.gdshader not found — skipping shield mesh")
+		return
+
+	# Radius heuristic: cube-root scale from 1000-unit baseline.
+	# Art pass will tune per-ship via JSON later.
+	var radius: float = maxf(3.0, pow(mass / 1000.0, 0.33) * 4.0)
+
+	var sphere := SphereMesh.new()
+	sphere.radius = radius
+	sphere.height = radius * 2.0
+	sphere.radial_segments = 16
+	sphere.rings = 8
+
+	var shield_mat := ShaderMaterial.new()
+	shield_mat.shader = shader
+	shield_mat.set_shader_parameter("u_hit_time", -1.0)
+	shield_mat.set_shader_parameter("u_color", Color(0.4, 0.7, 1.0, 0.8))
+	shield_mat.set_shader_parameter("u_ripple_speed", 2.5)
+	shield_mat.set_shader_parameter("u_ripple_falloff", 1.8)
+
+	var shield_mesh := MeshInstance3D.new()
+	shield_mesh.name = "ShieldMesh"
+	shield_mesh.mesh = sphere
+	shield_mesh.material_override = shield_mat
+	shield_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+	var shield_player := ShieldEffectPlayer.new()
+	shield_player.name = "ShieldEffectPlayer"
+	shield_player.effect_id = shield_hit_effect_id
+	shield_mesh.add_child(shield_player)
+
+	ship_visual.add_child(shield_mesh)
+	ship.shield_mesh = shield_mesh
