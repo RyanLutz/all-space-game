@@ -1,0 +1,10 @@
+{
+	"type": "beam",
+	"color_core": [0.55, 0.85, 1.0, 1.0],
+	"color_glow": [0.2, 0.5, 1.0, 0.4],
+	"width_core": 0.08,
+	"width_glow": 0.35,
+	"flicker_hz": 14.0,
+	"impact_flash_color": [1.0, 1.0, 1.0, 1.0],
+	"impact_flash_radius": 0.4
+}

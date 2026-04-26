@@ -29,12 +29,23 @@ var _is_firing_beam: bool = false
 var hardpoint: Node = null
 var _event_bus: Node = null
 var _perf: Node = null
+var _muzzle_flash: MuzzleFlashPlayer = null
+var _beam_renderer: BeamRenderer = null
 
 
 func _ready() -> void:
 	var service_locator := Engine.get_singleton("ServiceLocator")
 	_event_bus = service_locator.GetService("GameEventBus")
 	_perf = service_locator.GetService("PerformanceMonitor")
+	call_deferred("_discover_vfx_players")
+
+
+func _discover_vfx_players() -> void:
+	var parent := get_parent()
+	if parent == null:
+		return
+	_muzzle_flash = parent.get_node_or_null("MuzzleFlashPlayer") as MuzzleFlashPlayer
+	_beam_renderer = parent.get_node_or_null("BeamRenderer") as BeamRenderer
 
 
 func _process(delta: float) -> void:
@@ -81,6 +92,8 @@ func _fire_discrete(should_fire: bool) -> void:
 
 	# Fire!
 	_spawn_dumb_projectile()
+	if _muzzle_flash != null:
+		_muzzle_flash.play()
 
 	# Set cooldown
 	var cooldown: float = 1.0 / (fire_rate * hardpoint.get_fire_rate_multiplier())
@@ -111,6 +124,8 @@ func _fire_pulse(should_fire: bool) -> void:
 
 	# Fire hitscan
 	_fire_hitscan()
+	if _muzzle_flash != null:
+		_muzzle_flash.play()
 
 	# Set cooldown
 	var cooldown: float = 1.0 / (fire_rate * hardpoint.get_fire_rate_multiplier())
@@ -123,15 +138,22 @@ func _fire_pulse(should_fire: bool) -> void:
 
 func _fire_beam(should_fire: bool, delta: float) -> void:
 	if not should_fire:
+		if _is_firing_beam and _beam_renderer != null:
+			_beam_renderer.stop()
 		_is_firing_beam = false
 		return
 
 	if hardpoint.is_overheated:
+		if _is_firing_beam and _beam_renderer != null:
+			_beam_renderer.stop()
+		_is_firing_beam = false
 		return
 
 	# Check power (continuous drain)
 	var power_needed := power_per_second * delta
 	if not hardpoint.owner_ship.draw_power(power_needed):
+		if _is_firing_beam and _beam_renderer != null:
+			_beam_renderer.stop()
 		_is_firing_beam = false
 		return
 
@@ -141,9 +163,20 @@ func _fire_beam(should_fire: bool, delta: float) -> void:
 	# Fire hitscan every frame
 	_fire_hitscan_beam(delta)
 
+	# Update beam visual
+	if _beam_renderer != null:
+		var from := get_muzzle_pos()
+		var aim_dir: Vector3 = hardpoint.get_aim_direction()
+		aim_dir.y = 0.0
+		aim_dir = aim_dir.normalized()
+		var to := from + aim_dir * range_val
+		_beam_renderer.update(from, to)
+
 	if not _is_firing_beam:
 		# Just started firing
 		_event_bus.emit_signal("weapon_fired", hardpoint.owner_ship, weapon_id, get_muzzle_pos())
+		if _muzzle_flash != null:
+			_muzzle_flash.play()
 
 	_is_firing_beam = true
 
@@ -165,6 +198,8 @@ func _fire_guided(should_fire: bool) -> void:
 
 	# Fire guided missile!
 	_spawn_guided_projectile()
+	if _muzzle_flash != null:
+		_muzzle_flash.play()
 
 	# Set cooldown
 	var cooldown: float = 1.0 / (fire_rate * hardpoint.get_fire_rate_multiplier())

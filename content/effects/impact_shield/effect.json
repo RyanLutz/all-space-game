@@ -1,0 +1,12 @@
+{
+	"type": "particle_burst",
+	"pool_size": 12,
+	"lifetime": 0.4,
+	"color_primary": [0.4, 0.7, 1.0, 1.0],
+	"color_secondary": [0.0, 0.3, 1.0, 0.0],
+	"particle_count": 16,
+	"particle_speed_min": 20.0,
+	"particle_speed_max": 80.0,
+	"scale": 1.1,
+	"emit_direction": "normal"
+}

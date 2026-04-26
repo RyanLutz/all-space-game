@@ -96,5 +96,10 @@
 	"assets": {
 		"parts": "parts.glb",
 		"icon": "icon.png"
+	},
+
+	"effects": {
+		"explosion": "explosion_medium",
+		"shield_hit": "shield_ripple_light"
 	}
 }

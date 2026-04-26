@@ -1,0 +1,7 @@
+{
+	"type": "shield_ripple",
+	"color": [0.4, 0.7, 1.0, 0.8],
+	"ripple_speed": 2.5,
+	"ripple_falloff": 1.8,
+	"flash_duration": 0.12
+}

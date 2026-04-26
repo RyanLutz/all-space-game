@@ -36,6 +36,7 @@ The **Model** column uses two tiers:
 | 14 | ✅ | Fleet Command — selection, orders, stance, escort queue | `feature_spec-fleet_command` | **Opus** | Full RTS command layer. Large spec, many interacting concerns. |
 | 15 | ✅ | ChunkStreamer + Asteroid + Debris | `feature_spec-chunk_streamer.md` | **Opus** | Streaming architecture with deterministic generation. Novel and high blast radius — incorrect chunk lifecycle breaks AI spawning and everything in the world. |
 | 16 | ✅ | GameEventBus signal audit | `feature_spec-game_event_bus_signals.md` | Sonnet | Cross-cutting signal catalog. Spec reconciled with code — 12 signals added, 3 signatures fixed, emitter/listener columns updated. No code changes. |
+| 17 | ✅ | Combat VFX System | `feature_spec-combat_vfx.md` | Opus + Sonnet | Muzzle, beam, impact, shield, explosions. 3 sessions. |
 | — | 🔲 | Station & Loadout UI | Not yet specced | TBD | Post-MVP. Spec before building. |
 | — | 🔲 | Galactic Strategy | Not yet specced | TBD | Phase 3. Do not spec until MVP loop is proven. |
 

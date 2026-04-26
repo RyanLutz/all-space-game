@@ -16,5 +16,10 @@
 	"assets": {
 		"model": "beam_laser-small.glb",
 		"icon": "icon.png"
+	},
+
+	"effects": {
+		"muzzle_flash": "muzzle_beam_ignite",
+		"beam": "beam_laser_blue"
 	}
 }

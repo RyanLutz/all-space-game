@@ -106,23 +106,27 @@ func spawn_explosion(explosion_id: String, position: Vector3) -> void:
 	_sequence_explosion(def.get("layers", []), position)
 	_perf.end("VFXManager.explosion_spawn")
 
-
 func _sequence_explosion(layers: Array, position: Vector3) -> void:
 	for layer in layers:
 		var effect_id: String = layer.get("effect", "")
 		var delay: float = float(layer.get("delay", 0.0))
 		var scale: float = float(layer.get("scale", 1.0))
 		if delay > 0.0:
-			await get_tree().create_timer(delay).timeout
-		if not _pools.has(effect_id):
-			continue
-		var instance: GPUParticles3D = _pools[effect_id].acquire()
-		if instance == null:
-			continue
-		instance.global_position = position
-		instance.scale = Vector3.ONE * scale
-		instance.global_transform.basis = Basis()
-		instance.restart()
+			var timer := get_tree().create_timer(delay)
+			timer.timeout.connect(_spawn_explosion_layer.bind(effect_id, position, scale))
+		else:
+			_spawn_explosion_layer(effect_id, position, scale)
+
+func _spawn_explosion_layer(effect_id: String, position: Vector3, scale: float) -> void:
+	if not _pools.has(effect_id):
+		return
+	var instance: GPUParticles3D = _pools[effect_id].acquire()
+	if instance == null:
+		return
+	instance.global_position = position
+	instance.scale = Vector3.ONE * scale
+	instance.global_transform.basis = Basis()
+	instance.restart()
 
 
 # ─── Signal Handlers ────────────────────────────────────────────────────────

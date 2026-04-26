@@ -21,5 +21,9 @@
 	"assets": {
 		"model": "pulse_laser-small.glb",
 		"icon": "icon.png"
+	},
+
+	"effects": {
+		"muzzle_flash": "muzzle_pulse_laser"
 	}
 }

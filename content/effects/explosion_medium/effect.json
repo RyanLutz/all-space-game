@@ -1,0 +1,9 @@
+{
+	"type": "explosion",
+	"layers": [
+		{ "effect": "explosion_flash",     "delay": 0.0,  "scale": 1.2 },
+		{ "effect": "explosion_fireball",  "delay": 0.04, "scale": 1.5 },
+		{ "effect": "explosion_shockwave", "delay": 0.08, "scale": 1.8 },
+		{ "effect": "explosion_debris",    "delay": 0.04, "scale": 1.1 }
+	]
+}

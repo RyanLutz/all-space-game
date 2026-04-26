@@ -21,5 +21,10 @@
 	"assets": {
 		"model": "autocannon-small.glb",
 		"icon": "icon.png"
+	},
+
+	"effects": {
+		"muzzle_flash": "muzzle_autocannon",
+		"projectile_trail": "trail_ballistic"
 	}
 }

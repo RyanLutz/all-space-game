@@ -17,23 +17,22 @@ void vertex() {
 }
 
 void fragment() {
-	if (u_hit_time < 0.0) {
-		ALPHA = 0.0;
-		return;
+	vec3 albedo = vec3(0.0);
+	float alpha = 0.0;
+
+	if (u_hit_time >= 0.0) {
+		float elapsed = TIME - u_hit_time;
+		if (elapsed >= 0.0 && elapsed <= 1.0) {
+			float dist       = length(v_local_pos - u_hit_origin);
+			float ring_r     = elapsed * u_ripple_speed;
+			float ring_width = 0.3;
+			float ring       = 1.0 - clamp(abs(dist - ring_r) / ring_width, 0.0, 1.0);
+			float fade       = 1.0 - pow(elapsed, u_ripple_falloff);
+			albedo = u_color.rgb;
+			alpha  = ring * fade * u_color.a;
+		}
 	}
 
-	float elapsed = TIME - u_hit_time;
-	if (elapsed > 1.0 || elapsed < 0.0) {
-		ALPHA = 0.0;
-		return;
-	}
-
-	float dist       = length(v_local_pos - u_hit_origin);
-	float ring_r     = elapsed * u_ripple_speed;
-	float ring_width = 0.3;
-	float ring       = 1.0 - clamp(abs(dist - ring_r) / ring_width, 0.0, 1.0);
-	float fade       = 1.0 - pow(elapsed, u_ripple_falloff);
-
-	ALBEDO = u_color.rgb;
-	ALPHA  = ring * fade * u_color.a;
+	ALBEDO = albedo;
+	ALPHA  = alpha;
 }

@@ -17,5 +17,10 @@
 	"assets": {
 		"model": "torpedo_launcher-small.glb",
 		"icon": "icon.png"
+	},
+
+	"effects": {
+		"muzzle_flash": "muzzle_missile_launch",
+		"projectile_trail": "trail_missile_exhaust"
 	}
 }
