@@ -100,3 +100,5 @@ func _register_custom_monitors() -> void:
 		func(): return perf.get_avg_ms("VFXManager.pool_reclaim"))
 	Performance.add_custom_monitor("AllSpace/vfx_explosion_spawn_ms",
 		func(): return perf.get_avg_ms("VFXManager.explosion_spawn"))
+	Performance.add_custom_monitor("AllSpace/star_count",
+		func(): return perf.get_count("StarField.star_count"))

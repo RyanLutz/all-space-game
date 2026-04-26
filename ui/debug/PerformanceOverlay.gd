@@ -32,7 +32,9 @@ const METRIC_DISPLAY_NAMES = {
 	"ContentRegistry.load": "Content registry",
 	"ShipFactory.assemble": "Ship assembly",
 	"Ships.active_count": "Ships",
-	"Camera.update": "Camera"
+	"Camera.update": "Camera",
+	"StarField.generate": "Star field generation",
+	"StarField.star_count": "Stars"
 }
 
 func _input(event: InputEvent) -> void:

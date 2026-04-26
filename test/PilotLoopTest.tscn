@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://pilot_loop_test"]
+[gd_scene load_steps=4 format=3 uid="uid://pilot_loop_test"]
 
 [ext_resource type="Script" path="res://test/PilotLoopTest.gd" id="1"]
 [ext_resource type="Script" path="res://gameplay/camera/GameCamera.gd" id="2"]
+[ext_resource type="PackedScene" path="res://gameplay/world/StarField.tscn" id="3"]
 
 [node name="PilotLoopTest" type="Node3D"]
 script = ExtResource("1")
@@ -14,3 +15,5 @@ script = ExtResource("2")
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 200, 0)
 light_energy = 1.5
 shadow_enabled = true
+
+[node name="StarField" parent="." instance=ExtResource("3")]

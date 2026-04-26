@@ -40,5 +40,15 @@
     "lifetime": 3.5,
     "speed_min": 40.0,
     "speed_max": 160.0
+  },
+
+  "star_field": {
+    "star_count": 8000,
+    "spread_xz": 150000.0,
+    "spread_y": 8000.0,
+    "point_size": 2.0,
+    "brightness_min": 0.2,
+    "brightness_max": 1.0,
+    "seed": 42
   }
 }

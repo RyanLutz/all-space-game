@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://star_field_scene"]
+
+[ext_resource type="Script" path="res://gameplay/world/StarField.gd" id="1_abcd1"]
+[ext_resource type="Shader" path="res://gameplay/world/star_field.gdshader" id="2_abcd2"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_starfield"]
+render_priority = 0
+shader = ExtResource("2_abcd2")
+shader_parameter/point_size = 2.0
+
+[node name="StarField" type="Node3D"]
+script = ExtResource("1_abcd1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+material_override = SubResource("ShaderMaterial_starfield")
