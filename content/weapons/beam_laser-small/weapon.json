@@ -20,6 +20,11 @@
 
 	"effects": {
 		"muzzle_flash": "muzzle_beam_ignite",
-		"beam": "beam_laser_blue"
+		"beam": "beam_laser_red"
+	},
+
+	"visual": {
+		"beam_alpha": 1.0,
+		"linger_duration": 0.15
 	}
 }

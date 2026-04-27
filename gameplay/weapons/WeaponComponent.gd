@@ -25,6 +25,10 @@ var component_damage_ratio: float = 0.1
 var _fire_cooldown: float = 0.0
 var _is_firing_beam: bool = false
 
+# Pulse beam burst state (energy_pulse uses BeamRenderer for brief bursts)
+var _pulse_beam_timer: float = 0.0
+var _pulse_beam_duration: float = 0.08
+
 # ─── References ──────────────────────────────────────────────────────────────
 var hardpoint: Node = null
 var _event_bus: Node = null
@@ -32,11 +36,16 @@ var _perf: Node = null
 var _muzzle_flash: MuzzleFlashPlayer = null
 var _beam_renderer: BeamRenderer = null
 
+# Beam visual endpoint tracking (filled by hitscan_resolved from ProjectileManager)
+var _has_beam_endpoint: bool = false
+var _last_beam_endpoint: Vector3 = Vector3.ZERO
+
 
 func _ready() -> void:
 	var service_locator := Engine.get_singleton("ServiceLocator")
 	_event_bus = service_locator.GetService("GameEventBus")
 	_perf = service_locator.GetService("PerformanceMonitor")
+	_event_bus.hitscan_resolved.connect(_on_hitscan_resolved)
 	call_deferred("_discover_vfx_players")
 
 
@@ -55,6 +64,24 @@ func _process(delta: float) -> void:
 	# Update cooldown
 	if _fire_cooldown > 0.0:
 		_fire_cooldown -= delta
+
+	# Update active pulse beam visual
+	if _pulse_beam_timer > 0.0:
+		_pulse_beam_timer -= delta
+		if _beam_renderer != null:
+			var from := get_muzzle_pos()
+			var to: Vector3
+			if _has_beam_endpoint:
+				to = _last_beam_endpoint
+			else:
+				var aim_dir: Vector3 = hardpoint.get_aim_direction()
+				aim_dir.y = 0.0
+				aim_dir = aim_dir.normalized()
+				to = from + aim_dir * range_val
+			_beam_renderer.update(from, to)
+		if _pulse_beam_timer <= 0.0 and _beam_renderer != null:
+			_beam_renderer.stop()
+			_has_beam_endpoint = false
 
 	# Check if we should be firing
 	var should_fire: bool = hardpoint.should_fire(hardpoint.owner_ship.input_fire)
@@ -122,8 +149,19 @@ func _fire_pulse(should_fire: bool) -> void:
 	if hardpoint.is_overheated:
 		return
 
-	# Fire hitscan
+	# Fire hitscan (resolves actual endpoint via hitscan_resolved signal)
 	_fire_hitscan()
+
+	# Trigger beam burst visual
+	_pulse_beam_timer = _pulse_beam_duration
+	if _beam_renderer != null:
+		var from := get_muzzle_pos()
+		var aim_dir: Vector3 = hardpoint.get_aim_direction()
+		aim_dir.y = 0.0
+		aim_dir = aim_dir.normalized()
+		var to := from + aim_dir * range_val
+		_beam_renderer.update(from, to)
+
 	if _muzzle_flash != null:
 		_muzzle_flash.play()
 
@@ -141,12 +179,14 @@ func _fire_beam(should_fire: bool, delta: float) -> void:
 		if _is_firing_beam and _beam_renderer != null:
 			_beam_renderer.stop()
 		_is_firing_beam = false
+		_has_beam_endpoint = false
 		return
 
 	if hardpoint.is_overheated:
 		if _is_firing_beam and _beam_renderer != null:
 			_beam_renderer.stop()
 		_is_firing_beam = false
+		_has_beam_endpoint = false
 		return
 
 	# Check power (continuous drain)
@@ -155,6 +195,7 @@ func _fire_beam(should_fire: bool, delta: float) -> void:
 		if _is_firing_beam and _beam_renderer != null:
 			_beam_renderer.stop()
 		_is_firing_beam = false
+		_has_beam_endpoint = false
 		return
 
 	# Apply heat (continuous)
@@ -163,13 +204,17 @@ func _fire_beam(should_fire: bool, delta: float) -> void:
 	# Fire hitscan every frame
 	_fire_hitscan_beam(delta)
 
-	# Update beam visual
+	# Update beam visual using actual hitscan endpoint (via hitscan_resolved signal)
 	if _beam_renderer != null:
 		var from := get_muzzle_pos()
-		var aim_dir: Vector3 = hardpoint.get_aim_direction()
-		aim_dir.y = 0.0
-		aim_dir = aim_dir.normalized()
-		var to := from + aim_dir * range_val
+		var to: Vector3
+		if _has_beam_endpoint:
+			to = _last_beam_endpoint
+		else:
+			var aim_dir: Vector3 = hardpoint.get_aim_direction()
+			aim_dir.y = 0.0
+			aim_dir = aim_dir.normalized()
+			to = from + aim_dir * range_val
 		_beam_renderer.update(from, to)
 
 	if not _is_firing_beam:
@@ -298,7 +343,8 @@ func _fire_hitscan() -> void:
 		aim_dir,
 		range_val,
 		weapon_id,
-		hardpoint.owner_ship.get_instance_id()
+		hardpoint.owner_ship.get_instance_id(),
+		hardpoint.hardpoint_id
 	)
 
 
@@ -316,8 +362,27 @@ func _fire_hitscan_beam(_delta: float) -> void:
 		aim_dir,
 		range_val,
 		weapon_id,
-		hardpoint.owner_ship.get_instance_id()
+		hardpoint.owner_ship.get_instance_id(),
+		hardpoint.hardpoint_id
 	)
+
+
+# ─── Hitscan Response ────────────────────────────────────────────────────────
+
+func _on_hitscan_resolved(origin: Vector3, end: Vector3, hit: bool,
+						  w_id: String, owner_id: int, hp_id: String) -> void:
+	if hardpoint == null or hardpoint.owner_ship == null:
+		return
+	if owner_id != hardpoint.owner_ship.get_instance_id():
+		return
+	if w_id != weapon_id:
+		return
+	if hp_id != hardpoint.hardpoint_id:
+		return
+	_last_beam_endpoint = end
+	_has_beam_endpoint = true
+	if hit and _beam_renderer != null:
+		_beam_renderer.trigger_hit_flash()
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────

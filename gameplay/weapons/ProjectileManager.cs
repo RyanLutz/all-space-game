@@ -16,11 +16,7 @@ public partial class ProjectileManager : Node3D
 {
 	[Export] public int DumbPoolCapacity = 1024;
 	[Export] public int DebugMeshCount = 128;  // Max simultaneously rendered projectile spheres
-	[Export] public int TracerPoolCapacity = 128;  // Max simultaneous hitscan tracers
 	[Export] public float ProjectileRenderRadius = 1.5f;
-	[Export] public float TracerWidth = 0.8f;
-	[Export] public float TracerLifetimePulse = 0.08f;
-	[Export] public float TracerLifetimeBeam = 0.05f;
 
 	// ── Dumb projectile pool ────────────────────────────────────────────
 
@@ -49,7 +45,9 @@ public partial class ProjectileManager : Node3D
 		public float Damage;
 		public float ComponentDamageRatio;
 		public string DamageType;
+		public string WeaponId;
 		public ulong OwnerEntityId;
+		public string HardpointId;
 	}
 
 	private readonly List<HitscanRequest> _hitscanQueue = new();
@@ -76,21 +74,6 @@ public partial class ProjectileManager : Node3D
 	private MultiMesh _projectileMultiMesh;
 	private MultiMeshInstance3D _multiMeshInstance;
 
-	private struct TracerEntry
-	{
-		public Vector3 Origin;
-		public Vector3 End;
-		public float Lifetime;
-		public float MaxLifetime;
-		public Color TintColor;
-		public bool Active;
-	}
-
-	private TracerEntry[] _tracerPool;
-	private int _activeTracerCount;
-	private MultiMesh _tracerMultiMesh;
-	private MultiMeshInstance3D _tracerInstance;
-
 	// ── Lifecycle ───────────────────────────────────────────────────────
 
 	public override void _Ready()
@@ -100,7 +83,6 @@ public partial class ProjectileManager : Node3D
 		_contentRegistry = global::AllSpace.ServiceLocator.Get("ContentRegistry");
 
 		_dumbPool = new DumbProjectile[DumbPoolCapacity];
-		_tracerPool = new TracerEntry[TracerPoolCapacity];
 
 		_eventBus.Connect("request_spawn_dumb",
 			new Callable(this, MethodName.OnRequestSpawnDumb));
@@ -109,7 +91,7 @@ public partial class ProjectileManager : Node3D
 
 		_setup_projectile_visuals();
 
-		GD.Print($"[ProjectileManager] Ready — dumb pool: {DumbPoolCapacity}, render: {DebugMeshCount}, tracers: {TracerPoolCapacity}");
+		GD.Print($"[ProjectileManager] Ready — dumb pool: {DumbPoolCapacity}, render: {DebugMeshCount}");
 	}
 
 	private void _setup_projectile_visuals()
@@ -131,26 +113,6 @@ public partial class ProjectileManager : Node3D
 			_projectileMultiMesh.SetInstanceTransform(i,
 				new Transform3D(Basis.Identity.Scaled(Vector3.Zero), Vector3.Zero));
 		}
-
-		// Pooled hitscan tracers (pulse, beam)
-		_tracerInstance = new MultiMeshInstance3D();
-		_tracerInstance.Name = "HitscanTracers";
-		_tracerInstance.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
-		AddChild(_tracerInstance);
-
-		_tracerMultiMesh = new MultiMesh();
-		_tracerMultiMesh.TransformFormat = MultiMesh.TransformFormatEnum.Transform3D;
-		_tracerMultiMesh.UseColors = true;
-		_tracerMultiMesh.Mesh = _create_tracer_mesh();
-		_tracerMultiMesh.InstanceCount = TracerPoolCapacity;
-		_tracerInstance.Multimesh = _tracerMultiMesh;
-
-		for (int i = 0; i < TracerPoolCapacity; i++)
-		{
-			_tracerMultiMesh.SetInstanceTransform(i,
-				new Transform3D(Basis.Identity.Scaled(Vector3.Zero), Vector3.Zero));
-			_tracerMultiMesh.SetInstanceColor(i, new Color(1, 1, 1, 0));
-		}
 	}
 
 	private Mesh _create_projectile_mesh()
@@ -171,24 +133,7 @@ public partial class ProjectileManager : Node3D
 		return sphere;
 	}
 
-	private Mesh _create_tracer_mesh()
-	{
-		// Unit cube centered at origin, 1 unit in Z. We scale per-instance:
-		// scale.z = length, translate to origin, rotate -Z → direction.
-		var box = new BoxMesh();
-		box.Size = new Vector3(TracerWidth, TracerWidth, 1.0f);
 
-		var mat = new StandardMaterial3D();
-		mat.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
-		mat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
-		mat.AlbedoColor = new Color(1, 1, 1, 1);
-		mat.EmissionEnabled = true;
-		mat.Emission = new Color(1, 1, 1);
-		mat.EmissionEnergyMultiplier = 2.5f;
-		mat.VertexColorUseAsAlbedo = true;
-		box.Material = mat;
-		return box;
-	}
 
 	public override void _PhysicsProcess(double delta)
 	{
@@ -211,7 +156,6 @@ public partial class ProjectileManager : Node3D
 		_perf.Call("set_count", "ProjectileManager.active_count", _activeDumbCount);
 
 		UpdateProjectileVisuals();
-		UpdateTracerVisuals(dt);
 	}
 
 	// ── Projectile/tracer visualization ────────────────────────────────
@@ -238,81 +182,7 @@ public partial class ProjectileManager : Node3D
 		}
 	}
 
-	private void UpdateTracerVisuals(float dt)
-	{
-		int active = 0;
-		for (int i = 0; i < _tracerPool.Length; i++)
-		{
-			ref var tr = ref _tracerPool[i];
-			if (!tr.Active)
-			{
-				_tracerMultiMesh.SetInstanceTransform(i,
-					new Transform3D(Basis.Identity.Scaled(Vector3.Zero), Vector3.Zero));
-				continue;
-			}
 
-			tr.Lifetime -= dt;
-			if (tr.Lifetime <= 0f)
-			{
-				tr.Active = false;
-				_tracerMultiMesh.SetInstanceTransform(i,
-					new Transform3D(Basis.Identity.Scaled(Vector3.Zero), Vector3.Zero));
-				continue;
-			}
-
-			float alpha = Mathf.Clamp(tr.Lifetime / tr.MaxLifetime, 0f, 1f);
-			_tracerMultiMesh.SetInstanceTransform(i, BuildTracerTransform(tr.Origin, tr.End));
-			var c = tr.TintColor;
-			c.A = alpha;
-			_tracerMultiMesh.SetInstanceColor(i, c);
-			active++;
-		}
-		_activeTracerCount = active;
-	}
-
-	private static Transform3D BuildTracerTransform(Vector3 origin, Vector3 end)
-	{
-		var delta = end - origin;
-		float length = delta.Length();
-		if (length < 0.001f)
-			return new Transform3D(Basis.Identity.Scaled(Vector3.Zero), origin);
-
-		var dir = delta / length;
-		// Unit box lies along -Z → we want forward = +dir. Use LookingAt from origin.
-		var mid = origin + delta * 0.5f;
-		mid.Y = 0.5f;
-
-		// Avoid parallel up vector if dir ≈ Y
-		var up = Mathf.Abs(dir.Dot(Vector3.Up)) > 0.99f ? Vector3.Forward : Vector3.Up;
-		var basis = Basis.LookingAt(-dir, up).Scaled(new Vector3(1f, 1f, length));
-		return new Transform3D(basis, mid);
-	}
-
-	private void SpawnTracer(Vector3 origin, Vector3 end, Color color, float lifetime)
-	{
-		for (int i = 0; i < _tracerPool.Length; i++)
-		{
-			if (_tracerPool[i].Active)
-				continue;
-			_tracerPool[i].Origin = new Vector3(origin.X, 0f, origin.Z);
-			_tracerPool[i].End = new Vector3(end.X, 0f, end.Z);
-			_tracerPool[i].Lifetime = lifetime;
-			_tracerPool[i].MaxLifetime = lifetime;
-			_tracerPool[i].TintColor = color;
-			_tracerPool[i].Active = true;
-			return;
-		}
-	}
-
-	private Color TracerColorFor(string archetype)
-	{
-		return archetype switch
-		{
-			"energy_beam" => new Color(0.4f, 1.0f, 0.6f, 1f),
-			"energy_pulse" => new Color(0.4f, 0.8f, 1.0f, 1f),
-			_ => new Color(1.0f, 0.85f, 0.3f, 1f),
-		};
-	}
 
 	// ── Dumb pool update ────────────────────────────────────────────────
 
@@ -437,11 +307,10 @@ public partial class ProjectileManager : Node3D
 				beamEnd = endPoint;
 			}
 
-			// Tracer VFX — brief visible line from muzzle to hit/endpoint
-			float tracerLife = req.DamageType == "energy_beam"
-				? TracerLifetimeBeam
-				: TracerLifetimePulse;
-			SpawnTracer(req.Origin, beamEnd, TracerColorFor(req.DamageType), tracerLife);
+			// Notify WeaponComponent of actual hitscan endpoint so beam visual can clamp correctly
+			_eventBus.EmitSignal("hitscan_resolved",
+				req.Origin, beamEnd, result.ContainsKey("collider"),
+				req.WeaponId, (long)req.OwnerEntityId, req.HardpointId);
 		}
 
 		_hitscanQueue.Clear();
@@ -512,7 +381,7 @@ public partial class ProjectileManager : Node3D
 	}
 
 	private void OnRequestFireHitscan(Vector3 origin, Vector3 direction,
-		double rangeVal, string weaponId, long ownerId)
+		double rangeVal, string weaponId, long ownerId, string hardpointId)
 	{
 		var weaponData = GetOrCacheWeapon(weaponId);
 
@@ -524,7 +393,9 @@ public partial class ProjectileManager : Node3D
 			Damage = weaponData.Damage,
 			ComponentDamageRatio = weaponData.ComponentDamageRatio,
 			DamageType = weaponData.DamageType,
-			OwnerEntityId = (ulong)ownerId
+			WeaponId = weaponId,
+			OwnerEntityId = (ulong)ownerId,
+			HardpointId = hardpointId
 		});
 	}
 

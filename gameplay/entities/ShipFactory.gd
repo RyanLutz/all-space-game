@@ -306,12 +306,17 @@ func _attach_weapon(hp_node: Node3D, hardpoint: HardpointComponent, weapon_id: S
 	muzzle_player.effect_id = effects.get("muzzle_flash", "")
 	weapon_model.add_child(muzzle_player)
 
-	# BeamRenderer — energy_beam archetype only
-	if weapon_data.get("archetype", "") == "energy_beam":
+	# BeamRenderer — energy_beam and energy_pulse archetypes
+	if weapon_data.get("archetype", "") in ["energy_beam", "energy_pulse"]:
 		var beam_renderer := BeamRenderer.new()
 		beam_renderer.name = "BeamRenderer"
 		beam_renderer.effect_id = effects.get("beam", "")
 		weapon_model.add_child(beam_renderer)
+		# Apply weapon-specific visual overrides
+		var visual: Dictionary = weapon_data.get("visual", {})
+		var alpha: float = float(visual.get("beam_alpha", 1.0))
+		var linger: float = float(visual.get("linger_duration", 0.15))
+		beam_renderer.set_visual_params(alpha, linger)
 
 
 # ─── Name Resolution ────────────────────────────────────────────────────────

@@ -24,6 +24,12 @@
 	},
 
 	"effects": {
-		"muzzle_flash": "muzzle_pulse_laser"
+		"muzzle_flash": "muzzle_pulse_laser",
+		"beam": "beam_laser_blue"
+	},
+
+	"visual": {
+		"beam_alpha": 0.8,
+		"linger_duration": 0.08
 	}
 }

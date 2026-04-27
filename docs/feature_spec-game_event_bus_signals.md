@@ -54,7 +54,9 @@ signal projectile_spawned(position: Vector3, velocity: Vector3,
 signal request_spawn_dumb(position: Vector3, velocity: Vector3, lifetime: float,
                           weapon_id: String, owner_id: int)
 signal request_fire_hitscan(origin: Vector3, direction: Vector3, range_val: float,
-                            weapon_id: String, owner_id: int)
+                            weapon_id: String, owner_id: int, hardpoint_id: String)
+signal hitscan_resolved(origin: Vector3, end: Vector3, hit: bool,
+                        weapon_id: String, owner_id: int, hardpoint_id: String)
 signal request_spawn_guided(position: Vector3, velocity: Vector3,
                             guidance_mode: String, weapon_data: Dictionary,
                             owner_id: int)
@@ -140,7 +142,8 @@ receiver directly. The receiver owns the behavior; the sender owns the trigger.
 | Signal | Args | Emitted By | Listened By |
 |---|---|---|---|
 | `request_spawn_dumb` | `position: Vector3, velocity: Vector3, lifetime: float, weapon_id: String, owner_id: int` | WeaponComponent | ProjectileManager |
-| `request_fire_hitscan` | `origin: Vector3, direction: Vector3, range_val: float, weapon_id: String, owner_id: int` | WeaponComponent | ProjectileManager |
+| `request_fire_hitscan` | `origin: Vector3, direction: Vector3, range_val: float, weapon_id: String, owner_id: int, hardpoint_id: String` | WeaponComponent | ProjectileManager |
+| `hitscan_resolved` | `origin: Vector3, end: Vector3, hit: bool, weapon_id: String, owner_id: int, hardpoint_id: String` | ProjectileManager | WeaponComponent |
 | `request_spawn_guided` | `position: Vector3, velocity: Vector3, guidance_mode: String, weapon_data: Dictionary, owner_id: int` | WeaponComponent | GuidedProjectilePool |
 
 **`owner_id` note:** Pass `ship.get_instance_id()`. ProjectileManager uses this to

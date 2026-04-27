@@ -88,7 +88,7 @@ func spawn_effect(effect_id: String, position: Vector3, normal: Vector3 = Vector
 	var instance: GPUParticles3D = _pools[effect_id].acquire()
 	if instance == null:
 		return
-	position.y = 0.0
+	position.y = 0.5  # Lift above play plane for visibility from top-down
 	instance.global_position = position
 	instance.global_transform.basis = _basis_from_normal(normal)
 	instance.restart()

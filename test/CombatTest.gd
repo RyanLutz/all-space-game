@@ -381,8 +381,8 @@ func _spawn_player() -> void:
 	# Mixed loadout: port = autocannon (group 1), stbd = pulse laser (group 2)
 	var loadout := {
 		"weapons": {
-			"sharps_hp_wing_port": "autocannon_light",
-			"sharps_hp_wing_stbd": "pulse_laser"
+			"sharps_hp_wing_port": "pulse_laser",
+			"sharps_hp_wing_stbd": "beam_laser"
 		},
 		"fire_groups": {
 			"sharps_hp_wing_port": [1],   # Group 1 (LMB): kinetic — 1-based per JSON convention
@@ -504,7 +504,7 @@ func _on_request_spawn_dumb(pos: Vector3, velocity: Vector3, _lifetime: float, w
 	print("[CombatTest] REQUEST spawn dumb: %s at (%.1f, %.1f) vel=(%.1f, %.1f)" % [weapon_id, pos.x, pos.z, velocity.x, velocity.z])
 
 
-func _on_request_fire_hitscan(origin: Vector3, direction: Vector3, _range_val: float, weapon_id: String, _owner_id: int) -> void:
+func _on_request_fire_hitscan(origin: Vector3, direction: Vector3, _range_val: float, weapon_id: String, _owner_id: int, _hardpoint_id: String) -> void:
 	print("[CombatTest] REQUEST fire hitscan: %s from (%.1f, %.1f) dir=(%.1f, %.1f)" % [weapon_id, origin.x, origin.z, direction.x, direction.z])
 
 

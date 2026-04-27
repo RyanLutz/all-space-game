@@ -80,13 +80,14 @@ func _build_instance(def: Dictionary) -> GPUParticles3D:
 
 	p.process_material = mat
 
-	# Default mesh — small quad billboard placeholder; art pass replaces.
-	var mesh := QuadMesh.new()
-	mesh.size = Vector2(0.5, 0.5) * float(def.get("scale", 1.0))
+	# Default mesh — small box, visible from top-down camera.
+	# Art pass may replace with custom mesh.
+	var mesh := BoxMesh.new()
+	var box_scale: float = float(def.get("scale", 1.0))
+	mesh.size = Vector3(0.3, 0.3, 0.3) * box_scale
 	var draw_mat := StandardMaterial3D.new()
 	draw_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	draw_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	draw_mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	draw_mat.albedo_color = color_primary
 	draw_mat.emission_enabled = true
 	draw_mat.emission = Color(color_primary.r, color_primary.g, color_primary.b)
