@@ -1,12 +1,12 @@
-# Graph Report - /home/lutz/Projects/All Space  (2026-04-26)
+# Graph Report - /home/lutz/Projects/All Space  (2026-04-29)
 
 ## Corpus Check
-- 2 files · ~85,932 words
+- 2 files · ~85,166 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 301 nodes · 422 edges · 47 communities detected
-- Extraction: 66% EXTRACTED · 34% INFERRED · 0% AMBIGUOUS · INFERRED: 144 edges (avg confidence: 0.83)
+- 296 nodes · 412 edges · 47 communities detected
+- Extraction: 65% EXTRACTED · 35% INFERRED · 0% AMBIGUOUS · INFERRED: 144 edges (avg confidence: 0.83)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -60,10 +60,10 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `Decisions Log` - 23 edges
-2. `ProjectileManager` - 21 edges
-3. `Sci-Fi Anime Art Style` - 18 edges
-4. `Spaceship Interior Setting` - 18 edges
-5. `Holographic Display UI Elements` - 18 edges
+2. `Sci-Fi Anime Art Style` - 18 edges
+3. `Spaceship Interior Setting` - 18 edges
+4. `Holographic Display UI Elements` - 18 edges
+5. `ProjectileManager` - 16 edges
 6. `Pixel Art Style` - 10 edges
 7. `CLAUDE.md Project Context` - 7 edges
 8. `EscortQueue — Ordered Escort Ship IDs, Queue-Shared Stance, Away-on-Orders` - 7 edges
@@ -120,12 +120,12 @@ Cohesion: 0.12
 Nodes (31): Advanced Spacesuit, Backpack Gear, Circular Data Center Environment, Circular Engine Turbine, Cleanroom Environment, Female Engineer in Orange Jumpsuit, Female Engineer in Tan Jumpsuit, Engineer in White EVA Suit (+23 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.12
-Nodes (4): Node, Node3D, ProjectileManager, ServiceLocator
-
-### Community 3 - "Community 3"
 Cohesion: 0.23
 Nodes (26): Holographic Display UI Elements, Sci-Fi Anime Art Style, Spaceship Interior Setting, Captain Character 1 - Blonde Captain on Throne, Captain Character 2 - Red Lit Captain, Captain Character 3 - Purple Hair Captain, Captain Character 4 - White Hair Orange Eye Captain, Captain Character 5 - Silver Hair Green Hologram Captain (+18 more)
+
+### Community 3 - "Community 3"
+Cohesion: 0.13
+Nodes (4): Node, Node3D, ProjectileManager, ServiceLocator
 
 ### Community 4 - "Community 4"
 Cohesion: 0.1
@@ -165,11 +165,11 @@ Nodes (7): Canonical Metric Names — System.method format table, PerformanceMon
 
 ### Community 13 - "Community 13"
 Cohesion: 0.4
-Nodes (5): Content Architecture — Folder-Per-Item Under /content/, ContentRegistry — Scans /content at Startup, Indexes Ships/Weapons/Modules by Folder, PlayerState — Tracks Active Player Ship, Emits player_ship_changed, ShipFactory — spawn_ship(), Stat Resolution, Part Assembly, Hardpoint Discovery, Color Material, GuidedProjectilePool GDScript — Missile Steering via slerp, track_cursor/auto_lock/click_lock
+Nodes (5): Rationale: Height Zoom vs FOV Zoom — Constant Distortion, Natural Feel, Camera System — Perspective Follow, Cursor-Offset, Height Zoom, Camera Is Sibling of Game World — Never Child of Any Ship, Critically Damped Spring Follow — No Overshoot, No Oscillation, Delta-Time Correct, Camera Summary — Camera3D Perspective, Height Zoom, Never Child of Ship
 
 ### Community 14 - "Community 14"
 Cohesion: 0.4
-Nodes (5): Rationale: Height Zoom vs FOV Zoom — Constant Distortion, Natural Feel, Camera System — Perspective Follow, Cursor-Offset, Height Zoom, Camera Is Sibling of Game World — Never Child of Any Ship, Critically Damped Spring Follow — No Overshoot, No Oscillation, Delta-Time Correct, Camera Summary — Camera3D Perspective, Height Zoom, Never Child of Ship
+Nodes (5): Content Architecture — Folder-Per-Item Under /content/, ContentRegistry — Scans /content at Startup, Indexes Ships/Weapons/Modules by Folder, PlayerState — Tracks Active Player Ship, Emits player_ship_changed, ShipFactory — spawn_ship(), Stat Resolution, Part Assembly, Hardpoint Discovery, Color Material, GuidedProjectilePool GDScript — Missile Steering via slerp, track_cursor/auto_lock/click_lock
 
 ### Community 15 - "Community 15"
 Cohesion: 0.5
@@ -217,23 +217,23 @@ Nodes (2): Chunk Coordinate ↔ World Position — Vector2i Grid Coord → Vecto
 
 ### Community 26 - "Community 26"
 Cohesion: 1.0
-Nodes (2): Vertex Color Shader — R=Primary, G=Trim, B=Accent, A=Glow; Shared Material Per Ship, factions.json — color_scheme (primary/trim/accent/glow) + name_vocabulary
+Nodes (2): Momentum Inheritance — Projectiles Inherit Ship velocity at Spawn, ProjectileManager C# — Dumb Pool (DumbProjectile struct), Hitscan, Swept Raycast
 
 ### Community 27 - "Community 27"
 Cohesion: 1.0
-Nodes (2): Weapons Summary — JSON Stats, Damage Types, Heat Per Hardpoint, Power Per Ship, Weapons & Projectiles — Data-Driven, Dual Heat/Power Resources, Dual Pool
+Nodes (2): Vertex Color Shader — R=Primary, G=Trim, B=Accent, A=Glow; Shared Material Per Ship, factions.json — color_scheme (primary/trim/accent/glow) + name_vocabulary
 
 ### Community 28 - "Community 28"
 Cohesion: 1.0
-Nodes (2): Aim Direction Algorithm — slerp-Clamp to Arc for Gimbal/Partial Turret, Unconstrained Full Turret, Hardpoint Types — fixed (~5°), gimbal (~25°), partial_turret (~120°), full_turret (360°)
+Nodes (2): Weapons Summary — JSON Stats, Damage Types, Heat Per Hardpoint, Power Per Ship, Weapons & Projectiles — Data-Driven, Dual Heat/Power Resources, Dual Pool
 
 ### Community 29 - "Community 29"
 Cohesion: 1.0
-Nodes (2): Weapon Archetypes — Ballistic, Energy Beam, Energy Pulse, Dumb Missile, Guided Missile, Heat System — Per-Hardpoint heat_current, Overheat Lockout, Passive Cooling
+Nodes (2): Aim Direction Algorithm — slerp-Clamp to Arc for Gimbal/Partial Turret, Unconstrained Full Turret, Hardpoint Types — fixed (~5°), gimbal (~25°), partial_turret (~120°), full_turret (360°)
 
 ### Community 30 - "Community 30"
 Cohesion: 1.0
-Nodes (2): Momentum Inheritance — Projectiles Inherit Ship velocity at Spawn, ProjectileManager C# — Dumb Pool (DumbProjectile struct), Hitscan, Swept Raycast
+Nodes (2): Weapon Archetypes — Ballistic, Energy Beam, Energy Pulse, Dumb Missile, Guided Missile, Heat System — Per-Hardpoint heat_current, Overheat Lockout, Passive Cooling
 
 ### Community 31 - "Community 31"
 Cohesion: 1.0
@@ -310,15 +310,15 @@ Nodes (1): Debug Grid Texture
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 25`** (2 nodes): `Chunk Coordinate ↔ World Position — Vector2i Grid Coord → Vector3 World Origin`, `Deterministic RNG Seeded by Chunk Coord Hash — Same Coord = Same Content Every Visit`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 26`** (2 nodes): `Vertex Color Shader — R=Primary, G=Trim, B=Accent, A=Glow; Shared Material Per Ship`, `factions.json — color_scheme (primary/trim/accent/glow) + name_vocabulary`
+- **Thin community `Community 26`** (2 nodes): `Momentum Inheritance — Projectiles Inherit Ship velocity at Spawn`, `ProjectileManager C# — Dumb Pool (DumbProjectile struct), Hitscan, Swept Raycast`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 27`** (2 nodes): `Weapons Summary — JSON Stats, Damage Types, Heat Per Hardpoint, Power Per Ship`, `Weapons & Projectiles — Data-Driven, Dual Heat/Power Resources, Dual Pool`
+- **Thin community `Community 27`** (2 nodes): `Vertex Color Shader — R=Primary, G=Trim, B=Accent, A=Glow; Shared Material Per Ship`, `factions.json — color_scheme (primary/trim/accent/glow) + name_vocabulary`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 28`** (2 nodes): `Aim Direction Algorithm — slerp-Clamp to Arc for Gimbal/Partial Turret, Unconstrained Full Turret`, `Hardpoint Types — fixed (~5°), gimbal (~25°), partial_turret (~120°), full_turret (360°)`
+- **Thin community `Community 28`** (2 nodes): `Weapons Summary — JSON Stats, Damage Types, Heat Per Hardpoint, Power Per Ship`, `Weapons & Projectiles — Data-Driven, Dual Heat/Power Resources, Dual Pool`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 29`** (2 nodes): `Weapon Archetypes — Ballistic, Energy Beam, Energy Pulse, Dumb Missile, Guided Missile`, `Heat System — Per-Hardpoint heat_current, Overheat Lockout, Passive Cooling`
+- **Thin community `Community 29`** (2 nodes): `Aim Direction Algorithm — slerp-Clamp to Arc for Gimbal/Partial Turret, Unconstrained Full Turret`, `Hardpoint Types — fixed (~5°), gimbal (~25°), partial_turret (~120°), full_turret (360°)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 30`** (2 nodes): `Momentum Inheritance — Projectiles Inherit Ship velocity at Spawn`, `ProjectileManager C# — Dumb Pool (DumbProjectile struct), Hitscan, Swept Raycast`
+- **Thin community `Community 30`** (2 nodes): `Weapon Archetypes — Ballistic, Energy Beam, Energy Pulse, Dumb Missile, Guided Missile`, `Heat System — Per-Hardpoint heat_current, Overheat Lockout, Passive Cooling`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 31`** (1 nodes): `Sim-Lite Physics — Mass, Momentum, Angular Inertia`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -357,7 +357,7 @@ Nodes (1): Debug Grid Texture
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `AI & Patrol Behavior — State Machine, JSON Profiles, NavigationController` connect `Community 4` to `Community 6`?**
-  _High betweenness centrality (0.015) - this node is a cross-community bridge._
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
 - **Are the 18 inferred relationships involving `Sci-Fi Anime Art Style` (e.g. with `Navigator Character 6 - Star Map Navigator` and `Navigator Character 7 - Dark Lit Navigator`) actually correct?**
   _`Sci-Fi Anime Art Style` has 18 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 18 inferred relationships involving `Spaceship Interior Setting` (e.g. with `Navigator Character 6 - Star Map Navigator` and `Navigator Character 7 - Dark Lit Navigator`) actually correct?**
