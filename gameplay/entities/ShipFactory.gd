@@ -65,7 +65,7 @@ func spawn_ship(
 
 	var parts_path: String = _content_registry.get_asset_path(class_data, "parts")
 	if not parts_path.is_empty() and FileAccess.file_exists(parts_path):
-		_assemble_parts(ship_visual, variant_data, parts_path)
+		_assemble_parts(ship, ship_visual, variant_data, parts_path)
 	else:
 		push_warning("ShipFactory: no parts.glb found for %s" % class_id)
 
@@ -178,13 +178,14 @@ func _resolve_stats(class_data: Dictionary, variant_id: String) -> Dictionary:
 
 # ─── Part Assembly ──────────────────────────────────────────────────────────
 
-func _assemble_parts(ship_visual: Node3D, variant_data: Dictionary, parts_path: String) -> void:
+func _assemble_parts(ship: RigidBody3D, ship_visual: Node3D, variant_data: Dictionary, parts_path: String) -> void:
 	var parts_scene: PackedScene = load(parts_path)
 	if parts_scene == null:
 		push_error("ShipFactory: failed to load parts from %s" % parts_path)
 		return
 
 	var parts_root := parts_scene.instantiate()
+	var has_per_part_collision := false
 
 	for category in variant_data["parts"]:
 		var node_name: String = variant_data["parts"][category]
@@ -194,7 +195,46 @@ func _assemble_parts(ship_visual: Node3D, variant_data: Dictionary, parts_path: 
 			continue
 		ship_visual.add_child(part_node.duplicate())
 
+		# Look for matching -colonly collision mesh
+		var col_name := node_name + "-colonly"
+		var col_node := parts_root.find_child(col_name, true, false)
+		if col_node != null:
+			_extract_and_attach_collision(ship, col_node, category)
+			has_per_part_collision = true
+
 	parts_root.queue_free()
+
+	# Remove placeholder collision if we have per-part collisions
+	if has_per_part_collision:
+		var placeholder_col := ship.get_node_or_null("CollisionShape3D")
+		if placeholder_col != null:
+			placeholder_col.queue_free()
+
+
+func _extract_and_attach_collision(ship: RigidBody3D, col_node: Node, category: String) -> void:
+	# -colonly exports as StaticBody3D with CollisionShape3D child
+	# Extract the CollisionShape3D and attach directly to RigidBody3D
+	var collision_shape: CollisionShape3D = null
+
+	if col_node is CollisionShape3D:
+		collision_shape = col_node.duplicate() as CollisionShape3D
+	elif col_node is StaticBody3D or col_node is Node3D:
+		# Find CollisionShape3D inside the imported node
+		for child in col_node.get_children():
+			if child is CollisionShape3D:
+				collision_shape = child.duplicate() as CollisionShape3D
+				break
+
+	if collision_shape == null:
+		push_warning("ShipFactory: no CollisionShape3D found in '%s'" % col_node.name)
+		return
+
+	collision_shape.name = "CollisionShape3D_" + category
+	ship.add_child(collision_shape)
+	collision_shape.owner = ship
+
+	# Store part category on the shape for hit resolution
+	collision_shape.set_meta("part_category", category)
 
 
 # ─── Hardpoint Discovery ────────────────────────────────────────────────────
