@@ -16,6 +16,7 @@ config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
+
 PerformanceMonitor="*res://core/services/PerformanceMonitor.gd"
 ServiceLocator="*res://core/services/ServiceLocator.cs"
 GameBootstrap="*res://core/GameBootstrap.gd"
