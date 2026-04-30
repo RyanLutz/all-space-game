@@ -566,3 +566,22 @@ Decision:
 - None. All implementation follows phase_plan-combat_vfx.md Session 2 spec.
 
 Spec updated: no — spec unchanged; build status updated in agent_brief.md
+
+---
+
+## 2026-04-29 — Per-part `-colonly` collision from parts GLB
+
+Agent:   Cursor agent (Composer)
+System:  ShipFactory / ship collision
+Spec:    feature_spec-ship_system.md §5 Parts GLB Structure (collision not previously specified)
+Problem:  Single placeholder `BoxShape3D` on `Ship.tscn` did not match variant part silhouettes;
+          author wanted collision authored in Blender alongside meshes (`appendage_*-colonly`).
+Decision:  At spawn, for each variant part node `name`, look up `name-colonly` in the loaded
+           parts scene; duplicate its `CollisionShape3D` (or extract from imported StaticBody3D
+           wrapper) and parent under the ship `RigidBody3D`; name `CollisionShape3D_<category>`;
+           `set_meta("part_category", category)` for future component damage. If any `-colonly`
+           is present, `queue_free()` the scene’s default `CollisionShape3D`. Projectile hits
+           still resolve `apply_damage` on the body — no per-part damage in this change.
+           Committed: `ShipFactory.gd`, `content/ships/axum-fighter-1/parts.glb`,
+           `assets/blender/axum-light-craft.glb`, graphify-out refresh.
+Spec updated:  pending — document `-colonly` naming and factory behavior in ship system spec
