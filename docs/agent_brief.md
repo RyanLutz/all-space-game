@@ -146,6 +146,7 @@ a new pattern, or requires updating a spec — flag it rather than deciding your
 | `docs/agent_brief.md` | This file — agent context, build status, deviation protocol |
 | `docs/decisions_log.md` | Full history of decisions and spec deviations |
 | `docs/feature_spec-*.md` | Per-system specifications |
+| `docs/SYSTEMS.md` | Systems lookup — build step → spec, JSON ownership, PerformanceMonitor metrics |
 | `data/` | Global config JSON (damage types, AI profiles, world config, factions) |
 | `content/` | Per-item content folders (ships, weapons, modules) |
 | `core/` | Bootstrap, GameEventBus, ServiceLocator |
