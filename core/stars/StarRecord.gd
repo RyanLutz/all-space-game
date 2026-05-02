@@ -19,7 +19,9 @@ var light_range: float        # OmniLight3D range (world units); = radius * ligh
 
 # ─── Runtime State (mutated by StarRegistry) ────────────────────────────────
 var lod_state: int = 0        # 0 = point (MultiMesh), 1 = glow (screen-pass), 2 = mesh
-var mesh_node: Node3D = null  # Non-null only when LOD 2 mesh is spawned
+var lod_prev_state: int = 0   # LOD state before the most recent transition; drives crossfade direction
+var blend_alpha: float = 1.0  # Crossfade progress: 0.0=just entered new LOD, 1.0=fully settled
+var mesh_node: Node3D = null  # Non-null only when LOD 2 mesh is spawned (or fading out)
 
 # ─── Destination Stars Only ──────────────────────────────────────────────────
 var faction_id: StringName = &""

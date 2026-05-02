@@ -26,6 +26,9 @@ uniform float flow_speed      : hint_range(0.0,  1.0) = 0.05;
 uniform float rotation_speed  : hint_range(-1.0, 1.0) = 0.0;
 uniform float brightness      : hint_range(0.0,  4.0) = 1.4;
 uniform float contrast        : hint_range(0.5,  4.0) = 1.6;
+// LOD 1→2 crossfade: driven by StarRegistry each frame (0=invisible, 1=fully visible).
+// Default 1.0 so the shader is correct when previewed outside StarRegistry.
+uniform float blend_alpha     : hint_range(0.0, 1.0)  = 1.0;
 
 // Object-local normalized direction from sphere center. Stable across camera
 // motion; only TIME drives the noise field.
@@ -104,5 +107,6 @@ void fragment() {
 
 	ALBEDO   = col;
 	EMISSION = col;
-	ALPHA    = layer_alpha;
+	// mix() crossfade: blend_alpha drives the LOD 1→2 spawn fade-in / LOD 2→1 despawn fade-out.
+	ALPHA    = mix(0.0, layer_alpha, blend_alpha);
 }

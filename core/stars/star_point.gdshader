@@ -47,5 +47,8 @@ void fragment() {
 	float glow = 1.0 - smoothstep(0.1, 1.0, d);
 
 	ALBEDO = INSTANCE_CUSTOM.rgb;
-	ALPHA  = INSTANCE_CUSTOM.a * glow;
+	// INSTANCE_CUSTOM.a carries the LOD 0 crossfade weight (set by StarRegistry._update_multimesh()).
+	// 1.0 = fully visible; fades toward 0 as the star transitions to the LOD 1 screen-pass.
+	// mix() is the spec-required crossfade idiom — avoids hard pop at the LOD 0→1 boundary.
+	ALPHA  = mix(0.0, glow, INSTANCE_CUSTOM.a);
 }

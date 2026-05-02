@@ -49,6 +49,8 @@ func configure(record: StarRecord, mesh_cfg: Dictionary) -> void:
 	_configure_corona(record, mesh_cfg)
 	_configure_light(record, mesh_cfg)
 	_configure_exclusion(record)
+	# Start invisible — StarRegistry drives blend_alpha 0→1 over lod_crossfade_frames.
+	set_blend_alpha(0.0)
 
 
 # ─── Layer configuration ─────────────────────────────────────────────────────
@@ -185,3 +187,17 @@ func _on_exclusion_body_entered(body: Node3D) -> void:
 
 func get_star_id() -> int:
 	return _star_id
+
+
+## Set the crossfade blend weight on all four layer materials simultaneously.
+## Called by StarRegistry every frame during LOD transitions:
+##   - 0.0 = invisible (just spawned or fully despawning)
+##   - 1.0 = fully visible (transition complete)
+## Corresponds to `blend_alpha` uniforms in star_surface.gdshader and
+## star_corona.gdshader, which use mix(0, layer_alpha/a, blend_alpha).
+func set_blend_alpha(alpha: float) -> void:
+	var a := clampf(alpha, 0.0, 1.0)
+	(_core.get_surface_override_material(0)       as ShaderMaterial).set_shader_parameter("blend_alpha", a)
+	(_atmo_inner.get_surface_override_material(0) as ShaderMaterial).set_shader_parameter("blend_alpha", a)
+	(_atmo_outer.get_surface_override_material(0) as ShaderMaterial).set_shader_parameter("blend_alpha", a)
+	(_corona.get_surface_override_material(0)     as ShaderMaterial).set_shader_parameter("blend_alpha", a)

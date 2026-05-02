@@ -860,3 +860,60 @@ Spec:    feature_spec-ui_design.md
 - None from spec intent. Corner-clip impl deferred by design (spec anticipates this).
 
 Spec updated: no — spec unchanged; build status updated in agent_brief.md
+
+---
+
+## 2026-05-02 — Star System Phase 5: LOD Crossfade + Performance Validation
+
+Agent:   Claude Sonnet (Cursor)
+System:  StarRegistry / StarMesh / star shaders
+Spec:    feature_spec-star_system.md § "LOD Crossfade", § "Performance Instrumentation"
+Problem: LOD 0→1 and LOD 1→2 transitions produced a visible brightness/geometry pop.
+         `lod_update` hot path called `distance_to()` (sqrt) for all 3000 stars per frame.
+         `screen_pass_count` could exceed 200 with no culling, wasting shader iterations.
+
+Decision:
+
+### `StarRecord` additions
+- `blend_alpha: float = 1.0` — progress of settling into current `lod_state`
+  (0.0 = just entered, 1.0 = fully settled).
+- `lod_prev_state: int = 0` — LOD before the most recent transition; drives which
+  representation is fading out.
+
+### Crossfade state machine (StarRegistry._update_lod)
+- On LOD change: set `blend_alpha = 0.0`, `lod_prev_state = old state`.
+- Each frame: advance `blend_alpha += 1.0 / lod_crossfade_frames`; mark dirty.
+- LOD 2 mesh spawns invisible (`StarMesh.configure()` calls `set_blend_alpha(0.0)`).
+- LOD 2 despawn is **delayed**: mesh fades out over `lod_crossfade_frames` frames
+  before `queue_free()` — eliminates the hard pop when leaving close range.
+- Stars transitioning LOD 1→0 remain in `_screen_pass_stars` until fade-out completes.
+
+### Crossfade weight routing
+- `_compute_screen_pass_weight()` encodes blend direction per transition pair and
+  packs the result into `_u_color[i].w` (formerly `star.color.a`, always 1.0).
+- LOD 0 point alpha uses `INSTANCE_CUSTOM.a`; `_update_multimesh()` writes
+  `blend_alpha` (fade in) or `1 - blend_alpha` (fade out) into it each dirty frame.
+
+### mix() in all four shaders
+- `star_point.gdshader`: `ALPHA = mix(0.0, glow, INSTANCE_CUSTOM.a)`
+- `star_screen_pass.gdshader`: `mix(0.0, glow * intensity, star_color[i].a)`
+- `star_surface.gdshader`: `ALPHA = mix(0.0, layer_alpha, blend_alpha)`
+- `star_corona.gdshader`: `ALPHA = mix(0.0, a, blend_alpha)`
+
+### Performance optimisation
+- Replaced `distance_to()` with `distance_squared_to()` + pre-computed squared
+  thresholds (`_lod1_distance_sq`, `_lod2_spawn_distance_sq`) — eliminates
+  3000 sqrt() calls per frame, the primary budget driver.
+
+### Frustum-cull stub
+- `_frustum_cull_screen_pass_stars()` runs only when `screen_pass_stars.size() > 200`.
+- Simple half-space cull: remove stars where `(pos - cam).dot(cam_forward) < 0`.
+- Full six-plane frustum cull deferred to Phase 6.
+
+### All four overlay metrics confirmed
+`StarRegistry.lod_update`, `StarRegistry.generate`,
+`StarRegistry.active_meshes`, `StarRegistry.screen_pass_count`
+all wired with `PerformanceMonitor.begin/end/set_count`.
+
+Spec updated: yes — `lod_update` and crossfade sections already describe Phase 5 intent;
+build status updated in agent_brief.md and development_guide.md.

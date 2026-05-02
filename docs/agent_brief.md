@@ -95,6 +95,7 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 21 | Star System — Phase 2 (LOD 1 fullscreen-quad screen-pass glow shader, `_update_shader_uniforms`, closest-N cap, camera-attach lifecycle) | Implemented |
 | 22 | Star System — Phase 3 (LOD 2 `StarMesh.tscn`, `star_surface.gdshader`, `star_corona.gdshader`, `_spawn_mesh` lifecycle, `StarRecord.light_range`, backdrop-clamp fix, `galaxy.star_mesh` tunables) | Implemented |
 | 23 | Star System — Phase 4 (`star_exclusion_entered` signal in GameEventBus, `StarMesh` ExclusionArea live, collision_mask=1, body_entered handler filters to Ship, emits signal) | Implemented |
+| 24 | Star System — Phase 5 (per-star `blend_alpha` + `lod_prev_state` on `StarRecord`; `mix()` crossfade in `star_point.gdshader`, `star_screen_pass.gdshader`, `star_surface.gdshader`, `star_corona.gdshader`; delayed LOD 2 despawn; frustum-cull stub at >200 screen-pass stars; `distance_squared_to()` perf optimisation; all four `StarRegistry.*` metrics) | Implemented |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 
@@ -164,7 +165,16 @@ The most recent decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-05-02 — Star System Phase 4: ExclusionArea wired** —
+1. **2026-05-02 — Star System Phase 5: LOD crossfade + perf** —
+   `StarRecord` gains `blend_alpha` (0→1 settling progress) and `lod_prev_state`.
+   `StarRegistry._update_lod()` drives crossfade: delayed mesh despawn (LOD 2→1
+   fades out over `lod_crossfade_frames` before queue_free), per-star
+   `_compute_screen_pass_weight()` packed into `_u_color[i].w`.
+   `distance_squared_to()` replaces `distance_to()` (eliminates 3000 sqrt/frame).
+   Frustum-cull stub fires when `screen_pass_count > 200` (half-space dot product).
+   `mix()` used in all four shaders: `star_point`, `star_screen_pass`,
+   `star_surface`, `star_corona`. All four `StarRegistry.*` metrics in overlay.
+2. **2026-05-02 — Star System Phase 4: ExclusionArea wired** —
    `star_exclusion_entered(star_id: int, ship_id: int)` added to
    `GameEventBus.gd`. `StarMesh._configure_exclusion()` enables
    `monitoring = true`, `collision_mask = 1` (ship layer),

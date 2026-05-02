@@ -117,8 +117,12 @@ void fragment() {
 		float halo = 1.0 - smoothstep(core_radius, 1.0,         t);
 		float glow = core + halo * 0.4;
 
-		rgb   += star_color[i].rgb * glow * star_color[i].a * intensity;
-		alpha = max(alpha, glow);
+		// star_color[i].a carries the per-star crossfade blend weight set by
+		// StarRegistry._compute_screen_pass_weight(): 0=fading out, 1=fully visible.
+		// mix() is the spec-required crossfade idiom (same pattern as the LOD 0 shader).
+		float weighted_glow = mix(0.0, glow * intensity, star_color[i].a);
+		rgb   += star_color[i].rgb * weighted_glow;
+		alpha = max(alpha, weighted_glow);
 	}
 
 	ALBEDO = rgb;
