@@ -1,0 +1,109 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://core/stars/StarMesh.gd" id="1_starmesh"]
+[ext_resource type="Shader" path="res://core/stars/star_surface.gdshader" id="2_surface"]
+[ext_resource type="Shader" path="res://core/stars/star_corona.gdshader" id="3_corona"]
+
+; ─── Mesh resources — placeholder sizes; StarMesh.gd duplicates and overwrites.
+[sub_resource type="SphereMesh" id="SphereMesh_core"]
+radius = 1.0
+height = 2.0
+radial_segments = 48
+rings = 32
+
+[sub_resource type="SphereMesh" id="SphereMesh_inner"]
+radius = 1.04
+height = 2.08
+radial_segments = 48
+rings = 32
+
+[sub_resource type="SphereMesh" id="SphereMesh_outer"]
+radius = 1.10
+height = 2.20
+radial_segments = 48
+rings = 32
+
+[sub_resource type="QuadMesh" id="QuadMesh_corona"]
+size = Vector2(1, 1)
+
+; ─── Shader materials — defaults match shader uniforms; StarMesh.gd duplicates and overrides per spawn.
+[sub_resource type="ShaderMaterial" id="SurfMat_core"]
+shader = ExtResource("2_surface")
+shader_parameter/base_color = Vector3(1, 0.5, 0.2)
+shader_parameter/layer_alpha = 1.0
+shader_parameter/noise_scale = 2.5
+shader_parameter/flow_speed = 0.05
+shader_parameter/rotation_speed = 0.02
+shader_parameter/brightness = 1.4
+shader_parameter/contrast = 1.6
+
+[sub_resource type="ShaderMaterial" id="SurfMat_inner"]
+shader = ExtResource("2_surface")
+shader_parameter/base_color = Vector3(1, 0.5, 0.2)
+shader_parameter/layer_alpha = 0.55
+shader_parameter/noise_scale = 1.7
+shader_parameter/flow_speed = 0.08
+shader_parameter/rotation_speed = 0.05
+shader_parameter/brightness = 1.4
+shader_parameter/contrast = 1.6
+
+[sub_resource type="ShaderMaterial" id="SurfMat_outer"]
+shader = ExtResource("2_surface")
+shader_parameter/base_color = Vector3(1, 0.5, 0.2)
+shader_parameter/layer_alpha = 0.30
+shader_parameter/noise_scale = 1.1
+shader_parameter/flow_speed = 0.03
+shader_parameter/rotation_speed = -0.03
+shader_parameter/brightness = 1.4
+shader_parameter/contrast = 1.6
+
+[sub_resource type="ShaderMaterial" id="CoronaMat"]
+shader = ExtResource("3_corona")
+shader_parameter/base_color = Vector3(1, 0.7, 0.3)
+shader_parameter/intensity = 1.8
+shader_parameter/inner_falloff = 0.18
+shader_parameter/outer_falloff = 1.0
+
+; ─── Scene tree ──────────────────────────────────────────────────────────────
+[node name="StarMesh" type="Node3D"]
+script = ExtResource("1_starmesh")
+
+[node name="Core" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+gi_mode = 0
+mesh = SubResource("SphereMesh_core")
+surface_material_override/0 = SubResource("SurfMat_core")
+
+[node name="AtmosphereInner" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+gi_mode = 0
+mesh = SubResource("SphereMesh_inner")
+surface_material_override/0 = SubResource("SurfMat_inner")
+
+[node name="AtmosphereOuter" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+gi_mode = 0
+mesh = SubResource("SphereMesh_outer")
+surface_material_override/0 = SubResource("SurfMat_outer")
+
+[node name="Corona" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+gi_mode = 0
+extra_cull_margin = 16384.0
+mesh = SubResource("QuadMesh_corona")
+surface_material_override/0 = SubResource("CoronaMat")
+
+[node name="StarLight" type="OmniLight3D" parent="."]
+light_color = Color(1, 1, 1, 1)
+light_energy = 2.0
+shadow_enabled = false
+omni_range = 4096.0
+omni_attenuation = 1.0
+
+[node name="ExclusionArea" type="Area3D" parent="."]
+monitoring = false
+monitorable = false
+collision_layer = 0
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="ExclusionArea"]

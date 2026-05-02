@@ -15,6 +15,7 @@ var radius: float             # Visual radius in world units
 var exclusion_radius: float   # Hard no-fly boundary (always >= radius)
 var color: Color              # Derived from star_type at generation time
 var light_energy: float       # OmniLight3D intensity when mesh is active
+var light_range: float        # OmniLight3D range (world units); = radius * light_range_multiplier
 
 # ─── Runtime State (mutated by StarRegistry) ────────────────────────────────
 var lod_state: int = 0        # 0 = point (MultiMesh), 1 = glow (screen-pass), 2 = mesh

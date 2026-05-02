@@ -77,6 +77,7 @@ class StarRecord:
     var exclusion_radius: float  # Hard no-fly boundary (always >= radius)
     var color: Color             # Derived from star_type at generation time
     var light_energy: float      # OmniLight3D intensity when mesh is active
+    var light_range: float       # OmniLight3D range; = radius * light_range_multiplier
     var lod_state: int           # 0=point, 1=glow, 2=mesh (runtime only)
     var mesh_node: Node3D        # null when not spawned (runtime only)
 
@@ -136,6 +137,16 @@ frame — never the previous physics tick. This means the glow tracks instantly 
 the camera rotates or moves; there is no lag from a CPU-passed view-projection
 uniform.
 
+**Depth occlusion — manual depth texture check.** Godot 4 Forward+ uses reversed-Z
+depth buffering (near = 1.0, far = 0.0, clear = 0.0). The implicit transparent-pass
+depth test does not reliably occlude the fullscreen quad in this configuration.
+The fragment stage samples `hint_depth_texture` at `SCREEN_UV` and discards any
+fragment where the depth value exceeds a small epsilon (`> 0.00001`): that indicates
+opaque scene geometry is present at this pixel. Empty sky returns the clear value
+(0.0), so star glows render freely in empty space. The vertex stage places the quad
+at `POSITION.z = 0.0001` (just inside the far plane in reversed-Z) rather than the
+original `0.999` which was valid only for standard forward-Z.
+
 **Per-frame star cap.** The shader's uniform array is fixed-size at 256 entries
 (matches `MAX_SCREEN_PASS_STARS` in `StarRegistry.gd`). When the visible list
 exceeds this cap, `StarRegistry` sorts by camera distance and keeps the closest N.
@@ -167,19 +178,48 @@ spawns a `StarMesh` node:
 
 ```
 StarMesh (Node3D)
-    ├── Core sphere (MeshInstance3D — opaque base color)
-    ├── Atmosphere layer 1 (MeshInstance3D — transparent, noise shader, slow rotation)
-    ├── Atmosphere layer 2 (MeshInstance3D — transparent, different noise, faster rotation)
-    ├── Corona billboard (MeshInstance3D — additive, camera-facing)
-    ├── OmniLight3D (color = star.color, energy = star.light_energy, range from data)
-    └── ExclusionArea (Area3D + SphereShape3D, radius = star.exclusion_radius)
+    ├── Core sphere       (MeshInstance3D — star_surface shader, layer_alpha=1.0, opaque)
+    ├── AtmosphereInner   (MeshInstance3D — star_surface shader, layer_alpha~0.55, blend_mix)
+    ├── AtmosphereOuter   (MeshInstance3D — star_surface shader, layer_alpha~0.30, counter-rotated)
+    ├── Corona            (MeshInstance3D — star_corona shader, billboard, blend_add)
+    ├── StarLight         (OmniLight3D — color, energy, range from StarRecord)
+    └── ExclusionArea     (Area3D + SphereShape3D — Phase 3 stub, monitoring=false; Phase 4 wires)
 ```
 
-The layered billboard approach produces a volumetric-looking plasma ball from any camera
-angle without true GPU volumetrics. The noise shader on each atmosphere layer is driven
-by a time uniform so the surface appears to roil.
+All three sphere layers share `star_surface.gdshader`; they differ only in
+`layer_alpha`, `flow_speed`, `noise_scale`, `rotation_speed` (counter-rotated
+atmospheres). The shader samples 3D fBm noise in object-local space so the
+plasma pattern is stable on the surface and only flows with `TIME`. Hot peaks
+are biased toward white-hot for the inverse-sunspot look.
+
+The corona is a single camera-facing `QuadMesh` running `star_corona.gdshader`
+(`blend_add`, `depth_draw_never`). Two-component falloff (tight bright core +
+wide soft halo) matches the LOD 1 screen-pass character so the LOD 1 → 2
+visual handoff stays continuous.
 
 Post-process bloom in Godot's `WorldEnvironment` amplifies the corona for free.
+
+`StarLight` is an `OmniLight3D` whose `omni_range` is precomputed at galaxy
+generation as `radius * light_range_multiplier` (per-star-type) and stored on
+the `StarRecord`. Close-range stars visibly tint the lighting on nearby
+ships, asteroids, and debris.
+
+The `ExclusionArea` has `monitoring = true`, `collision_mask = 1` (ship
+RigidBody3D default layer), `body_entered` connected to a handler that filters
+to `Ship` bodies and emits `GameEventBus.star_exclusion_entered(star_id,
+ship.get_instance_id())`. Boundary-force enforcement (repulsion on breach) is
+an integration point for the physics and navigation specs — they must listen to
+this signal. Backdrop stars never instantiate `StarMesh`, so they have no
+`ExclusionArea`.
+
+**LOD 2 + screen-pass coexistence.** A LOD-2 star also remains in the
+screen-pass list. The screen-pass quad lives at clip z = 0.0001 (far plane in
+reversed-Z) and the default depth test occludes it where scene geometry is
+present; the StarMesh's opaque core also occludes the screen-pass glow via
+the manual depth-texture check. The screen-pass contribution shows through only
+at the corona-only edge where no opaque depth was written. This makes LOD 1 → 2
+perceptually continuous without per-frame crossfade work (Phase 5 adds explicit
+alpha crossfade across the transition).
 
 ---
 
@@ -344,9 +384,43 @@ Prevents visible pops at transition boundaries.
     "glow_max_pixel_radius": 64.0,
     "glow_intensity": 1.5,
     "glow_core_radius": 0.15
+  },
+
+  "star_mesh": {
+    "core_radius_scale":      1.0,
+    "atmosphere_inner_scale": 1.04,
+    "atmosphere_outer_scale": 1.10,
+    "corona_scale":           3.5,
+
+    "surface_noise_scale":    2.5,
+    "surface_flow_speed":     0.05,
+    "surface_brightness":     1.4,
+    "surface_contrast":       1.6,
+    "atmosphere_inner_alpha": 0.55,
+    "atmosphere_outer_alpha": 0.30,
+    "atmosphere_inner_speed": 0.08,
+    "atmosphere_outer_speed": 0.03,
+
+    "corona_intensity":       1.8,
+    "corona_inner_falloff":   0.18,
+    "corona_outer_falloff":   1.0,
+
+    "light_attenuation":      1.0
   }
 }
 ```
+
+LOD 2 (`star_mesh`) tunables:
+- `core_radius_scale`, `atmosphere_inner_scale`, `atmosphere_outer_scale` —
+  per-layer sphere radius multipliers applied to `StarRecord.radius`.
+- `corona_scale` — corona quad size as a multiple of `radius`.
+- `surface_noise_scale`, `surface_flow_speed`, `surface_brightness`,
+  `surface_contrast` — base noise/animation parameters; `StarMesh.gd` derives
+  per-layer noise/flow factors from these and the `atmosphere_*_speed` keys.
+- `atmosphere_*_alpha` — translucency of each atmosphere layer.
+- `corona_intensity`, `corona_inner_falloff`, `corona_outer_falloff` — corona
+  shader uniforms; falloff radii are normalized in disc-space `[0, 1]`.
+- `light_attenuation` — `OmniLight3D.omni_attenuation`. `1.0` = inverse-square.
 
 Shared LOD 0 + LOD 1 tunable:
 - `min_pixel_radius` — floor on a star's apparent size in screen pixels. Bound to
@@ -399,10 +473,10 @@ climbs above ~200, investigate culling by frustum before passing to the shader.
 | `core/stars/StarRecord.gd` | Data class for a single star |
 | `core/stars/star_point.gdshader` | LOD 0 MultiMesh point/quad shader (Phase 1) |
 | `core/stars/star_screen_pass.gdshader` | LOD 1 fullscreen-quad glow shader; projects world pos via built-in matrices (Phase 2) |
-| `core/stars/StarMesh.tscn` | LOD 2 reusable scene: layered billboards + OmniLight3D + ExclusionArea (Phase 3) |
-| `core/stars/StarMesh.gd` | LOD 2 script: receives StarRecord, configures shaders and light (Phase 3) |
-| `core/stars/star_surface.gdshader` | LOD 2 noise-driven roiling plasma surface shader (Phase 3) |
-| `core/stars/star_corona.gdshader` | LOD 2 additive corona billboard shader (Phase 3) |
+| `core/stars/StarMesh.tscn` | LOD 2 reusable scene: 3 layered spheres + corona billboard + OmniLight3D + ExclusionArea stub (Phase 3) |
+| `core/stars/StarMesh.gd` | LOD 2 script: receives StarRecord + star_mesh tunable block, duplicates per-layer mesh and material, configures shaders and OmniLight (Phase 3) |
+| `core/stars/star_surface.gdshader` | LOD 2 noise-driven roiling plasma surface shader; object-local fBm; shared across all 3 sphere layers (Phase 3) |
+| `core/stars/star_corona.gdshader` | LOD 2 additive billboard corona shader; standard Godot 4 billboard idiom (Phase 3) |
 | `data/world_config.json` | `galaxy.*` block: seed, star types, LOD distances, screen-pass tunables |
 | `test/StarSystemTest.tscn` / `.gd` | Phase 2 verification scene: fly-cam, occluders, debug overlay |
 

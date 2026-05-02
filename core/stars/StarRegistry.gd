@@ -8,7 +8,7 @@ class_name StarRegistry
 ## LOD levels:
 ##   0 — MultiMesh point (all distances > lod1_distance)
 ##   1 — Screen-space glow pass (fullscreen MeshInstance3D quad child of camera)
-##   2 — StarMesh + OmniLight3D  [stub: implemented in Phase 3]
+##   2 — StarMesh + OmniLight3D (spawned per-star within lod2_spawn_distance)
 ##
 ## Never chunk-streamed. All star data is always resident.
 
@@ -50,6 +50,10 @@ var _multimesh: MultiMesh = null
 var _screen_pass_quad: MeshInstance3D = null
 var _screen_pass_material: ShaderMaterial = null
 
+# ─── Star Mesh (LOD 2) ───────────────────────────────────────────────────────
+const _STAR_MESH_SCENE := preload("res://core/stars/StarMesh.tscn")
+var _star_mesh_cfg: Dictionary = {}
+
 # Pre-allocated uniform buffers — re-assigned to the shader each frame to
 # avoid per-frame PackedVector4Array allocation churn.
 var _u_pos_radius: PackedVector4Array = PackedVector4Array()
@@ -82,6 +86,7 @@ func _ready() -> void:
 	_lod1_distance       = float(lod_cfg.get("lod1_distance",      80000.0))
 	_lod2_spawn_distance = float(lod_cfg.get("lod2_spawn_distance", 8000.0))
 	_load_screen_pass_config(lod_cfg)
+	_star_mesh_cfg = _config.get("star_mesh", {})
 
 	_perf.begin("StarRegistry.generate")
 	_catalog = _generate_catalog(_galaxy_seed, _config)
@@ -183,6 +188,11 @@ func _apply_type_stats(
 	var e_range: Array = type_data.get("light_energy_range", [1.0, 3.0])
 	record.light_energy = rng.randf_range(float(e_range[0]), float(e_range[1]))
 
+	# OmniLight3D range = visual radius × per-type multiplier. Read once at
+	# generation; LOD 2 spawn just copies it to the light node.
+	var range_mult: float = float(type_data.get("light_range_multiplier", 6.0))
+	record.light_range = record.radius * range_mult
+
 
 # ─── MultiMesh Setup (LOD 0) ──────────────────────────────────────────────────
 
@@ -227,21 +237,29 @@ func _update_lod(camera_pos: Vector3) -> void:
 		var dist := camera_pos.distance_to(star.position)
 		var new_lod: int
 
+		# Backdrop tier never reaches LOD 2 — clamp at 1 even when within
+		# lod2_spawn_distance so it stays a screen-space glow only.
 		if dist > _lod1_distance:
 			new_lod = 0
-		elif dist > _lod2_spawn_distance:
+		elif dist > _lod2_spawn_distance or star.tier == &"backdrop":
 			new_lod = 1
 		else:
-			if star.tier == &"backdrop":
-				continue
 			new_lod = 2
 
-		if new_lod != star.lod_state:
+		var prev_lod: int = star.lod_state
+		if new_lod != prev_lod:
+			# LOD 2 ↔ {0,1} requires mesh lifecycle — spawn or despawn before
+			# the state flip so the dirty flag accurately reflects rendering.
+			if prev_lod == 2 and new_lod != 2:
+				_despawn_mesh(star)
+			elif new_lod == 2 and prev_lod != 2:
+				_spawn_mesh(star)
 			star.lod_state = new_lod
-			_lod_dirty[i] = 1
+			_lod_dirty[i]  = 1
 
-			# Phase 3: _spawn_mesh / _despawn_mesh
-
+		# LOD 1 and LOD 2 both contribute to the screen-pass — at LOD 2 the
+		# screen-pass glow halos around the mesh corona; depth-test makes the
+		# opaque core occlude its own glow naturally.
 		if star.lod_state >= 1:
 			_screen_pass_stars.append(star)
 
@@ -357,10 +375,23 @@ func _update_shader_uniforms(camera_pos: Vector3) -> void:
 	_screen_pass_material.set_shader_parameter("star_color",     _u_color)
 
 
-# ─── Phase 3 Stubs ────────────────────────────────────────────────────────────
+# ─── LOD 2 Mesh Lifecycle ─────────────────────────────────────────────────────
 
-func _spawn_mesh(_star: StarRecord) -> void:
-	pass  # Implemented in Phase 3
+## Instantiates a StarMesh, configures it from the StarRecord and the cached
+## star_mesh tunable block, and parents it to this registry. Idempotent —
+## bails if a mesh is already present. Backdrop guard is upstream in
+## _update_lod(); no defensive check here.
+func _spawn_mesh(star: StarRecord) -> void:
+	if star.mesh_node != null and is_instance_valid(star.mesh_node):
+		return
+
+	var instance: Node3D = _STAR_MESH_SCENE.instantiate()
+	add_child(instance)
+	# add_child must run before configure() so the @onready vars resolve.
+	(instance as StarMesh).configure(star, _star_mesh_cfg)
+
+	star.mesh_node = instance
+	_active_mesh_count += 1
 
 
 func _despawn_mesh(star: StarRecord) -> void:

@@ -93,6 +93,8 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 || 19 | Pilot HUD (PilotHUD, Radar — five panels, hit flash, event subscriptions) | Implemented |
 | 20 | Star System — Phase 1 (StarRecord, StarRegistry skeleton, catalog generation, LOD 0 MultiMesh point shader, `world_config.galaxy` block) | Implemented |
 | 21 | Star System — Phase 2 (LOD 1 fullscreen-quad screen-pass glow shader, `_update_shader_uniforms`, closest-N cap, camera-attach lifecycle) | Implemented |
+| 22 | Star System — Phase 3 (LOD 2 `StarMesh.tscn`, `star_surface.gdshader`, `star_corona.gdshader`, `_spawn_mesh` lifecycle, `StarRecord.light_range`, backdrop-clamp fix, `galaxy.star_mesh` tunables) | Implemented |
+| 23 | Star System — Phase 4 (`star_exclusion_entered` signal in GameEventBus, `StarMesh` ExclusionArea live, collision_mask=1, body_entered handler filters to Ship, emits signal) | Implemented |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 
@@ -162,24 +164,29 @@ The most recent decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-05-01 — Star System Phase 2: LOD 1 screen-pass glow** —
-   `core/stars/star_screen_pass.gdshader` (spatial, NDC-direct vertex,
-   fragment iterates star uniform array using built-in
-   `PROJECTION_MATRIX * VIEW_MATRIX` so no rotation lag from CPU-passed VP
-   uniforms). `StarRegistry` gains `_setup_screen_pass()`,
-   `_attach_screen_pass_to_camera()`, `_update_shader_uniforms()`; quad is
-   parented to the active `Camera3D` once resolved. Per-frame star cap of
-   256 (`MAX_SCREEN_PASS_STARS`) with closest-N selection when exceeded;
-   frustum culling deferred to Phase 5. Depth_test left enabled (LESS) +
-   `depth_draw_never` so opaque ships occlude glow naturally and
-   transparent VFX still composites on top. Tunables in
-   `data/world_config.json` under `galaxy.lod` (`screen_pass_max_stars`,
-   `glow_*`). Phase 2 verification scene at `test/StarSystemTest.tscn`.
-   **Deviation**: spec called for SubViewport with no depth test; Godot
-   4.x `CanvasLayer.layer<-1` is broken (#67633), so the standard
-   fullscreen-3D-quad-with-depth-test idiom satisfies the spec's intent
-   ("stars appear behind scene geometry") without the SubViewport
-   round-trip. Spec rewritten to match implementation.
+1. **2026-05-02 — Star System Phase 4: ExclusionArea wired** —
+   `star_exclusion_entered(star_id: int, ship_id: int)` added to
+   `GameEventBus.gd`. `StarMesh._configure_exclusion()` enables
+   `monitoring = true`, `collision_mask = 1` (ship layer),
+   connects `body_entered` → handler filters to `Ship` bodies,
+   emits `star_exclusion_entered`. Backdrop guard remains upstream
+   in `StarRegistry._update_lod()`. Boundary-force enforcement
+   flagged as integration point for physics/nav specs.
+2. **2026-05-02 — Star System depth fix: reversed-Z occlusion** —
+   `star_screen_pass.gdshader` vertex z changed `0.999 → 0.0001`
+   (far plane in reversed-Z). Fragment adds `hint_depth_texture`
+   sample; discards where `depth > 0.00001` (geometry present).
+   Fixes stars painting in front of opaque objects.
+3. **2026-05-01 — Star System Phase 3: LOD 2 mesh** —
+   `StarMesh.tscn`, `star_surface.gdshader`, `star_corona.gdshader`,
+   `_spawn_mesh` lifecycle, `StarRecord.light_range`, backdrop-clamp
+   fix, `galaxy.star_mesh` JSON tunables block.
+4. **2026-05-01 — Star System Phase 2: LOD 1 screen-pass glow** —
+   `star_screen_pass.gdshader` fullscreen quad parented to Camera3D;
+   built-in `PROJECTION_MATRIX * VIEW_MATRIX` in fragment; 256-star
+   cap with closest-N selection; deviation from SubViewport spec
+   logged (Godot #67633).
+<!-- RECENT-DECISIONS-END -->
 2. **2026-04-29 — UI Session 2: Pilot HUD** —
    PilotHUD.gd (five panels: Mode Tag, Target Lock, Vessel Status, Weapon Systems, Radar;
    hit flash overlay). Radar.gd (custom _draw() sweep + enemy dots via scene group query).

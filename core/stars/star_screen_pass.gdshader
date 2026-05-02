@@ -30,13 +30,29 @@ uniform float max_pixel_radius : hint_range(8.0, 256.0) = 64.0;
 uniform float intensity        : hint_range(0.05,  8.0) = 1.5;
 uniform float core_radius      : hint_range(0.01,  0.5) = 0.15;
 
+// Manual depth occlusion. Godot 4 Forward+ uses reversed-Z, so the implicit
+// transparent-pass depth test does not reliably occlude this quad. We sample
+// the depth buffer explicitly instead.
+uniform sampler2D depth_texture : hint_depth_texture, repeat_disable, filter_nearest;
+
 void vertex() {
-	// QuadMesh.size = (2,2) → VERTEX.xy spans [-1, 1], i.e. full NDC.
-	// z = 0.999 puts us at the far plane so scene depth-test occludes us.
-	POSITION = vec4(VERTEX.xy, 0.999, 1.0);
+	// Godot 4 Forward+ reversed-Z: near = 1.0, far = 0.0.
+	// Place the quad at the far plane. Using 0.0001 rather than exactly 0.0
+	// avoids precision artefacts at the far clip boundary.
+	// The manual depth check in the fragment stage handles actual occlusion.
+	POSITION = vec4(VERTEX.xy, 0.0001, 1.0);
 }
 
 void fragment() {
+	// Godot 4 Forward+ reversed-Z depth buffer.
+	// Clear value = 0.0 (far/empty). Scene geometry writes depth > 0.
+	// Discard any fragment where opaque geometry is present — it is
+	// in front of the star glow. This replaces the implicit depth test,
+	// which does not reliably fire for transparent objects in reversed-Z.
+	if (texture(depth_texture, SCREEN_UV).r > 0.00001) {
+		discard;
+	}
+
 	vec3  rgb    = vec3(0.0);
 	float alpha  = 0.0;
 

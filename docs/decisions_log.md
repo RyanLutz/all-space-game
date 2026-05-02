@@ -15,6 +15,113 @@ Spec updated: yes / no / pending
 
 ---
 
+## 2026-05-02 — Star System Phase 4: ExclusionArea + star_exclusion_entered signal
+
+Agent:   Claude Sonnet (Cursor)
+System:  StarMesh / GameEventBus
+Spec:    feature_spec-star_system.md § "Exclusion Zone"
+Problem: Phase 3 left ExclusionArea.monitoring = false. Phase 4 wires it.
+Decision: Added `signal star_exclusion_entered(star_id: int, ship_id: int)` to
+         `GameEventBus.gd` (World section). In `StarMesh.gd _configure_exclusion()`:
+         `collision_mask = 1` (ships default to layer 1); `monitoring = true`;
+         `monitorable = false` (other areas don't need to detect this one);
+         `body_entered` connected to `_on_exclusion_body_entered`. The handler
+         checks `body is Ship` to filter out asteroids and debris sharing the
+         same collision layer, then emits
+         `_event_bus.star_exclusion_entered.emit(star_id, body.get_instance_id())`.
+         GameEventBus resolved via `ServiceLocator.GetService("GameEventBus")` in
+         `configure()`. Boundary-force enforcement is flagged as an integration
+         point for the physics and nav specs — this session delivers the emitter
+         only.
+Spec updated: yes — LOD 2 + ExclusionArea description updated to remove "Phase 3
+         stub" language; LOD 2 + screen-pass coexistence note updated for the
+         reversed-Z depth fix (z=0.0001, not z=0.999).
+
+---
+
+## 2026-05-02 — Star System Phase 2 depth fix: reversed-Z occlusion
+
+Agent:   Claude Sonnet (Cursor)
+System:  star_screen_pass.gdshader (LOD 1)
+Spec:    feature_spec-star_system.md § "LOD 1 — Screen-Space Glow"
+Problem: Stars (screen-pass glow) were rendering in front of opaque scene
+         geometry. Phase 2 placed the fullscreen quad at clip z = 0.999,
+         intending that to be "just inside the far plane" in standard forward-Z
+         (near=0, far=1). However, Godot 4 Forward+ uses reversed-Z (near=1,
+         far=0, clear=0). In reversed-Z, z=0.999 is near the NEAR plane,
+         not the far plane. The implicit transparent-pass depth test was
+         therefore unreliable for occlusion.
+Decision: Two changes to star_screen_pass.gdshader:
+         1. Vertex stage: POSITION.z changed from 0.999 to 0.0001 (just inside
+            the far plane in reversed-Z).
+         2. Fragment stage: add `uniform sampler2D depth_texture :
+            hint_depth_texture`. At the start of fragment(), sample the depth
+            buffer at SCREEN_UV; if the value > 0.00001 (geometry present —
+            reversed-Z scene objects write depth > 0, empty sky clears to 0),
+            discard immediately. This replaces the implicit depth test, which
+            is not reliable for transparent-pass objects in reversed-Z Godot 4.
+Spec updated: yes — feature_spec-star_system.md LOD 1 section updated with
+         "Depth occlusion — manual depth texture check" paragraph explaining
+         reversed-Z, the depth texture approach, and why z=0.999 was wrong.
+
+---
+
+## 2026-05-01 — Star System Phase 3: LOD 2 mesh, surface + corona shaders, light range plumbing
+
+Agent:   Claude Opus (Cursor) — Star System Phase 3 session
+System:  StarRegistry / StarMesh / star_surface + star_corona shaders (LOD 2)
+Spec:    feature_spec-star_system.md § "LOD 2 — Mesh + Light (close range)"
+Problem: Phase 2 left LOD 2 as a placeholder: `_spawn_mesh()` was a no-op,
+         `StarRecord` had no light range field, and there was no
+         `star_mesh` tunable block in `world_config.json`. Implementing Phase
+         3 also surfaced two design questions: (1) should the LOD 2 surface
+         and atmosphere layers reuse one shader or each have their own; (2)
+         should LOD-2 stars stay in the screen-pass list.
+Decision: Implemented LOD 2 as a single reusable `StarMesh.tscn` consisting
+         of three concentric `SphereMesh` `MeshInstance3D` layers (core +
+         two atmospheres) all running a shared `star_surface.gdshader`, plus
+         one billboarded `QuadMesh` running `star_corona.gdshader`, plus an
+         `OmniLight3D` and an `Area3D + SphereShape3D` exclusion stub.
+         `StarMesh.gd` is the configuration entry point — it duplicates the
+         per-layer SphereMesh and ShaderMaterial so per-layer parameters
+         (alpha, flow speed, rotation direction, noise scale) don't stomp
+         each other across simultaneously-spawned stars.
+         Surface shader uses object-local 3D fBm so the plasma pattern is
+         stable on the surface and only `TIME` advances it; hot peaks bias
+         toward white-hot for inverse-sunspot look. Corona shader uses the
+         standard Godot 4 billboard MODELVIEW idiom + two-component falloff
+         that mirrors the LOD 1 screen-pass character (continuous LOD 1 → 2
+         handoff). `OmniLight3D.omni_range` derived per star type from a new
+         per-type `light_range_multiplier` JSON key, computed once at
+         generation and stored on `StarRecord.light_range`.
+         Decided LOD-2 stars **stay in the screen-pass list**: at the star
+         center the opaque core writes depth so the screen-pass quad
+         (clip z = 0.999, depth-test LESS) loses; only the corona edge —
+         where no opaque depth was written — admits the screen-pass glow.
+         This keeps Phase 5's planned alpha-crossfade implementation
+         straightforward (both representations are already coexisting; only
+         the per-star alpha needs to ramp).
+         Also fixed a latent bug in `_update_lod()`: the prior `continue`
+         on backdrop-tier within `lod2_spawn_distance` skipped LOD state
+         updates entirely, so a backdrop star inside LOD 2 distance could
+         be stuck rendering as LOD 0. Now backdrop tier clamps to LOD 1
+         within that distance and only ever transitions through the
+         {0, 1} states.
+         New `galaxy.star_mesh` block in `data/world_config.json` carries
+         all LOD 2 tunables (per-layer scales, surface noise/flow,
+         atmosphere alphas, atmosphere rotation speeds, corona intensity
+         and falloff radii, light attenuation). Phase 3 leaves
+         `ExclusionArea.monitoring = false`; Phase 4 will flip that and
+         wire the signal to GameEventBus.
+Spec updated: yes — `feature_spec-star_system.md` LOD 2 section rewritten
+         to describe the layered shader strategy, the screen-pass-stays-on
+         decision, and the Phase 3 / Phase 4 boundary on `ExclusionArea`;
+         data model expanded with `light_range`; JSON section gains the
+         full `star_mesh` tunable block; Files table marks Phase 3 files
+         done.
+
+---
+
 ## 2026-05-01 — Star System Phase 2: fullscreen 3D quad replaces SubViewport for LOD 1
 
 Agent:   Claude Opus (Cursor) — Star System Phase 2 session

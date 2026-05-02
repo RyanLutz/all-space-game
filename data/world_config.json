@@ -114,6 +114,29 @@
       "glow_max_pixel_radius": 64.0,
       "glow_intensity": 1.5,
       "glow_core_radius": 0.15
+    },
+
+    "star_mesh": {
+      "_comment": "LOD 2 close-range mesh tunables. core_radius_scale: visual core sphere size relative to StarRecord.radius. atmosphere_*_scale: outer plasma layers (always > 1.0). corona_scale: additive halo billboard size relative to radius. surface_*: noise/animation parameters for the plasma surface shader. corona_*: corona shader falloff and intensity. light_attenuation: OmniLight3D attenuation curve (1.0 = inverse-square).",
+      "core_radius_scale": 1.0,
+      "atmosphere_inner_scale": 1.04,
+      "atmosphere_outer_scale": 1.10,
+      "corona_scale": 3.5,
+
+      "surface_noise_scale": 2.5,
+      "surface_flow_speed": 0.05,
+      "surface_brightness": 1.4,
+      "surface_contrast": 1.6,
+      "atmosphere_inner_alpha": 0.55,
+      "atmosphere_outer_alpha": 0.30,
+      "atmosphere_inner_speed": 0.08,
+      "atmosphere_outer_speed": 0.03,
+
+      "corona_intensity": 1.8,
+      "corona_inner_falloff": 0.18,
+      "corona_outer_falloff": 1.0,
+
+      "light_attenuation": 1.0
     }
   }
 }

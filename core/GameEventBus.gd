@@ -36,6 +36,7 @@ signal ai_target_lost(ship_id: int)
 signal chunk_loaded(chunk_coords: Vector2i)
 signal chunk_unloaded(chunk_coords: Vector2i)
 signal explosion_triggered(position: Vector3, radius: float, intensity: float)
+signal star_exclusion_entered(star_id: int, ship_id: int)
 
 # ─── Game Mode ─────────────────────────────────────────────────────────────────
 signal game_mode_changed(old_mode: String, new_mode: String)
