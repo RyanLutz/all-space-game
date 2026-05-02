@@ -22,6 +22,7 @@ func _ready() -> void:
 	_register_player_state()
 	_register_projectile_manager()
 	_register_vfx_manager()
+	_register_star_registry()
 	_register_custom_monitors()
 	print("[GameBootstrap] All core services registered.")
 
@@ -67,6 +68,13 @@ func _register_vfx_manager() -> void:
 	_service_locator.Register("VFXManager", vfx)
 
 
+func _register_star_registry() -> void:
+	var sr = preload("res://core/stars/StarRegistry.gd").new()
+	sr.name = "StarRegistry"
+	add_child(sr)
+	_service_locator.Register("StarRegistry", sr)
+
+
 ## All Godot debugger custom monitors are registered here, once, to avoid
 ## duplicate-registration errors when systems with multiple instances each try
 ## to register their own monitor in _ready(). Per-call instrumentation
@@ -102,3 +110,11 @@ func _register_custom_monitors() -> void:
 		func(): return perf.get_avg_ms("VFXManager.explosion_spawn"))
 	Performance.add_custom_monitor("AllSpace/star_count",
 		func(): return perf.get_count("StarField.star_count"))
+	Performance.add_custom_monitor("AllSpace/star_lod_update_ms",
+		func(): return perf.get_avg_ms("StarRegistry.lod_update"))
+	Performance.add_custom_monitor("AllSpace/star_generate_ms",
+		func(): return perf.get_avg_ms("StarRegistry.generate"))
+	Performance.add_custom_monitor("AllSpace/star_screen_pass_count",
+		func(): return perf.get_count("StarRegistry.screen_pass_count"))
+	Performance.add_custom_monitor("AllSpace/star_active_meshes",
+		func(): return perf.get_count("StarRegistry.active_meshes"))
