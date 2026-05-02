@@ -91,6 +91,8 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 17 | Combat VFX System (Session 1: VFX core + pools; Session 2: local players) | In progress |
 || 18 | UI Foundation (UITokens, UITheme, StatBar, SegBar, HeatBar, WeaponSlot, RosterRow, ModeSwitch) | Implemented |
 || 19 | Pilot HUD (PilotHUD, Radar — five panels, hit flash, event subscriptions) | Implemented |
+| 20 | Star System — Phase 1 (StarRecord, StarRegistry skeleton, catalog generation, LOD 0 MultiMesh point shader, `world_config.galaxy` block) | Implemented |
+| 21 | Star System — Phase 2 (LOD 1 fullscreen-quad screen-pass glow shader, `_update_shader_uniforms`, closest-N cap, camera-attach lifecycle) | Implemented |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 
@@ -160,7 +162,25 @@ The most recent decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-04-29 — UI Session 2: Pilot HUD** —
+1. **2026-05-01 — Star System Phase 2: LOD 1 screen-pass glow** —
+   `core/stars/star_screen_pass.gdshader` (spatial, NDC-direct vertex,
+   fragment iterates star uniform array using built-in
+   `PROJECTION_MATRIX * VIEW_MATRIX` so no rotation lag from CPU-passed VP
+   uniforms). `StarRegistry` gains `_setup_screen_pass()`,
+   `_attach_screen_pass_to_camera()`, `_update_shader_uniforms()`; quad is
+   parented to the active `Camera3D` once resolved. Per-frame star cap of
+   256 (`MAX_SCREEN_PASS_STARS`) with closest-N selection when exceeded;
+   frustum culling deferred to Phase 5. Depth_test left enabled (LESS) +
+   `depth_draw_never` so opaque ships occlude glow naturally and
+   transparent VFX still composites on top. Tunables in
+   `data/world_config.json` under `galaxy.lod` (`screen_pass_max_stars`,
+   `glow_*`). Phase 2 verification scene at `test/StarSystemTest.tscn`.
+   **Deviation**: spec called for SubViewport with no depth test; Godot
+   4.x `CanvasLayer.layer<-1` is broken (#67633), so the standard
+   fullscreen-3D-quad-with-depth-test idiom satisfies the spec's intent
+   ("stars appear behind scene geometry") without the SubViewport
+   round-trip. Spec rewritten to match implementation.
+2. **2026-04-29 — UI Session 2: Pilot HUD** —
    PilotHUD.gd (five panels: Mode Tag, Target Lock, Vessel Status, Weapon Systems, Radar;
    hit flash overlay). Radar.gd (custom _draw() sweep + enemy dots via scene group query).
    Hardpoints discovered from ship's ShipVisual subtree on player_ship_changed.

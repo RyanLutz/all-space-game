@@ -7,7 +7,7 @@ class_name StarRegistry
 ##
 ## LOD levels:
 ##   0 — MultiMesh point (all distances > lod1_distance)
-##   1 — Screen-space glow pass  [stub: implemented in Phase 2]
+##   1 — Screen-space glow pass (fullscreen MeshInstance3D quad child of camera)
 ##   2 — StarMesh + OmniLight3D  [stub: implemented in Phase 3]
 ##
 ## Never chunk-streamed. All star data is always resident.
@@ -25,9 +25,35 @@ var _config: Dictionary = {}
 var _lod1_distance: float = 80000.0
 var _lod2_spawn_distance: float = 8000.0
 
+# ─── Screen-Pass Tunables (cached from world_config.galaxy.lod) ──────────────
+# Hard ceiling on how many stars we pack into the shader uniform array per
+# frame. Must match the const in star_screen_pass.gdshader.
+const MAX_SCREEN_PASS_STARS: int = 256
+
+# min_pixel_radius is the visual size floor (in screen pixels) shared by the
+# LOD 0 point shader and the LOD 1 screen-pass shader. Single source of
+# truth — both shaders read this same value so the LOD 0->1 handoff cannot
+# develop a size discontinuity if it is later tuned.
+var _min_pixel_radius: float = 2.0
+
+var _screen_pass_max_stars: int = MAX_SCREEN_PASS_STARS
+var _glow_world_radius_multiplier: float = 3.0
+var _glow_max_pixel_radius: float = 64.0
+var _glow_intensity: float = 1.5
+var _glow_core_radius: float = 0.15
+
 # ─── MultiMesh (LOD 0) ───────────────────────────────────────────────────────
 var _multimesh_instance: MultiMeshInstance3D = null
 var _multimesh: MultiMesh = null
+
+# ─── Screen-Pass (LOD 1) ─────────────────────────────────────────────────────
+var _screen_pass_quad: MeshInstance3D = null
+var _screen_pass_material: ShaderMaterial = null
+
+# Pre-allocated uniform buffers — re-assigned to the shader each frame to
+# avoid per-frame PackedVector4Array allocation churn.
+var _u_pos_radius: PackedVector4Array = PackedVector4Array()
+var _u_color: PackedVector4Array = PackedVector4Array()
 
 # ─── Runtime Counts ──────────────────────────────────────────────────────────
 var _screen_pass_stars: Array[StarRecord] = []
@@ -55,6 +81,7 @@ func _ready() -> void:
 	var lod_cfg: Dictionary = _config.get("lod", {})
 	_lod1_distance       = float(lod_cfg.get("lod1_distance",      80000.0))
 	_lod2_spawn_distance = float(lod_cfg.get("lod2_spawn_distance", 8000.0))
+	_load_screen_pass_config(lod_cfg)
 
 	_perf.begin("StarRegistry.generate")
 	_catalog = _generate_catalog(_galaxy_seed, _config)
@@ -64,16 +91,19 @@ func _ready() -> void:
 	_lod_dirty.fill(1)
 
 	_setup_multimesh()
+	_setup_screen_pass()
 
 	print("[StarRegistry] Generated %d stars (seed %d)" % [_catalog.size(), _galaxy_seed])
 
 
 func _physics_process(_delta: float) -> void:
-	# Lazy-resolve camera — GameCamera is placed in the scene, not registered at boot.
-	if _camera == null:
+	# Lazy-resolve camera — GameCamera is placed in the scene, not registered
+	# at boot. Re-resolve if the camera was freed (scene change, etc).
+	if _camera == null or not is_instance_valid(_camera):
 		_camera = get_viewport().get_camera_3d()
 		if _camera == null:
 			return
+		_attach_screen_pass_to_camera()
 
 	_update_lod(_camera.global_position)
 
@@ -162,7 +192,7 @@ func _setup_multimesh() -> void:
 
 	var shader_mat := ShaderMaterial.new()
 	shader_mat.shader = preload("res://core/stars/star_point.gdshader")
-	shader_mat.set_shader_parameter("min_pixel_radius", 2.0)
+	shader_mat.set_shader_parameter("min_pixel_radius", _min_pixel_radius)
 	mesh.material = shader_mat
 
 	_multimesh = MultiMesh.new()
@@ -210,15 +240,13 @@ func _update_lod(camera_pos: Vector3) -> void:
 			star.lod_state = new_lod
 			_lod_dirty[i] = 1
 
-			# Phase 2: spawn/despawn screen-pass entry
 			# Phase 3: _spawn_mesh / _despawn_mesh
 
 		if star.lod_state >= 1:
 			_screen_pass_stars.append(star)
 
 	_update_multimesh()
-
-	# Phase 2: _update_shader_uniforms(_screen_pass_stars)
+	_update_shader_uniforms(camera_pos)
 
 	_perf.end("StarRegistry.lod_update")
 	_perf.set_count("StarRegistry.active_meshes",    _active_mesh_count)
@@ -236,6 +264,97 @@ func _update_multimesh() -> void:
 			# Star is handled by screen-pass (LOD 1) or mesh (LOD 2) — hide from MultiMesh.
 			_multimesh.set_instance_transform(i, _HIDDEN_TRANSFORM)
 		_lod_dirty[i] = 0
+
+
+# ─── Screen-Pass Setup (LOD 1) ───────────────────────────────────────────────
+
+func _load_screen_pass_config(lod_cfg: Dictionary) -> void:
+	# Shared by both LOD 0 and LOD 1 — must be loaded before _setup_multimesh().
+	_min_pixel_radius             = float(lod_cfg.get("min_pixel_radius",             2.0))
+	_screen_pass_max_stars = mini(
+		int(lod_cfg.get("screen_pass_max_stars", MAX_SCREEN_PASS_STARS)),
+		MAX_SCREEN_PASS_STARS)
+	_glow_world_radius_multiplier = float(lod_cfg.get("glow_world_radius_multiplier", 3.0))
+	_glow_max_pixel_radius        = float(lod_cfg.get("glow_max_pixel_radius",       64.0))
+	_glow_intensity               = float(lod_cfg.get("glow_intensity",               1.5))
+	_glow_core_radius             = float(lod_cfg.get("glow_core_radius",             0.15))
+
+
+## Builds the fullscreen MeshInstance3D + ShaderMaterial for the LOD 1 screen
+## pass. The quad is intentionally created un-parented; it is attached as a
+## child of the active Camera3D the first time the camera is resolved in
+## _physics_process(). The vertex shader writes POSITION directly in NDC, so
+## the quad's transform is irrelevant — being a camera child guarantees it
+## is never frustum-culled and that PROJECTION_MATRIX/VIEW_MATRIX inside the
+## shader resolve to the correct camera.
+func _setup_screen_pass() -> void:
+	var quad_mesh := QuadMesh.new()
+	# size = (2,2) → VERTEX.xy spans [-1, 1] = full NDC, matching the shader.
+	quad_mesh.size = Vector2(2.0, 2.0)
+
+	_screen_pass_material = ShaderMaterial.new()
+	_screen_pass_material.shader = preload("res://core/stars/star_screen_pass.gdshader")
+	_screen_pass_material.set_shader_parameter("min_pixel_radius", _min_pixel_radius)
+	_screen_pass_material.set_shader_parameter("max_pixel_radius", _glow_max_pixel_radius)
+	_screen_pass_material.set_shader_parameter("intensity",        _glow_intensity)
+	_screen_pass_material.set_shader_parameter("core_radius",      _glow_core_radius)
+	_screen_pass_material.set_shader_parameter("star_count",       0)
+
+	quad_mesh.material = _screen_pass_material
+
+	_screen_pass_quad = MeshInstance3D.new()
+	_screen_pass_quad.name = "StarScreenPass"
+	_screen_pass_quad.mesh = quad_mesh
+	_screen_pass_quad.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_screen_pass_quad.gi_mode     = GeometryInstance3D.GI_MODE_DISABLED
+	_screen_pass_quad.extra_cull_margin = 16384.0   # max — frustum cull never trims us
+
+	# Pre-allocate uniform buffers at the shader's array size.
+	_u_pos_radius.resize(MAX_SCREEN_PASS_STARS)
+	_u_color.resize(MAX_SCREEN_PASS_STARS)
+
+
+## Re-parents the screen-pass quad onto the resolved Camera3D. Idempotent —
+## safe to call every camera-resolution attempt.
+func _attach_screen_pass_to_camera() -> void:
+	if _screen_pass_quad == null or _camera == null:
+		return
+	if _screen_pass_quad.get_parent() == _camera:
+		return
+	if _screen_pass_quad.get_parent() != null:
+		_screen_pass_quad.get_parent().remove_child(_screen_pass_quad)
+	_camera.add_child(_screen_pass_quad)
+	_screen_pass_quad.position = Vector3.ZERO
+	_screen_pass_quad.rotation = Vector3.ZERO
+
+
+## Packs the visible-star list into the shader's uniform arrays. If the list
+## exceeds the per-frame cap, sort by camera distance and keep the closest N
+## (closer stars are bigger on screen and matter more visually). Frustum
+## culling is deferred to Phase 5.
+func _update_shader_uniforms(camera_pos: Vector3) -> void:
+	if _screen_pass_material == null:
+		return
+
+	var n: int = _screen_pass_stars.size()
+	if n > _screen_pass_max_stars:
+		_screen_pass_stars.sort_custom(
+			func(a: StarRecord, b: StarRecord) -> bool:
+				return camera_pos.distance_squared_to(a.position) \
+					<  camera_pos.distance_squared_to(b.position)
+		)
+		_screen_pass_stars.resize(_screen_pass_max_stars)
+		n = _screen_pass_max_stars
+
+	for i in n:
+		var star: StarRecord = _screen_pass_stars[i]
+		var glow_radius: float = star.radius * _glow_world_radius_multiplier
+		_u_pos_radius[i] = Vector4(star.position.x, star.position.y, star.position.z, glow_radius)
+		_u_color[i]      = Vector4(star.color.r, star.color.g, star.color.b, star.color.a)
+
+	_screen_pass_material.set_shader_parameter("star_count",     n)
+	_screen_pass_material.set_shader_parameter("star_pos_radius", _u_pos_radius)
+	_screen_pass_material.set_shader_parameter("star_color",     _u_color)
 
 
 # ─── Phase 3 Stubs ────────────────────────────────────────────────────────────

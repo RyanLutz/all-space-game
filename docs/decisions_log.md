@@ -15,6 +15,43 @@ Spec updated: yes / no / pending
 
 ---
 
+## 2026-05-01 — Star System Phase 2: fullscreen 3D quad replaces SubViewport for LOD 1
+
+Agent:   Claude Opus (Cursor) — Star System Phase 2 session
+System:  StarRegistry / star_screen_pass shader (LOD 1)
+Spec:    feature_spec-star_system.md § "LOD 1 — Screen-Space Glow (mid range)"
+Problem: Spec called for a "SubViewport full-screen shader" rendering "with no
+         depth test — always behind scene geometry by compositing order." User
+         initially approved a CanvasLayer (`layer = -1`) + ColorRect canvas-item
+         shader implementation. Pre-implementation research surfaced that
+         CanvasLayer with negative layer for rendering behind 3D content is a
+         tracked, unresolved Godot 4.x regression (godotengine/godot#67633);
+         WorldEnvironment.BG_CANVAS workarounds are also affected.
+Decision: Implemented LOD 1 as a single `MeshInstance3D` fullscreen quad parented
+         to the active `Camera3D`. Spatial shader writes `POSITION` directly in
+         NDC at clip z = 0.999 so quad geometry is screen-locked and the default
+         depth test (`LESS`) fails wherever scene geometry wrote a closer
+         fragment — opaque ships occlude the glow naturally. `depth_draw_never`
+         keeps subsequent transparent passes (combat VFX) compositing normally
+         on top of the stars. Star world positions are projected in the fragment
+         shader using built-in `PROJECTION_MATRIX * VIEW_MATRIX`, which Godot
+         binds per rendered frame — eliminates the rotation lag a CPU-passed VP
+         uniform would introduce when LOD updates run on physics tick. Per-frame
+         star cap of 256 (`MAX_SCREEN_PASS_STARS`) with closest-N selection when
+         exceeded; frustum culling deferred to Phase 5. New tunables added to
+         `data/world_config.json` under `galaxy.lod`:
+         `screen_pass_max_stars`, `glow_world_radius_multiplier`,
+         `glow_min_pixel_radius`, `glow_max_pixel_radius`, `glow_intensity`,
+         `glow_core_radius`. Phase 2 verification scene at `test/StarSystemTest.tscn`
+         (fly-cam + occluder boxes + PerformanceMonitor overlay).
+Spec updated: yes — `feature_spec-star_system.md` LOD 1 section rewritten to
+         describe the fullscreen-quad mechanism and the rotation-lag-prevention
+         rationale; Files table updated with `star_screen_pass.gdshader` (Phase
+         2) and `StarSystemTest.tscn` paths; JSON section gains the new
+         `screen_pass_*` and `glow_*` tunables.
+
+---
+
 ## 2026-04-16 — Pre-implementation spec audit and 3D cleanup
 
 Agent:   Claude Sonnet (Claude Code) — session review-core-spec-QSCaF

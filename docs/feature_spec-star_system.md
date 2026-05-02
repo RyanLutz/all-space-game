@@ -110,20 +110,55 @@ minimum apparent size so it is always visible regardless of distance.
 
 ### LOD 1 — Screen-Space Glow (mid range)
 
-A full-screen `SubViewport` shader receives the list of visible stars (world positions,
-colors, apparent angular sizes) as a uniform array each frame. The shader:
+A single fullscreen `MeshInstance3D` quad parented to the active `Camera3D` carries
+a spatial shader that receives the list of visible stars (world positions, colors,
+world-space glow radii) as a `vec4[]` uniform array each frame. The shader:
 
-1. Projects each star's world position to NDC using the camera's view-projection matrix
-2. Draws a soft radial glow disc at that screen coordinate
-3. Renders with no depth test — always behind scene geometry by compositing order
+1. **Vertex stage:** writes `POSITION = vec4(VERTEX.xy, 0.999, 1.0)` directly in NDC
+   so the quad geometry is screen-locked regardless of where the host node sits.
+   The depth value `0.999` places it just inside the far plane.
+2. **Fragment stage:** for each star, projects its world position to NDC using
+   Godot's built-in `PROJECTION_MATRIX * VIEW_MATRIX`. Computes screen-space
+   distance from the current fragment to the projected star center, applies a
+   two-component glow (tight bright core + wide soft halo), and accumulates
+   color from all visible stars in one fragment.
+3. **Render mode:** `unshaded, cull_disabled, depth_draw_never, blend_mix`. The
+   default depth test (`LESS`) is left enabled so the quad fails wherever scene
+   opaque geometry wrote a closer fragment — this is what makes ships occlude
+   the glow. `depth_draw_never` keeps the quad from polluting the depth buffer
+   for subsequent transparent passes (combat VFX still composites normally on
+   top of the stars).
 
-This pass replaces the MultiMesh instance for stars that have crossed the LOD 0 → 1
-threshold. The transition is crossfaded over a configurable number of frames.
+**Built-in matrices, not CPU uniforms.** Star world positions are camera-independent,
+so the CPU only re-uploads them when the visible-star list changes. The shader uses
+`PROJECTION_MATRIX` and `VIEW_MATRIX`, which Godot binds to the actual rendered
+frame — never the previous physics tick. This means the glow tracks instantly when
+the camera rotates or moves; there is no lag from a CPU-passed view-projection
+uniform.
 
-**Why this approach:** At mid-range distances, world-space geometry suffers from depth
-buffer precision loss at extreme Z values. The screen-space pass bypasses the depth
-buffer entirely — no Z-fighting, no clipping, no scale problems. The star's apparent
-size is computed from real angular size math, so it looks physically correct.
+**Per-frame star cap.** The shader's uniform array is fixed-size at 256 entries
+(matches `MAX_SCREEN_PASS_STARS` in `StarRegistry.gd`). When the visible list
+exceeds this cap, `StarRegistry` sorts by camera distance and keeps the closest N.
+Frustum culling is deferred to Phase 5.
+
+**LOD 0 → 1 transition.** When a star crosses the `lod1_distance` threshold,
+`StarRegistry._update_multimesh()` hides it from the MultiMesh in the same frame
+the screen-pass starts drawing it. The screen-pass glow is sized to roughly match
+the MultiMesh point's `min_pixel_radius` at the threshold, so the visual handoff
+reads as a continuous brightness rather than a pop. Per-star alpha crossfade is
+deferred to Phase 5.
+
+**Why a 3D quad and not a SubViewport composited under the scene?** In Godot 4.x,
+the historical Godot 3 patterns for "render behind 3D" — negative `CanvasLayer.layer`
+and `WorldEnvironment.BG_CANVAS` — are tracked as broken (godotengine/godot#67633)
+and produce blank backgrounds or hall-of-mirrors artefacts. The fullscreen-quad
+approach achieves the spec's intent ("stars appear behind scene geometry") using
+the standard Godot 4 idiom of depth-testing against the scene depth buffer.
+
+**Why this avoids extreme-distance artifacts.** The quad lives at constant clip-space
+z = 0.999. Star centers are projected analytically in the fragment shader — there is
+no per-star world-space geometry at galactic distances, so there is no Z-fighting,
+no near/far clipping, and no perspective-divide precision loss to worry about.
 
 ### LOD 2 — Mesh + Light (close range)
 
@@ -301,10 +336,35 @@ Prevents visible pops at transition boundaries.
   "lod": {
     "lod1_distance": 80000.0,
     "lod2_spawn_distance": 8000.0,
-    "lod_crossfade_frames": 30
+    "lod_crossfade_frames": 30,
+
+    "min_pixel_radius": 2.0,
+    "screen_pass_max_stars": 256,
+    "glow_world_radius_multiplier": 3.0,
+    "glow_max_pixel_radius": 64.0,
+    "glow_intensity": 1.5,
+    "glow_core_radius": 0.15
   }
 }
 ```
+
+Shared LOD 0 + LOD 1 tunable:
+- `min_pixel_radius` — floor on a star's apparent size in screen pixels. Bound to
+  the `min_pixel_radius` uniform in **both** `star_point.gdshader` (LOD 0) and
+  `star_screen_pass.gdshader` (LOD 1). Single source of truth — the LOD 0 → 1
+  handoff cannot develop a size discontinuity.
+
+LOD 1 (screen-pass) tunables:
+- `screen_pass_max_stars` — per-frame star cap. Hard-clamped in code to
+  `MAX_SCREEN_PASS_STARS` (256), which must equal the const in
+  `star_screen_pass.gdshader`.
+- `glow_world_radius_multiplier` — scales `StarRecord.radius` into a perceived glow
+  halo radius in world units.
+- `glow_max_pixel_radius` — clamps how big a near-LOD-2 star's halo can get so
+  close stars don't dominate the screen.
+- `glow_intensity` — output color multiplier into bloom.
+- `glow_core_radius` — `[0, 1]` threshold inside the glow disc where the bright
+  inner core falls off into the soft halo.
 
 ---
 
@@ -335,14 +395,16 @@ climbs above ~200, investigate culling by frustum before passing to the shader.
 
 | Path | Description |
 |---|---|
-| `core/stars/StarRegistry.gd` | Autoload or world-root child; catalog owner, LOD manager |
+| `core/stars/StarRegistry.gd` | Service registered in GameBootstrap; catalog owner, LOD manager, screen-pass driver |
 | `core/stars/StarRecord.gd` | Data class for a single star |
-| `core/stars/StarMesh.tscn` | Reusable scene: layered billboards + OmniLight3D + ExclusionArea |
-| `core/stars/StarMesh.gd` | Script: receives StarRecord, configures shaders and light |
-| `core/stars/star_surface.gdshader` | Noise-driven roiling plasma surface shader |
-| `core/stars/star_corona.gdshader` | Additive corona billboard shader |
-| `core/stars/star_screen_pass.gdshader` | Full-screen glow pass; projects world pos to screen |
-| `data/world_config.json` | Extended with galaxy seed and star generation params |
+| `core/stars/star_point.gdshader` | LOD 0 MultiMesh point/quad shader (Phase 1) |
+| `core/stars/star_screen_pass.gdshader` | LOD 1 fullscreen-quad glow shader; projects world pos via built-in matrices (Phase 2) |
+| `core/stars/StarMesh.tscn` | LOD 2 reusable scene: layered billboards + OmniLight3D + ExclusionArea (Phase 3) |
+| `core/stars/StarMesh.gd` | LOD 2 script: receives StarRecord, configures shaders and light (Phase 3) |
+| `core/stars/star_surface.gdshader` | LOD 2 noise-driven roiling plasma surface shader (Phase 3) |
+| `core/stars/star_corona.gdshader` | LOD 2 additive corona billboard shader (Phase 3) |
+| `data/world_config.json` | `galaxy.*` block: seed, star types, LOD distances, screen-pass tunables |
+| `test/StarSystemTest.tscn` / `.gd` | Phase 2 verification scene: fly-cam, occluders, debug overlay |
 
 ---
 
