@@ -89,6 +89,8 @@ From `docs/core_spec.md` §19. Update this table at the end of every session.
 | 15 | ChunkStreamer + Asteroid + Debris | Implemented |
 | 16 | GameEventBus signal audit | Implemented |
 | 17 | Combat VFX System (Session 1: VFX core + pools; Session 2: local players) | In progress |
+|| 18 | UI Foundation (UITokens, UITheme, StatBar, SegBar, HeatBar, WeaponSlot, RosterRow, ModeSwitch) | Implemented |
+|| 19 | Pilot HUD (PilotHUD, Radar — five panels, hit flash, event subscriptions) | Implemented |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 
@@ -157,7 +159,20 @@ The most recent decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-04-29 — Ship collision from parts GLB (`-colonly`)** —
+1. **2026-04-29 — UI Session 2: Pilot HUD** —
+   PilotHUD.gd (five panels: Mode Tag, Target Lock, Vessel Status, Weapon Systems, Radar;
+   hit flash overlay). Radar.gd (custom _draw() sweep + enemy dots via scene group query).
+   Hardpoints discovered from ship's ShipVisual subtree on player_ship_changed.
+   Heat polled from HardpointComponent. Ammo: ∞ for energy, -- for ballistic (deferred).
+   Target Lock panel built but always hidden (player targeting not yet specced).
+   Flash decay frame-rate-independent: 3.3 alpha/sec (≡ 0.055/frame at 60fps).
+2. **2026-04-29 — UI Session 1: Foundation Layer** —
+   UITokens autoload (all design token constants + font helpers), UITheme.tres (panel/
+   label/button base styles), StatBar/SegBar/HeatBar/WeaponSlot/RosterRow components,
+   ModeSwitch (Tab → game_mode_changed). Components build UI in _ready() via GDScript.
+   Font application deferred gracefully until Orbitron + Share Tech Mono are imported
+   into assets/fonts/. Corner-clip polygons deferred to post-MVP. No deviations.
+2. **2026-04-29 — Ship collision from parts GLB (`-colonly`)** —
    ShipFactory assembles `part_name-colonly` meshes into child `CollisionShape3D` nodes on
    the ship `RigidBody3D`, removes the scene placeholder when any part defines collision,
    sets `part_category` meta for future use; whole-ship damage unchanged (raycast hits body).

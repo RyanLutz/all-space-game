@@ -585,3 +585,134 @@ Decision:  At spawn, for each variant part node `name`, look up `name-colonly` i
            Committed: `ShipFactory.gd`, `content/ships/axum-fighter-1/parts.glb`,
            `assets/blender/axum-light-craft.glb`, graphify-out refresh.
 Spec updated:  pending — document `-colonly` naming and factory behavior in ship system spec
+
+---
+
+## 2026-04-29 — UI Session 2: Pilot HUD
+
+Agent:   Cursor agent (Sonnet)
+System:  UI — PilotHUD, Radar
+Spec:    feature_spec-ui_design.md §Pilot HUD Layout, §Indicator Types
+
+### What was built
+
+- `ui/radar/Radar.gd/.tscn` — Custom Control using `_draw()` for all rendering.
+  Sweep angle advances in `_process()`, triggers `queue_redraw()` each frame.
+  Wedge drawn as filled polygon (WEDGE_STEPS=24 segments). Enemy dots from
+  `get_tree().get_nodes_in_group("ships")` — read-only scene tree query; acceptable
+  per architecture rules (not a cross-system call). Radar orientation: X→right, -Z→up
+  (world north-up). Enemy cull: distance-squared check before coordinate conversion.
+
+- `ui/PilotHUD.gd/.tscn` — Five panels + hit flash overlay.
+  All panels built programmatically in `_ready()` via helper methods.
+  Anchors: Mode Tag top-left, Target Lock top-center, Vessel Status bottom-left,
+  Weapon Systems bottom-center, Radar container bottom-right.
+  Subscriptions: `player_ship_changed`, `game_mode_changed`, `ship_damaged`.
+  Also checks `PlayerState.active_ship` at `_ready()` for late-add robustness.
+  PerformanceMonitor wraps `_process()` body under `UI.pilot_hud_update`.
+
+### Decisions made
+
+1. **Hardpoint discovery** — PilotHUD walks the ship's ShipVisual subtree at bind time,
+   collects HardpointComponent nodes sorted by `hardpoint_id` for stable slot assignment.
+   This is the ship's own internal structure; not a cross-system violation.
+
+2. **Heat polling** — `HardpointComponent.heat_current / heat_capacity` polled each
+   frame. No new signal added; the ship's own components are accessible to its own
+   HUD display system.
+
+3. **Ammo** — Energy weapon archetypes show "∞" (U+221E). Ballistic/missile show "--".
+   Full ammo tracking deferred to a future session when inventory system is specced.
+
+4. **Active weapon slot** — A slot is visually "active" when any of its fire groups
+   has `input_fire[group] == true` (i.e., the player is holding that fire button).
+   This is the correct MVP interpretation: no separate "selected weapon" concept exists.
+
+5. **Target Lock panel** — Built with all inner nodes (name label, HULL/DIST/THREAT
+   readouts) but `visible = false`. No `target_locked` signal exists in GameEventBus.
+   Structure is ready for wiring when the player targeting system is specced.
+
+6. **Hit flash decay** — `FLASH_DECAY_PS = 3.3` (alpha units/second), derived from
+   spec's `0.055/frame × 60fps`. Frame-rate-independent via `delta` multiplication.
+
+7. **Old `ui/pilot/PilotHUD.gd`** — Superseded by `ui/PilotHUD.gd`. Old file left in
+   place to avoid breaking `test/PilotHudTest.gd`. That test needs updating to use the
+   event bus pattern (`player_ship_changed`) rather than `set_player_ship()`.
+
+### Deviations
+- None from spec intent.
+
+Spec updated: no — spec unchanged; build status updated in agent_brief.md
+
+---
+
+## 2026-04-29 — UI Session 1: Foundation Layer
+
+Agent:   Cursor agent (Sonnet)
+System:  UI — tokens, theme, reusable components, mode switch
+Spec:    feature_spec-ui_design.md
+
+### What was built
+
+- `ui/UITokens.gd` — Node autoload registered in project.godot as "UITokens".
+  Exports all design token constants (GREY_*, ACCENT_*, TAC_ACCENT_*, HOSTILE_*,
+  STATUS_*, SURFACE, SURFACE_RAISED, SIZE_*, CLIP_SIZE, PAD_*). Provides
+  `get_font_label()`, `get_font_data()`, `apply_font_label()`, `apply_font_data()`
+  helpers with graceful fallback when font files are not yet imported.
+
+- `ui/UITheme.tres` — Godot 4 Theme resource. Styles: Panel, PanelContainer, Label,
+  Button (normal / hover / pressed / focus / disabled). All values derived from tokens.
+  No font references (applied programmatically per-component until fonts are imported).
+
+- `ui/components/StatBar.gd/.tscn` — MarginContainer with ProgressBar.
+  Exposes: `set_header()`, `set_fill_color()`, `set_ratio()`, `set_value_text()`,
+  `mark_critical()`. ProgressBar styled via StyleBoxFlat overrides from UITokens.
+
+- `ui/components/SegBar.gd/.tscn` — Control with 10-segment HBoxContainer.
+  Exposes: `set_ratio()`, `set_active_color()`. Segments are ColorRect nodes.
+
+- `ui/components/HeatBar.gd/.tscn` — Control with ProgressBar. Three-state
+  machine: COOL / WARM / CRITICAL. Critical state runs sin-wave pulse in _process().
+  Exposes: `set_heat()`, `set_cool_color()`.
+
+- `ui/components/WeaponSlot.gd/.tscn` — PanelContainer. Top-bar accent line (2px,
+  hidden by default), slot-num / weapon-name / ammo-count header row, embedded HeatBar.
+  Inactive → surface/grey-20. Active → surface-raised/accent-dim + accent weapon name.
+  Exposes: `set_weapon_name()`, `set_slot_index()`, `set_active()`, `set_heat()`,
+  `set_ammo_text()`, `set_empty()`.
+
+- `ui/components/RosterRow.gd/.tscn` — PanelContainer with bottom-border divider.
+  Icon ColorRect + name/class/HP-bar/status column. HP bar (3px, no track border)
+  uses STATUS_HULL / STATUS_POWER / HOSTILE by hull ratio. Selected: name → TAC_ACCENT.
+  Exposes: `set_ship_data()`, `update_hull()`, `set_selected()`, `get_ship_id()`.
+
+- `ui/ModeSwitch.gd/.tscn` — Control (full-rect, MOUSE_FILTER_IGNORE). Listens for
+  "toggle_mode" input action. Emits `GameEventBus.game_mode_changed(old, new)`.
+  Never holds references to PilotHUD or TacticalHUD — event-only coupling.
+  Exposes: `set_mode()`, `get_current_mode()`.
+
+- `project.godot` — Added `UITokens="*res://ui/UITokens.gd"` to [autoload] section.
+
+### Decisions made
+
+1. **Components build UI in _ready() via GDScript** (not editor-authored node trees in
+   tscn). This matches the existing PilotHUD.gd pattern and avoids fragile hand-written
+   sub-resource tscn syntax.
+
+2. **UITheme.tres has no font references** until Orbitron and Share Tech Mono are
+   imported. Font application is handled by `UITokens.apply_font_label/data()` in each
+   component's _ready(), with graceful no-op if files are absent. Font files belong at:
+   - `assets/fonts/Orbitron-Regular.ttf`
+   - `assets/fonts/ShareTechMono-Regular.ttf`
+
+3. **RosterRow HP bar uses _process() to sync fill width** after layout changes.
+   This is a known pattern for ratio-based fills without a custom draw call.
+
+4. **Corner-clip polygons deferred** — StyleBoxFlat with corner_radius=0 gives the
+   hard angular aesthetic. True 14px diagonal polygon clips require custom _draw() or
+   baked textures; deferred to post-MVP polish.
+
+### Deviations
+- None from spec intent. Corner-clip impl deferred by design (spec anticipates this).
+
+Spec updated: no — spec unchanged; build status updated in agent_brief.md

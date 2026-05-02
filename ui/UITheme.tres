@@ -1,0 +1,53 @@
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://b_uitheeme"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.024, 0.047, 0.086, 0.94)
+border_color = Color(0.824, 0.855, 0.878, 0.16)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.824, 0.855, 0.878, 0.06)
+border_color = Color(0.824, 0.855, 0.878, 0.16)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_active"]
+bg_color = Color(0.039, 0.071, 0.125, 0.96)
+border_color = Color(0.133, 0.800, 0.659, 0.42)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[resource]
+Panel/styles/panel = SubResource("StyleBoxFlat_panel")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_panel")
+Label/colors/font_color = Color(0.824, 0.855, 0.878, 0.70)
+Label/font_sizes/font_size = 10
+Button/styles/normal = SubResource("StyleBoxFlat_button_normal")
+Button/styles/hover = SubResource("StyleBoxFlat_button_normal")
+Button/styles/pressed = SubResource("StyleBoxFlat_button_active")
+Button/styles/focus = SubResource("StyleBoxFlat_button_normal")
+Button/styles/disabled = SubResource("StyleBoxFlat_button_normal")
+Button/colors/font_color = Color(0.824, 0.855, 0.878, 0.70)
+Button/colors/font_pressed_color = Color(0.824, 0.855, 0.878, 0.95)
+Button/colors/font_hover_color = Color(0.824, 0.855, 0.878, 0.95)
+Button/colors/font_focus_color = Color(0.824, 0.855, 0.878, 0.70)
+Button/colors/font_disabled_color = Color(0.824, 0.855, 0.878, 0.42)

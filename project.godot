@@ -20,6 +20,12 @@ config/icon="res://icon.svg"
 PerformanceMonitor="*res://core/services/PerformanceMonitor.gd"
 ServiceLocator="*res://core/services/ServiceLocator.cs"
 GameBootstrap="*res://core/GameBootstrap.gd"
+UITokens="*res://ui/UITokens.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 
 [dotnet]
 

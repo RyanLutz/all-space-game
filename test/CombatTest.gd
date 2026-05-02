@@ -8,6 +8,9 @@ const EscortQueue := preload("res://gameplay/fleet_command/EscortQueue.gd")
 const FormationController := preload("res://gameplay/fleet_command/FormationController.gd")
 const StanceController := preload("res://gameplay/fleet_command/StanceController.gd")
 
+const PilotHUDScene := preload("res://ui/PilotHUD.tscn")
+const UIThemeRes      := preload("res://ui/UITheme.tres")
+
 ## Controls (Pilot mode):
 ##   W / S / A / D  — thrust
 ##   Mouse          — aim
@@ -36,6 +39,9 @@ var _tactical_input: TacticalInputHandler = null
 var _stance_controller: StanceController = null
 var _cursor_indicator: MeshInstance3D = null
 var _debug_visible: bool = false
+
+# Game UI (Pilot HUD — Tab/mode is handled by InputManager, not ModeSwitch.gd, to avoid double-toggle)
+var _ui_layer: CanvasLayer = null
 
 # Debug UI
 var _debug_canvas: CanvasLayer = null
@@ -115,11 +121,25 @@ func _ready() -> void:
 	if spawn_dummy_target:
 		_spawn_dummy_target()
 
+	_setup_game_ui()
+
 	print("[CombatTest] Combatants spawned. WASD=thrust | Mouse=aim | LMB/RMB=fire | Tab=Tactical | F3=Debug")
 	print("[CombatTest] Enemy 1: 2x autocannon (gimbal) | Enemy 2: 2x pulse (gimbal)")
 
 	# Verify weapons after a frame delay (allow ShipFactory to finish setup)
 	call_deferred("_verify_weapons")
+
+
+func _setup_game_ui() -> void:
+	_ui_layer = CanvasLayer.new()
+	_ui_layer.name = "UILayer"
+	_ui_layer.layer = 10
+	add_child(_ui_layer)
+
+	var pilot_hud := PilotHUDScene.instantiate()
+	pilot_hud.name = "PilotHUD"
+	pilot_hud.theme = UIThemeRes
+	_ui_layer.add_child(pilot_hud)
 
 
 func _setup_debug_ui() -> void:

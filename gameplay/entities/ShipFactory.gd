@@ -59,9 +59,10 @@ func spawn_ship(
 	var variant_data: Dictionary = class_data["variants"][variant_id]
 	var ship_visual := ship.get_node("ShipVisual")
 
-	# Clear placeholder hardpoints from base scene
+	# Clear placeholder hardpoints from base scene immediately — queue_free() leaves
+	# nodes in get_children() until end-of-frame, which corrupts hardpoint discovery.
 	for child in ship_visual.get_children():
-		child.queue_free()
+		child.free()
 
 	var parts_path: String = _content_registry.get_asset_path(class_data, "parts")
 	if not parts_path.is_empty() and FileAccess.file_exists(parts_path):

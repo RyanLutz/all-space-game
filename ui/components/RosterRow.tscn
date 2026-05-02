@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b_rosterrow"]
+
+[ext_resource type="Script" path="res://ui/components/RosterRow.gd" id="1_rosterrow"]
+
+[node name="RosterRow" type="PanelContainer"]
+script = ExtResource("1_rosterrow")

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b_statbar"]
+
+[ext_resource type="Script" path="res://ui/components/StatBar.gd" id="1_statbar"]
+
+[node name="StatBar" type="MarginContainer"]
+script = ExtResource("1_statbar")

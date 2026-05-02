@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b_weaponslot"]
+
+[ext_resource type="Script" path="res://ui/components/WeaponSlot.gd" id="1_weaponslot"]
+
+[node name="WeaponSlot" type="PanelContainer"]
+script = ExtResource("1_weaponslot")

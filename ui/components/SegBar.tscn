@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://b_segbar"]
+
+[ext_resource type="Script" path="res://ui/components/SegBar.gd" id="1_segbar"]
+
+[node name="SegBar" type="Control"]
+custom_minimum_size = Vector2(0, 8)
+mouse_filter = 2
+script = ExtResource("1_segbar")

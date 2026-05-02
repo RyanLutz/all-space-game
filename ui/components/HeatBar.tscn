@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://b_heatbar"]
+
+[ext_resource type="Script" path="res://ui/components/HeatBar.gd" id="1_heatbar"]
+
+[node name="HeatBar" type="Control"]
+custom_minimum_size = Vector2(0, 4)
+mouse_filter = 2
+script = ExtResource("1_heatbar")
