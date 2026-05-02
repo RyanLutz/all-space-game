@@ -1,12 +1,12 @@
-# Graph Report - /home/lutz/Projects/All Space  (2026-04-29)
+# Graph Report - /home/lutz/Projects/All Space  (2026-05-01)
 
 ## Corpus Check
-- 2 files · ~85,048 words
+- 2 files · ~80,805 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 296 nodes · 412 edges · 47 communities detected
-- Extraction: 65% EXTRACTED · 35% INFERRED · 0% AMBIGUOUS · INFERRED: 144 edges (avg confidence: 0.83)
+- 175 nodes · 156 edges · 58 communities detected
+- Extraction: 85% EXTRACTED · 15% INFERRED · 0% AMBIGUOUS · INFERRED: 24 edges (avg confidence: 0.77)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -57,316 +57,391 @@
 - [[_COMMUNITY_Community 44|Community 44]]
 - [[_COMMUNITY_Community 45|Community 45]]
 - [[_COMMUNITY_Community 46|Community 46]]
+- [[_COMMUNITY_Community 47|Community 47]]
+- [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 51|Community 51]]
+- [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
+- [[_COMMUNITY_Community 54|Community 54]]
+- [[_COMMUNITY_Community 55|Community 55]]
+- [[_COMMUNITY_Community 56|Community 56]]
+- [[_COMMUNITY_Community 57|Community 57]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Decisions Log` - 23 edges
-2. `Sci-Fi Anime Art Style` - 18 edges
-3. `Spaceship Interior Setting` - 18 edges
-4. `Holographic Display UI Elements` - 18 edges
-5. `ProjectileManager` - 16 edges
-6. `Pixel Art Style` - 10 edges
-7. `CLAUDE.md Project Context` - 7 edges
-8. `EscortQueue — Ordered Escort Ship IDs, Queue-Shared Stance, Away-on-Orders` - 7 edges
-9. `Neutral dark gray base color field (~#444444)` - 7 edges
-10. `Bright red accent paint on hull markings` - 7 edges
+1. `ProjectileManager` - 16 edges
+2. `GameEventBus signal contract specification` - 8 edges
+3. `Neutral dark gray base color field (~#444444)` - 7 edges
+4. `Bright red accent paint on hull markings` - 7 edges
+5. `Accent marking color (high-chroma red)` - 7 edges
+6. `UI Design Specification — tokens & HUD layouts` - 7 edges
+7. `ServiceLocator` - 6 edges
+8. `Base color (albedo) texture map` - 5 edges
+9. `Axum-class fighter surface livery` - 5 edges
+10. `Combat VFX System Specification` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `CLAUDE.md Project Context` --references--> `Non-Negotiable Architecture Rules`  [EXTRACTED]
+- `GameEventBus cross-system signal bus` --implements--> `GameEventBus signal contract specification`  [EXTRACTED]
+  AGENTS.md → docs/feature_spec-game_event_bus_signals.md
+- `Star Field System Specification (MVP background)` --semantically_similar_to--> `Star System Specification — galactic LOD stars`  [EXTRACTED] [semantically similar]
+  feature_spec-star_field.md → docs/feature_spec-star_system.md
+- `CLAUDE.md — Cursor project context` --includes--> `AGENTS.md — project structure notes`  [EXTRACTED]
+  CLAUDE.md → AGENTS.md
+- `Read docs/agent_brief.md before other work` --references--> `agent_brief.md — read-first agent context`  [EXTRACTED]
   CLAUDE.md → docs/agent_brief.md
-- `Session End Protocol` --references--> `Decisions Log`  [EXTRACTED]
-  AGENTS.md → docs/decisions_log.md
-- `No 2D Nodes Rule` --rationale_for--> `3D Play Plane Contract — All Entities at Y=0, Vector2 Banned`  [EXTRACTED]
-  CLAUDE.md → docs/core_spec.md
-- `No Hardcoded Values — Tunable Data in JSON` --references--> `Architecture Rules — No Hardcoded Values, No Direct Cross-System Refs`  [EXTRACTED]
-  CLAUDE.md → docs/core_spec.md
-- `No Hardcoded Values — Tunable Data in JSON` --references--> `Data-Driven Everything — JSON Configuration Files`  [EXTRACTED]
-  CLAUDE.md → docs/All_Space_Project_Vision.md
+- `graphify-first recon: GRAPH_REPORT.md then graph.json` --references--> `GRAPH_REPORT.md — graphify corpus summary`  [EXTRACTED]
+  CLAUDE.md → graphify-out/GRAPH_REPORT.md
 
 ## Hyperedges (group relationships)
-- **Fleet Command Subsystems Coordinate Exclusively via GameEventBus Signals** — fleet_command_inputmanager, fleet_command_selectionstate, fleet_command_escortqueue, fleet_command_stancecontroller, fleet_command_formationcontroller, gameventbus_signal_contract [EXTRACTED 1.00]
-- **Tab Mode Switch Signal Chain: InputManager → game_mode_changed → GameCamera + UI** — fleet_command_inputmanager, gameventbus_mode_signals, camera_spec_tactical_extension, fleet_command_selectionstate [EXTRACTED 1.00]
 - **Unified Input Interface: Player, AIController, and NavigationController All Feed Ship Physics** — core_spec_unified_input, physics_spec_three_layers, nav_spec_overview, ai_spec_overview, fleet_command_inputmanager [EXTRACTED 1.00]
 - **XZ Plane Y=0 Enforcement Applies Across Ships, Projectiles, Asteroids, and Debris** — core_spec_xz_plane_contract, physics_spec_rigidbody_config, weapons_spec_projectile_manager, chunk_spec_asteroid, chunk_spec_debris [EXTRACTED 1.00]
 - **All Tunable Values in JSON — ship.json, weapon.json, ai_profiles.json, world_config.json, factions.json** — claude_md_json_tunables_rule, ship_spec_ship_json_schema, weapons_spec_weapon_json, ai_spec_behavior_profile_json, chunk_spec_world_config_json, ship_spec_factions_json [EXTRACTED 1.00]
 - **PerformanceMonitor begin/end Required on Every System — Instrumented from Day One** — core_spec_performance_monitor_contract, perf_spec_api, perf_spec_custom_monitors, perf_spec_built_first_rationale, vision_observability [EXTRACTED 1.00]
-- **Damage Pipeline: Shield Absorption → Hull → Component Split via damage_type Matrix** — weapons_spec_damage_pipeline, weapons_spec_damage_type_matrix, weapons_spec_shield_system, weapons_spec_heat_system, ship_spec_contentregistry [EXTRACTED 1.00]
 - **Stacked icon composition: panel, mascot fill, eye detail** — icon_rounded_panel, icon_mascot_vector_group, icon_ocular_detail_group [EXTRACTED 1.00]
 - **Red UV islands forming a coordinated accent graphic set on the fighter sheet** — fighter_base_color_vertical_stripe_island, fighter_base_color_chevron_trim_islands, fighter_base_color_arc_crescent_island, fighter_base_color_circular_solid_island, fighter_base_color_red_accent_paint [INFERRED 0.83]
 - **Fighter hull: flat albedo + implied material stack** — fighter_base_color_albedo_texture_file, fighter_base_color_uniform_charcoal_surface, fighter_base_color_neutral_pbr_foundation [INFERRED 0.72]
 - **Red livery graphic elements on hull texture** — model_fighter_base_color_vertical_stripe, model_fighter_base_color_circular_element, model_fighter_base_color_crescent_element, model_fighter_base_color_symmetrical_angled_pairs, model_fighter_base_color_bright_red_markings [INFERRED 0.84]
-- **Agent Session End Workflow** — agents_session_end_protocol, agent_brief_build_status, decisions_log [EXTRACTED 1.00]
-- **Build Progress Tracking** — agent_brief_build_status, development_guide_build_order, development_guide_session_checklist [INFERRED 0.80]
-- **April 17 2026 Implementation Decision Cluster** — decisions_log_decision_2026_04_17_physics_spec_auth, decisions_log_decision_2026_04_17_input_forward_sign, decisions_log_decision_2026_04_17_nav_monitor_registration, decisions_log_decision_2026_04_17_monitor_gamebootstrap, decisions_log_decision_2026_04_17_nav_flat_schema, decisions_log_decision_2026_04_17_projectilemanager_node3d, decisions_log_decision_2026_04_17_dumbprojectile_struct, decisions_log_decision_2026_04_17_hitscan_physics_tick, decisions_log_decision_2026_04_17_fire_group_indexing [INFERRED 0.75]
-- **Engineer Crew Character Variants** — crew_engineer_1_character, crew_engineer_2_character, crew_engineer_3_character, crew_engineer_4_character [INFERRED 0.90]
-- **Engineer Character Archetypes** — crew_engineer_5_character, crew_engineer_6_character, crew_engineer_7_character, crew_engineer_8_character, crew_engineer_9_character [INFERRED 0.80]
-- **Spaceship Interior Environments** — engine_room_environment, industrial_corridor_environment, cleanroom_environment, circular_data_center_environment, navigation_room_environment [INFERRED 0.80]
-- **Protective Engineer Gear** — tactical_harness_gear, backpack_gear, eva_suit, advanced_spacesuit [INFERRED 0.75]
-- **Engineer Crew Members** — crew_engineer_10_character, crew_engineer_11_character, crew_engineer_12_character [EXTRACTED 1.00]
-- **Navigator Crew Members** — crew_navigator_12_character, crew_navigator_1_character [EXTRACTED 1.00]
-- **Glitch Art Crew Portraits** — crew_engineer_10_character, crew_engineer_11_character, crew_engineer_12_character, crew_navigator_12_character, crew_navigator_1_character [INFERRED 0.85]
-- **Crew Navigator Portrait Collection** — crew_navigator_13_portrait, crew_navigator_3_portrait, crew_navigator_2_portrait, crew_navigator_4_portrait, crew_navigator_5_portrait [INFERRED 0.85]
-- **Sci-Fi Anime Crew Portrait Collection** — crew_navigator_6, crew_navigator_7, crew_captain_1, crew_captain_2, crew_captain_3, crew_captain_4, crew_captain_5, crew_soldier_1, crew_soldier_2, crew_random_1, crew_random_2, crew_random_3, crew_pilot_1, crew_pilot_2, crew_pilot_3, crew_pilot_4, crew_pilot_5, crew_pilot_6 [INFERRED 0.90]
-- **Captain Role Character Variants** — crew_captain_1, crew_captain_2, crew_captain_3, crew_captain_4, crew_captain_5 [EXTRACTED 1.00]
-- **Pilot Role Character Variants** — crew_pilot_1, crew_pilot_2, crew_pilot_3, crew_pilot_4, crew_pilot_5, crew_pilot_6 [EXTRACTED 1.00]
+- **GameBootstrap autoload cluster — core services through VFX (AGENTS)** — agents_autoload_servicelocator, agents_autoload_gameeventbus, agents_autoload_contentregistry, agents_autoload_projectilemanager, agents_autoload_vfxmanager [INFERRED 1.00]
+- **Data-driven tuning: world_config star_field, effect.json types, UITokens constants** — star_field_world_config, combat_vfx_effect_types_table, ui_design_uitokens_autoload [INFERRED 0.72]
+- **Graphify output trio — report, HTML viewer, embedded graph data** — graph_report_doc, graph_html_doc, graph_html_vis_raw_embed [INFERRED 1.00]
 
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.07
-Nodes (35): Agent Brief Build Status, Deviation Protocol, Agent Brief Project Context, Session End Protocol, Decisions Log, 2026-04-16 Pre-implementation Spec Audit, 2026-04-17 DumbProjectile Struct Stores Combat Values, 2026-04-17 Fire Group 1-Based JSON 0-Based Internal (+27 more)
+Cohesion: 0.22
+Nodes (2): Node3D, ProjectileManager
 
 ### Community 1 - "Community 1"
-Cohesion: 0.12
-Nodes (31): Advanced Spacesuit, Backpack Gear, Circular Data Center Environment, Circular Engine Turbine, Cleanroom Environment, Female Engineer in Orange Jumpsuit, Female Engineer in Tan Jumpsuit, Engineer in White EVA Suit (+23 more)
+Cohesion: 0.15
+Nodes (15): Full design intent: docs/core_spec.md, Deviation protocol — written report before spec deviation, agent_brief.md — read-first agent context, AGENTS.md — project structure notes, CLAUDE.md — Cursor project context, graphify-first recon: GRAPH_REPORT.md then graph.json, Read docs/agent_brief.md before other work, Session end: update agent_brief build status + decisions_log (+7 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.23
-Nodes (26): Holographic Display UI Elements, Sci-Fi Anime Art Style, Spaceship Interior Setting, Captain Character 1 - Blonde Captain on Throne, Captain Character 2 - Red Lit Captain, Captain Character 3 - Purple Hair Captain, Captain Character 4 - White Hair Orange Eye Captain, Captain Character 5 - Silver Hair Green Hologram Captain (+18 more)
+Cohesion: 0.14
+Nodes (14): Step 18 UI Foundation — implemented, Step 19 Pilot HUD — implemented, 2026-04-29 UI Session 2 Pilot HUD + Radar, UI Design Specification — tokens & HUD layouts, player_ship_changed(ship) — PlayerState emitter, Orbitron OFL.txt — SIL Open Font License 1.1, Reserved Font Name: Orbitron, Orbitron README — variable font wght axis (+6 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.13
-Nodes (4): Node, Node3D, ProjectileManager, ServiceLocator
+Cohesion: 0.18
+Nodes (11): Cross-system comms only via GameEventBus signals, GameEventBus cross-system signal bus, WeaponComponent direct calls MuzzleFlashPlayer & BeamRenderer (no bus), Rationale: bus avoided for high-frequency muzzle — latency, Ordered build steps 1–17 with spec references, development_guide.md — build order & session workflow, GameEventBus signal contract specification, Canonical signal definitions for core/GameEventBus.gd (+3 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.1
-Nodes (21): Aim Prediction — Linear Lead via aim_accuracy Float (0.0–1.0 Difficulty Knob), AI Behavior Profile JSON — ai_profiles.json, all tuning values, Detection System — Area3D SphereShape3D, body_entered Sets _player_detected, ENGAGE State — Maintain preferred_engage_distance, Orbit via Strafe, Fire When Aligned, IDLE State — Wander Within wander_radius of Spawn Position, AI & Patrol Behavior — State Machine, JSON Profiles, NavigationController, PURSUE State — Close on Target at pursue_thrust_fraction, Leash Range Check, AIController State Machine — IDLE→PURSUE→ENGAGE (FLEE/REGROUP/SEARCH reserved) (+13 more)
+Cohesion: 0.2
+Nodes (11): Star Field System Specification (MVP background), Star System Specification — galactic LOD stars, StarField sibling of ChunkStreamer under world root, depth_draw_never — stars never occlude gameplay, Stars fixed in world; parallax from perspective only, PRIMITIVE_POINTS one draw call star field, star_field.gdshader — gl_PointCoord soft circular glow, StarField Node3D + MeshInstance3D ArrayMesh (+3 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.12
-Nodes (16): Non-Negotiable Architecture Rules, Quick Rules, Mouse-to-World — Ray-Plane Intersection Against Y=0 (get_cursor_world_position), world_config.json — chunk_size, load_radius, asteroid_fields, debris tuning, No Direct Cross-System Calls — GameEventBus Signals Only, No Hardcoded Values — Tunable Data in JSON, No 2D Nodes Rule, One System Per Session — Do Not Mix Concerns (+8 more)
-
-### Community 6 - "Community 6"
-Cohesion: 0.21
-Nodes (11): Fleet Command Architecture — InputManager, SelectionState, EscortQueue, FormationController, StanceController, Away-on-Orders Tracking — Slot Reserved but Empty During Tactical Order, Context Menu — Stance Submenu (hidden in escort) + Escort Submenu, Defensive Stance Fan-Out — Escort Queue Member Hit Triggers All Members Attack Attacker, EscortQueue — Ordered Escort Ship IDs, Queue-Shared Stance, Away-on-Orders, FormationController — Pilot-Mode Tick, request_formation_destination Signal, InputManager — Tab Mode Toggle, game_mode_changed Emission, Pilot Input Routing, Fleet Command — RTS Fleet Control, Escort Queue, Stance System (+3 more)
-
-### Community 7 - "Community 7"
 Cohesion: 0.33
 Nodes (10): Base color (albedo) texture map, Axum-class fighter surface livery, Accent marking color (high-chroma red), Solid circular red hull mark, Crescent or jagged-bottom red marking, Primary hull base color (matte dark gray field), Minimalist high-contrast industrial sci-fi look, Mirrored angled line pairs (lower layout) (+2 more)
 
-### Community 8 - "Community 8"
-Cohesion: 0.4
-Nodes (10): Cosmic Navigation, Green-skinned Engineer with Holographic Tablet, Blue-skinned Engineer with Energy Sphere, Dark-skinned Engineer with Ring Interface, Navigator at Star Chart Console, White-haired Navigator Observing Cosmos, Engineer Role, Futuristic Spaceship Interior (+2 more)
+### Community 6 - "Community 6"
+Cohesion: 0.2
+Nodes (10): Step 17 Combat VFX — in progress, VFXManager combat visual effects (Step 17), gameplay/vfx/ EffectPool, VFXManager, local players, VFXManager subscribes to projectile_hit, shield_hit, ship_destroyed, missile_detonated, Distributed ownership: local weapon effects vs VFXManager pools, 2026-04-25 Phase 17 Session 2 local effect players, Step 17 Combat VFX — feature_spec-combat_vfx.md, Combat VFX System Specification (+2 more)
 
-### Community 9 - "Community 9"
+### Community 7 - "Community 7"
 Cohesion: 0.53
 Nodes (9): Small horizontal arc or crescent marking (irregular top edge), Symmetric angled chevron or open-diamond trim pair, Solid circular red island (upper-right), Fighter Base Color diffuse (albedo) texture map, Minimal high-contrast sci-fi vehicle livery (gray + red), Neutral dark gray base color field (~#444444), Bright red accent paint on hull markings, UV island layout on a single base-color sheet (+1 more)
 
+### Community 8 - "Community 8"
+Cohesion: 0.29
+Nodes (2): Node, ServiceLocator
+
+### Community 9 - "Community 9"
+Cohesion: 0.4
+Nodes (5): Pilot Mode — Direct Thrust + Mouse Aim, Close Follow Camera, Tactical Mode — Fleet RTS, Drag Select, Right-Click Orders, Three Gameplay Modes — Pilot, Tactical, Galactic, Unified Ship Input Interface (input_forward, input_strafe, input_aim_target, input_fire), Four Phases of Play (Personal Pilot → Fleet → Infrastructure → Galactic)
+
 ### Community 10 - "Community 10"
-Cohesion: 0.61
-Nodes (9): Engineer Character Variant 1 - Welding Repair, Engineer Crew Role, Pixel Art Visual Style, Repair Activity with Energy Tool, Sci-Fi Industrial Environment Theme, Engineer Character Variant 2 - Cylindrical Machinery Welding, Engineer Character Variant 3 - Tool Repair, Engineer Character Variant 4 - Diagnostic Tablet (+1 more)
-
-### Community 11 - "Community 11"
-Cohesion: 0.29
-Nodes (7): Asteroid — RigidBody3D with Jolt Axis Locks, apply_damage, Debris Spawn on Death, SpaceBody Contract — mass, velocity, angular_velocity, apply_damage, apply_impulse, Damage Resolution Pipeline — Shield Absorption → Hull → Component Split via component_damage_ratio, Damage Type Matrix — ballistic 0.4×/1.5×, energy_beam 1.8×/0.5×, missile 0.6×/1.4×, Power System — Per-Ship Shared Pool, Brownout Stops Energy Weapons + Shield Regen, Shield System — shield_hp, regen_delay, regen_power_draw; Regen Pauses on Hit, weapon.json Schema — archetype, stats (damage, fire_rate, heat_per_shot, muzzle_speed, etc.)
-
-### Community 12 - "Community 12"
-Cohesion: 0.29
-Nodes (7): Canonical Metric Names — System.method format table, PerformanceMonitor Contract — begin/end pairs required on every system, PerformanceMonitor API — begin/end Timing, set_count, get_avg_ms, get_peak_ms, Rationale: PerformanceMonitor Built First — Metrics From Day One Avoids Retrofitting, F3 In-Game Debug Overlay — CanvasLayer, Monospace Font, Frame Budget Display, PerformanceMonitor — Lightweight Always-On Observability Service, Observability From Day One — PerformanceMonitor
-
-### Community 13 - "Community 13"
-Cohesion: 0.4
-Nodes (5): Rationale: Height Zoom vs FOV Zoom — Constant Distortion, Natural Feel, Camera System — Perspective Follow, Cursor-Offset, Height Zoom, Camera Is Sibling of Game World — Never Child of Any Ship, Critically Damped Spring Follow — No Overshoot, No Oscillation, Delta-Time Correct, Camera Summary — Camera3D Perspective, Height Zoom, Never Child of Ship
-
-### Community 14 - "Community 14"
-Cohesion: 0.4
-Nodes (5): Content Architecture — Folder-Per-Item Under /content/, ContentRegistry — Scans /content at Startup, Indexes Ships/Weapons/Modules by Folder, PlayerState — Tracks Active Player Ship, Emits player_ship_changed, ShipFactory — spawn_ship(), Stat Resolution, Part Assembly, Hardpoint Discovery, Color Material, GuidedProjectilePool GDScript — Missile Steering via slerp, track_cursor/auto_lock/click_lock
-
-### Community 15 - "Community 15"
 Cohesion: 0.5
 Nodes (5): Semantic association: standard Godot Engine editor / project joystick-robot logo, Scaled path group: robot head, gear crown, blue face plate (#478cbf), white gear outline, Eye layer: two dark gray circles (#414042) for pupils, Rounded rectangle frame (#363d52 fill, #212532 stroke, rx=14), SVG application icon 128×128 (Godot-style brand mark)
 
-### Community 16 - "Community 16"
+### Community 11 - "Community 11"
 Cohesion: 0.5
 Nodes (5): Fighter Base Color texture (Blender albedo map), Dark utilitarian / industrial hull color direction, Featureless albedo (no gradients, noise, or markings), Neutral base layer for PBR (detail likely in roughness/normal/metallic), Uniform dark charcoal gray surface (~#444444 RGB)
 
-### Community 17 - "Community 17"
+### Community 12 - "Community 12"
 Cohesion: 0.5
-Nodes (4): Blueprint Discovery System — variant_id Added to Save Data on Reverse Engineering, ship.json Schema — base_stats, variants, part_stats, hardpoint_types, module_slots, default_loadout, Stat Resolution — base_stats + additive part_stat deltas Applied Once at Spawn, Ship Three Layers — Class (what it is) / Variant (discoverable config) / Loadout (player customizes)
+Nodes (4): content/effects/ JSON effect definitions, assets/shaders/shield_ripple.gdshader, Effect types: particle_burst, beam, muzzle_flash, explosion, shield_ripple, Projectile trails excluded from phase — deferred
 
-### Community 18 - "Community 18"
+### Community 13 - "Community 13"
 Cohesion: 0.67
 Nodes (3): All Space Core Spec — Top-Down 3D on XZ Plane, Core Philosophy: Complexity On Demand, All Space — Top-Down 3D Space Simulation Vision
 
-### Community 19 - "Community 19"
+### Community 14 - "Community 14"
 Cohesion: 0.67
-Nodes (3): Partial Alignment Drag — alignment_drag_current Per-Frame Reset Pattern, Lateral-Only Bleed, Assisted Steering — Predicted Stopping Distance Controls Brake vs Accelerate Torque, Shared Thruster Budget — Turning Priority Over Translation, Diagonal Clamped to Unit
+Nodes (3): Y=0 play plane for positions and velocities, World-space VFX spawn Y=0 enforcement, All world positions/velocities Vector3 (Y=0)
 
-### Community 20 - "Community 20"
-Cohesion: 0.67
-Nodes (3): Braking Decision Algorithm — Predicted Stop Distance vs Remaining Distance, Project World-Space Thrust onto Ship Axes — Correct Regardless of Facing, Physics Hull JSON Block — mass, max_speed, linear_drag, thruster_force, etc.
-
-### Community 21 - "Community 21"
-Cohesion: 0.67
-Nodes (3): Star Field System Specification, No 2D Nodes Rule, No Hardcoded Values Rule
-
-### Community 22 - "Community 22"
+### Community 15 - "Community 15"
 Cohesion: 1.0
 Nodes (2): Combat MVP — 3D Top-Down Space Combat Simulator, Streaming Map — Chunk-Based Seamless World
 
-### Community 23 - "Community 23"
+### Community 16 - "Community 16"
 Cohesion: 1.0
-Nodes (2): One Ship.tscn for All Ship Types — Configured at Spawn Time, Ship System — One Ship.tscn, Data-Driven Assembly from ship.json + parts.glb
+Nodes (2): 2026-04-16 pre-implementation spec audit & 3D cleanup, Core Spec > Feature Spec > agent assumption
 
-### Community 24 - "Community 24"
+### Community 17 - "Community 17"
 Cohesion: 1.0
-Nodes (2): ChunkStreamer — Deterministic Procedural Chunk Streaming, Bounded Memory, World Streaming Summary — Deterministic Chunk Grid, GameEventBus chunk_loaded
+Nodes (2): game_mode_changed(old_mode, new_mode), PilotHUD / TacticalHUD — no mutual references; bus only
 
-### Community 25 - "Community 25"
-Cohesion: 1.0
-Nodes (2): Chunk Coordinate ↔ World Position — Vector2i Grid Coord → Vector3 World Origin, Deterministic RNG Seeded by Chunk Coord Hash — Same Coord = Same Content Every Visit
-
-### Community 26 - "Community 26"
-Cohesion: 1.0
-Nodes (2): Momentum Inheritance — Projectiles Inherit Ship velocity at Spawn, ProjectileManager C# — Dumb Pool (DumbProjectile struct), Hitscan, Swept Raycast
-
-### Community 27 - "Community 27"
-Cohesion: 1.0
-Nodes (2): Vertex Color Shader — R=Primary, G=Trim, B=Accent, A=Glow; Shared Material Per Ship, factions.json — color_scheme (primary/trim/accent/glow) + name_vocabulary
-
-### Community 28 - "Community 28"
-Cohesion: 1.0
-Nodes (2): Weapons Summary — JSON Stats, Damage Types, Heat Per Hardpoint, Power Per Ship, Weapons & Projectiles — Data-Driven, Dual Heat/Power Resources, Dual Pool
-
-### Community 29 - "Community 29"
-Cohesion: 1.0
-Nodes (2): Aim Direction Algorithm — slerp-Clamp to Arc for Gimbal/Partial Turret, Unconstrained Full Turret, Hardpoint Types — fixed (~5°), gimbal (~25°), partial_turret (~120°), full_turret (360°)
-
-### Community 30 - "Community 30"
-Cohesion: 1.0
-Nodes (2): Weapon Archetypes — Ballistic, Energy Beam, Energy Pulse, Dumb Missile, Guided Missile, Heat System — Per-Hardpoint heat_current, Overheat Lockout, Passive Cooling
-
-### Community 31 - "Community 31"
+### Community 18 - "Community 18"
 Cohesion: 1.0
 Nodes (1): Sim-Lite Physics — Mass, Momentum, Angular Inertia
 
-### Community 32 - "Community 32"
+### Community 19 - "Community 19"
 Cohesion: 1.0
-Nodes (1): Formation Tick Algorithm — Pilot Mode, Slot Destination = Player Pos + Offset Rotated by Yaw
+Nodes (1): Observability From Day One — PerformanceMonitor
 
-### Community 33 - "Community 33"
+### Community 20 - "Community 20"
 Cohesion: 1.0
-Nodes (1): New Fleet Command Signals — request_tactical_stop, set_stance, escort_queue_changed, ship_damaged, request_formation_destination
+Nodes (1): Data-Driven Everything — JSON Configuration Files
 
-### Community 34 - "Community 34"
+### Community 21 - "Community 21"
+Cohesion: 1.0
+Nodes (1): Modularity as Development Forcing Function — Agent Sessions Stay Focused
+
+### Community 22 - "Community 22"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 23 - "Community 23"
+Cohesion: 1.0
+Nodes (1): 3D Play Plane Contract — All Entities at Y=0, Vector2 Banned
+
+### Community 24 - "Community 24"
+Cohesion: 1.0
+Nodes (1): Architecture Rules — No Hardcoded Values, No Direct Cross-System Refs
+
+### Community 25 - "Community 25"
 Cohesion: 1.0
 Nodes (1): Project Structure — Directory Layout
 
+### Community 26 - "Community 26"
+Cohesion: 1.0
+Nodes (1): SpaceBody Contract — mass, velocity, angular_velocity, apply_damage, apply_impulse
+
+### Community 27 - "Community 27"
+Cohesion: 1.0
+Nodes (1): PerformanceMonitor Contract — begin/end pairs required on every system
+
+### Community 28 - "Community 28"
+Cohesion: 1.0
+Nodes (1): Canonical Metric Names — System.method format table
+
+### Community 29 - "Community 29"
+Cohesion: 1.0
+Nodes (1): Content Architecture — Folder-Per-Item Under /content/
+
+### Community 30 - "Community 30"
+Cohesion: 1.0
+Nodes (1): One Ship.tscn for All Ship Types — Configured at Spawn Time
+
+### Community 31 - "Community 31"
+Cohesion: 1.0
+Nodes (1): Physics Summary — RigidBody3D + Jolt, Assisted Steering, Thruster Budget
+
+### Community 32 - "Community 32"
+Cohesion: 1.0
+Nodes (1): Weapons Summary — JSON Stats, Damage Types, Heat Per Hardpoint, Power Per Ship
+
+### Community 33 - "Community 33"
+Cohesion: 1.0
+Nodes (1): AI Summary — State Machine IDLE→PURSUE→ENGAGE, JSON Profiles
+
+### Community 34 - "Community 34"
+Cohesion: 1.0
+Nodes (1): Camera Summary — Camera3D Perspective, Height Zoom, Never Child of Ship
+
 ### Community 35 - "Community 35"
 Cohesion: 1.0
-Nodes (1): Build Order — 15-Step Dependency Sequence
+Nodes (1): World Streaming Summary — Deterministic Chunk Grid, GameEventBus chunk_loaded
 
 ### Community 36 - "Community 36"
 Cohesion: 1.0
-Nodes (1): Debris — Node3D Visual Only, Manual Velocity Integration, Alpha Fade Timer
+Nodes (1): Build Order — 15-Step Dependency Sequence
 
 ### Community 37 - "Community 37"
 Cohesion: 1.0
-Nodes (1): AI Spawn Point Markers — Node3D in ai_spawn_points Group, ChunkStreamer Agnostic of AI
+Nodes (0): 
 
 ### Community 38 - "Community 38"
 Cohesion: 1.0
-Nodes (1): RigidBody3D Configuration — gravity_scale 0, axis_lock_linear_y, DAMP_MODE_REPLACE
+Nodes (0): 
 
 ### Community 39 - "Community 39"
 Cohesion: 1.0
-Nodes (1): Hardpoint Empty Naming — HardpointEmpty_{part}_{id}_{size} Uniqueness Convention
+Nodes (0): 
 
 ### Community 40 - "Community 40"
 Cohesion: 1.0
-Nodes (1): Thrust Fraction Scaling — AI Expresses Intent (patrol vs pursue speed)
+Nodes (0): 
 
 ### Community 41 - "Community 41"
 Cohesion: 1.0
-Nodes (1): Arrival Behavior — Zero Thrust Within arrival_distance, Residual Drift Intentional
+Nodes (0): 
 
 ### Community 42 - "Community 42"
 Cohesion: 1.0
-Nodes (1): DriveMode Enum — EXTERNAL / TACTICAL_ORDER / FORMATION Self-Drive (Phase 14)
+Nodes (0): 
 
 ### Community 43 - "Community 43"
 Cohesion: 1.0
-Nodes (1): Godot Custom Monitors Registered in GameBootstrap to Avoid Duplicate Registration
+Nodes (0): 
 
 ### Community 44 - "Community 44"
 Cohesion: 1.0
-Nodes (1): Graph Report Summary
+Nodes (0): 
 
 ### Community 45 - "Community 45"
 Cohesion: 1.0
-Nodes (1): Godot AI Addon README
+Nodes (1): Star Field System Specification
 
 ### Community 46 - "Community 46"
 Cohesion: 1.0
 Nodes (1): Debug Grid Texture
 
+### Community 47 - "Community 47"
+Cohesion: 1.0
+Nodes (1): ServiceLocator singleton registry
+
+### Community 48 - "Community 48"
+Cohesion: 1.0
+Nodes (1): ContentRegistry JSON content loader
+
+### Community 49 - "Community 49"
+Cohesion: 1.0
+Nodes (1): ProjectileManager C# projectile pool
+
+### Community 50 - "Community 50"
+Cohesion: 1.0
+Nodes (1): No 2D nodes; Vector2 banned for world-space
+
+### Community 51 - "Community 51"
+Cohesion: 1.0
+Nodes (1): Ship.gd never writes velocity/position for motion — Jolt only
+
+### Community 52 - "Community 52"
+Cohesion: 1.0
+Nodes (1): ExclusionArea no-fly radius per destination star
+
+### Community 53 - "Community 53"
+Cohesion: 1.0
+Nodes (1): pool_size 0 disables effect without errors
+
+### Community 54 - "Community 54"
+Cohesion: 1.0
+Nodes (1): Session 1 Opus — VFX core, pools, GameBootstrap monitors
+
+### Community 55 - "Community 55"
+Cohesion: 1.0
+Nodes (1): UITokens.gd autoload — color/font constants
+
+### Community 56 - "Community 56"
+Cohesion: 1.0
+Nodes (1): UITheme.tres — Panel/Label/Button styles from tokens
+
+### Community 57 - "Community 57"
+Cohesion: 1.0
+Nodes (1): UI.pilot_hud_update / UI.tactical_hud_update metrics
+
 ## Knowledge Gaps
-- **93 isolated node(s):** `No Direct Cross-System Calls — GameEventBus Signals Only`, `Specs Are Authoritative — Deviations Require Report`, `Core Philosophy: Complexity On Demand`, `Four Phases of Play (Personal Pilot → Fleet → Infrastructure → Galactic)`, `Combat MVP — 3D Top-Down Space Combat Simulator` (+88 more)
+- **81 isolated node(s):** `Core Philosophy: Complexity On Demand`, `Four Phases of Play (Personal Pilot → Fleet → Infrastructure → Galactic)`, `Combat MVP — 3D Top-Down Space Combat Simulator`, `Sim-Lite Physics — Mass, Momentum, Angular Inertia`, `Streaming Map — Chunk-Based Seamless World` (+76 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 22`** (2 nodes): `Combat MVP — 3D Top-Down Space Combat Simulator`, `Streaming Map — Chunk-Based Seamless World`
+- **Thin community `Community 15`** (2 nodes): `Combat MVP — 3D Top-Down Space Combat Simulator`, `Streaming Map — Chunk-Based Seamless World`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 23`** (2 nodes): `One Ship.tscn for All Ship Types — Configured at Spawn Time`, `Ship System — One Ship.tscn, Data-Driven Assembly from ship.json + parts.glb`
+- **Thin community `Community 16`** (2 nodes): `2026-04-16 pre-implementation spec audit & 3D cleanup`, `Core Spec > Feature Spec > agent assumption`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 24`** (2 nodes): `ChunkStreamer — Deterministic Procedural Chunk Streaming, Bounded Memory`, `World Streaming Summary — Deterministic Chunk Grid, GameEventBus chunk_loaded`
+- **Thin community `Community 17`** (2 nodes): `game_mode_changed(old_mode, new_mode)`, `PilotHUD / TacticalHUD — no mutual references; bus only`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 25`** (2 nodes): `Chunk Coordinate ↔ World Position — Vector2i Grid Coord → Vector3 World Origin`, `Deterministic RNG Seeded by Chunk Coord Hash — Same Coord = Same Content Every Visit`
+- **Thin community `Community 18`** (1 nodes): `Sim-Lite Physics — Mass, Momentum, Angular Inertia`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 26`** (2 nodes): `Momentum Inheritance — Projectiles Inherit Ship velocity at Spawn`, `ProjectileManager C# — Dumb Pool (DumbProjectile struct), Hitscan, Swept Raycast`
+- **Thin community `Community 19`** (1 nodes): `Observability From Day One — PerformanceMonitor`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 27`** (2 nodes): `Vertex Color Shader — R=Primary, G=Trim, B=Accent, A=Glow; Shared Material Per Ship`, `factions.json — color_scheme (primary/trim/accent/glow) + name_vocabulary`
+- **Thin community `Community 20`** (1 nodes): `Data-Driven Everything — JSON Configuration Files`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 28`** (2 nodes): `Weapons Summary — JSON Stats, Damage Types, Heat Per Hardpoint, Power Per Ship`, `Weapons & Projectiles — Data-Driven, Dual Heat/Power Resources, Dual Pool`
+- **Thin community `Community 21`** (1 nodes): `Modularity as Development Forcing Function — Agent Sessions Stay Focused`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 29`** (2 nodes): `Aim Direction Algorithm — slerp-Clamp to Arc for Gimbal/Partial Turret, Unconstrained Full Turret`, `Hardpoint Types — fixed (~5°), gimbal (~25°), partial_turret (~120°), full_turret (360°)`
+- **Thin community `Community 22`** (1 nodes): `feature_spec-fleet_command.md`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 30`** (2 nodes): `Weapon Archetypes — Ballistic, Energy Beam, Energy Pulse, Dumb Missile, Guided Missile`, `Heat System — Per-Hardpoint heat_current, Overheat Lockout, Passive Cooling`
+- **Thin community `Community 23`** (1 nodes): `3D Play Plane Contract — All Entities at Y=0, Vector2 Banned`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 31`** (1 nodes): `Sim-Lite Physics — Mass, Momentum, Angular Inertia`
+- **Thin community `Community 24`** (1 nodes): `Architecture Rules — No Hardcoded Values, No Direct Cross-System Refs`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 32`** (1 nodes): `Formation Tick Algorithm — Pilot Mode, Slot Destination = Player Pos + Offset Rotated by Yaw`
+- **Thin community `Community 25`** (1 nodes): `Project Structure — Directory Layout`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 33`** (1 nodes): `New Fleet Command Signals — request_tactical_stop, set_stance, escort_queue_changed, ship_damaged, request_formation_destination`
+- **Thin community `Community 26`** (1 nodes): `SpaceBody Contract — mass, velocity, angular_velocity, apply_damage, apply_impulse`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 34`** (1 nodes): `Project Structure — Directory Layout`
+- **Thin community `Community 27`** (1 nodes): `PerformanceMonitor Contract — begin/end pairs required on every system`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 35`** (1 nodes): `Build Order — 15-Step Dependency Sequence`
+- **Thin community `Community 28`** (1 nodes): `Canonical Metric Names — System.method format table`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 36`** (1 nodes): `Debris — Node3D Visual Only, Manual Velocity Integration, Alpha Fade Timer`
+- **Thin community `Community 29`** (1 nodes): `Content Architecture — Folder-Per-Item Under /content/`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 37`** (1 nodes): `AI Spawn Point Markers — Node3D in ai_spawn_points Group, ChunkStreamer Agnostic of AI`
+- **Thin community `Community 30`** (1 nodes): `One Ship.tscn for All Ship Types — Configured at Spawn Time`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 38`** (1 nodes): `RigidBody3D Configuration — gravity_scale 0, axis_lock_linear_y, DAMP_MODE_REPLACE`
+- **Thin community `Community 31`** (1 nodes): `Physics Summary — RigidBody3D + Jolt, Assisted Steering, Thruster Budget`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (1 nodes): `Hardpoint Empty Naming — HardpointEmpty_{part}_{id}_{size} Uniqueness Convention`
+- **Thin community `Community 32`** (1 nodes): `Weapons Summary — JSON Stats, Damage Types, Heat Per Hardpoint, Power Per Ship`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 40`** (1 nodes): `Thrust Fraction Scaling — AI Expresses Intent (patrol vs pursue speed)`
+- **Thin community `Community 33`** (1 nodes): `AI Summary — State Machine IDLE→PURSUE→ENGAGE, JSON Profiles`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 41`** (1 nodes): `Arrival Behavior — Zero Thrust Within arrival_distance, Residual Drift Intentional`
+- **Thin community `Community 34`** (1 nodes): `Camera Summary — Camera3D Perspective, Height Zoom, Never Child of Ship`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 42`** (1 nodes): `DriveMode Enum — EXTERNAL / TACTICAL_ORDER / FORMATION Self-Drive (Phase 14)`
+- **Thin community `Community 35`** (1 nodes): `World Streaming Summary — Deterministic Chunk Grid, GameEventBus chunk_loaded`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 43`** (1 nodes): `Godot Custom Monitors Registered in GameBootstrap to Avoid Duplicate Registration`
+- **Thin community `Community 36`** (1 nodes): `Build Order — 15-Step Dependency Sequence`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 44`** (1 nodes): `Graph Report Summary`
+- **Thin community `Community 37`** (1 nodes): `feature_spec-ai_patrol_behavior.md`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 45`** (1 nodes): `Godot AI Addon README`
+- **Thin community `Community 38`** (1 nodes): `feature_spec-camera_system.md`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 39`** (1 nodes): `feature_spec-chunk_streamer.md`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 40`** (1 nodes): `feature_spec-physics_and_movement.md`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 41`** (1 nodes): `feature_spec-ship_system.md`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 42`** (1 nodes): `feature_spec-weapons_and_projectiles.md`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 43`** (1 nodes): `feature_spec-nav_controller.md`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 44`** (1 nodes): `feature_spec-performance_monitor.md`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 45`** (1 nodes): `Star Field System Specification`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 46`** (1 nodes): `Debug Grid Texture`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 47`** (1 nodes): `ServiceLocator singleton registry`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 48`** (1 nodes): `ContentRegistry JSON content loader`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 49`** (1 nodes): `ProjectileManager C# projectile pool`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 50`** (1 nodes): `No 2D nodes; Vector2 banned for world-space`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 51`** (1 nodes): `Ship.gd never writes velocity/position for motion — Jolt only`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 52`** (1 nodes): `ExclusionArea no-fly radius per destination star`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 53`** (1 nodes): `pool_size 0 disables effect without errors`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 54`** (1 nodes): `Session 1 Opus — VFX core, pools, GameBootstrap monitors`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 55`** (1 nodes): `UITokens.gd autoload — color/font constants`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 56`** (1 nodes): `UITheme.tres — Panel/Label/Button styles from tokens`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 57`** (1 nodes): `UI.pilot_hud_update / UI.tactical_hud_update metrics`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `AI & Patrol Behavior — State Machine, JSON Profiles, NavigationController` connect `Community 4` to `Community 6`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
-- **Are the 18 inferred relationships involving `Sci-Fi Anime Art Style` (e.g. with `Navigator Character 6 - Star Map Navigator` and `Navigator Character 7 - Dark Lit Navigator`) actually correct?**
-  _`Sci-Fi Anime Art Style` has 18 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 18 inferred relationships involving `Spaceship Interior Setting` (e.g. with `Navigator Character 6 - Star Map Navigator` and `Navigator Character 7 - Dark Lit Navigator`) actually correct?**
-  _`Spaceship Interior Setting` has 18 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 18 inferred relationships involving `Holographic Display UI Elements` (e.g. with `Navigator Character 6 - Star Map Navigator` and `Navigator Character 7 - Dark Lit Navigator`) actually correct?**
-  _`Holographic Display UI Elements` has 18 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `No Direct Cross-System Calls — GameEventBus Signals Only`, `Specs Are Authoritative — Deviations Require Report`, `Core Philosophy: Complexity On Demand` to the rest of the system?**
-  _93 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
-- **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.12 - nodes in this community are weakly interconnected._
+- **Why does `GameEventBus signal contract specification` connect `Community 3` to `Community 1`, `Community 6`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+- **Why does `2026-04-21 Phase 16 GameEventBus spec reconciled with code` connect `Community 1` to `Community 3`?**
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Are the 2 inferred relationships involving `Neutral dark gray base color field (~#444444)` (e.g. with `Bright red accent paint on hull markings` and `Minimal high-contrast sci-fi vehicle livery (gray + red)`) actually correct?**
+  _`Neutral dark gray base color field (~#444444)` has 2 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 2 inferred relationships involving `Bright red accent paint on hull markings` (e.g. with `Neutral dark gray base color field (~#444444)` and `Minimal high-contrast sci-fi vehicle livery (gray + red)`) actually correct?**
+  _`Bright red accent paint on hull markings` has 2 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `Core Philosophy: Complexity On Demand`, `Four Phases of Play (Personal Pilot → Fleet → Infrastructure → Galactic)`, `Combat MVP — 3D Top-Down Space Combat Simulator` to the rest of the system?**
+  _81 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Community 2` be split into smaller, more focused modules?**
+  _Cohesion score 0.14 - nodes in this community are weakly interconnected._
