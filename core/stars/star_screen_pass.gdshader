@@ -90,11 +90,13 @@ void fragment() {
 			continue;
 		}
 
-		// NDC → pixel coords. Godot 4 (Vulkan): FRAGCOORD origin top-left,
-		// NDC y = 1 at the top of the screen.
+		// NDC → pixel coords. Godot 4 spatial shaders use OpenGL-convention
+		// FRAGCOORD (origin bottom-left, y=0 at bottom). PROJECTION_MATRIX has
+		// ndc.y=+1 at the top, so both axes map without a flip — symmetric
+		// with the X formula. A Y-flip here would invert vertical star motion.
 		vec2 star_px = vec2(
 			(ndc.x * 0.5 + 0.5) * viewport_px.x,
-			(1.0 - (ndc.y * 0.5 + 0.5)) * viewport_px.y
+			(ndc.y * 0.5 + 0.5) * viewport_px.y
 		);
 
 		// Apparent screen radius in pixels.
