@@ -52,6 +52,86 @@
     "seed": 42
   },
 
+  "starfield": {
+    "_comment": "StarField autoload — procedural galaxy catalog. Change galaxy_seed for a different galaxy.",
+    "galaxy_seed": 8675309,
+    "backdrop_star_count": 80000,
+    "destination_system_count": 400,
+
+    "galaxy_radius": 100000.0,
+
+    "zone_core_center": {
+      "radius_pct": 10,
+      "height_pct": 8,
+      "density": 1
+    },
+    "zone_core_outer": {
+      "radius_pct": 42,
+      "height_pct": 24,
+      "density": 0.3,
+      "falloff_curve": 1.2
+    },
+    "zone_arms": {
+      "start_radius_pct": 10,
+      "end_radius_pct": 90,
+      "arm_count": 2,
+      "arm_tightness_start": 2.5,
+      "arm_tightness_end": 0.7,
+      "arm_width_start": 0.35,
+      "arm_width_end": 0.45,
+      "density": 0.8
+    },
+    "zone_disc": {
+      "radius_pct": 100,
+      "height_min_pct": 2,
+      "height_max_pct": 16,
+      "density": 0.2,
+      "falloff_curve": 2.0
+    },
+    "zone_overlap_pct": 15,
+
+    "color_core": [1.0, 0.6, 0.4],
+    "color_outer": [0.6, 0.8, 1.0],
+    "color_variation": 0.25,
+
+    "nebula_count": 24,
+    "nebula_radius_min": 8000.0,
+    "nebula_radius_max": 28000.0,
+    "nebula_colors": [
+      [0.8, 0.3, 0.2],
+      [0.3, 0.5, 0.9],
+      [0.6, 0.8, 0.4],
+      [0.9, 0.6, 0.2]
+    ],
+
+    "nebula_sky_shader": {
+      "galaxy_noise_influence": 0.00002,
+      "coarse_frequency": 1.2,
+      "fine_frequency": 4.5,
+      "noise_warp_strength": 0.6,
+      "nebula_base_opacity": 0.35
+    },
+
+    "warp_range_min": 8000.0,
+    "warp_range_max": 20000.0,
+
+    "star_type_weights": {
+      "red_dwarf":    0.60,
+      "yellow_dwarf": 0.25,
+      "blue_giant":   0.08,
+      "neutron_star": 0.05,
+      "white_dwarf":  0.02
+    },
+
+    "star_types": {
+      "red_dwarf":    { "color": [1.0, 0.3, 0.1], "brightness": 0.35, "apparent_size": 0.0004 },
+      "yellow_dwarf": { "color": [1.0, 0.9, 0.5], "brightness": 0.70, "apparent_size": 0.0006 },
+      "blue_giant":   { "color": [0.5, 0.7, 1.0], "brightness": 1.40, "apparent_size": 0.0012 },
+      "neutron_star": { "color": [0.8, 0.9, 1.0], "brightness": 0.90, "apparent_size": 0.0003 },
+      "white_dwarf":  { "color": [0.95, 0.97, 1.0],"brightness": 0.50, "apparent_size": 0.0004 }
+    }
+  },
+
   "galaxy": {
     "_comment": "StarRegistry — procedural galaxy. Change seed for a different galaxy layout.",
     "seed": 8675309,

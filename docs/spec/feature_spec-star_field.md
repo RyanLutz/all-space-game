@@ -1,6 +1,11 @@
 # Star Field System Specification
 *All Space Combat MVP — Background Star Field*
 
+> **SUPERSEDED.** This spec has been replaced by two more detailed specs:
+> - [`feature_spec-star_field_2.md`](feature_spec-star_field_2.md) — galaxy scale: procedural catalog, custom sky shader, nebula volumes, galactic map
+> - [`feature_spec-solar_system.md`](feature_spec-solar_system.md) — system scale: planets, moons, belts, in-system warp, floating origin
+
+
 ## Overview
 
 A procedurally generated star field rendered as a large point-cloud `ArrayMesh` using
