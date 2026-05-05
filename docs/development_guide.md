@@ -9,10 +9,13 @@
 Work top to bottom. Each row is one agent session. When a step is done, check it off.
 Do not skip steps — every system depends on the ones before it.
 
-The **Model** column uses two tiers:
+The **Model** column uses three tiers:
 - **Opus** — high blast radius (other systems depend on this) or requires novel decisions
   that the spec cannot fully anticipate
-- **Sonnet** — well-bounded scope, clear spec contract, limited downstream blast radius
+- **Sonnet** — well-bounded scope, clear spec contract, novel math or shader work, limited
+  downstream blast radius
+- **Haiku** — routine work: UI wiring, event bus hookup, connecting already-built systems,
+  tuning passes, checklist verification
 
 ---
 
@@ -37,11 +40,46 @@ The **Model** column uses two tiers:
 | 15 | ✅ | ChunkStreamer + Asteroid + Debris | `spec/feature_spec-chunk_streamer.md` | **Opus** | Streaming architecture with deterministic generation. Novel and high blast radius — incorrect chunk lifecycle breaks AI spawning and everything in the world. |
 | 16 | ✅ | GameEventBus signal audit | `spec/feature_spec-game_event_bus_signals.md` | Sonnet | Cross-cutting signal catalog. Spec reconciled with code — 12 signals added, 3 signatures fixed, emitter/listener columns updated. No code changes. |
 | 17 | ✅ | Combat VFX System | `spec/feature_spec-combat_vfx.md` | Opus + Sonnet | Muzzle, beam, impact, shield, explosions. 3 sessions. |
-| 18 | ✅ | Star System — Phase 1: Data + Generation + LOD 0 | `spec/feature_spec-star_system.md` | Sonnet | `StarRecord.gd`, `StarRegistry.gd` skeleton, procedural catalog from seed (two-component bulge+disc distribution), `MultiMeshInstance3D` for galactic-scale point rendering. `world_config.json` galaxy fields. All four `StarRegistry.*` PerformanceMonitor metrics wired. Test scene: `test/StarSystemTest.tscn` (added in Phase 2). |
-| 19 | ✅ | Star System — Phase 2: Screen-Space Glow Shader (LOD 1) | `spec/feature_spec-star_system.md` | **Opus** | `star_screen_pass.gdshader` — fullscreen `MeshInstance3D` quad parented to `Camera3D`; vertex writes POSITION in NDC at clip z=0.999 so default depth test occludes against scene; fragment uses built-in `PROJECTION_MATRIX * VIEW_MATRIX` to project per-star world positions (no CPU VP uniform → no rotation lag). `_update_shader_uniforms()` packs visible star list (`vec4` arrays, `PackedVector4Array`) with closest-N cap of 256 (`MAX_SCREEN_PASS_STARS`); frustum culling deferred to Phase 5. `min_pixel_radius` lifted to `world_config.json` and shared by both LOD 0 and LOD 1 shaders so the boundary cannot develop a size discontinuity. Test scene: `test/StarSystemTest.tscn`. **Deviation logged** (decisions_log 2026-05-01): SubViewport approach replaced with 3D fullscreen quad due to Godot 4.x CanvasLayer regression #67633. |
-| 20 | ✅ | Star System — Phase 3: StarMesh + Surface / Corona Shaders (LOD 2) | `spec/feature_spec-star_system.md` | **Opus** | `core/stars/StarMesh.tscn` (3 concentric `SphereMesh` layers + corona QuadMesh + `OmniLight3D` + `Area3D` exclusion stub), `StarMesh.gd` (`configure()` duplicates per-layer mesh + material, applies `galaxy.star_mesh` tunables), `star_surface.gdshader` (object-local 3D fBm, TIME-driven flow, white-hot peaks), `star_corona.gdshader` (billboard MODELVIEW idiom, additive 2-component falloff). `_spawn_mesh()` / `_despawn_mesh()` lifecycle in `StarRegistry`; backdrop-tier clamp now applied at LOD 1 (latent bug fix). `StarRecord.light_range` populated from per-type `light_range_multiplier`. Test scene: `test/StarSystemTest.tscn` (KEY_4 → LOD 2 fly-by). |
-| 21 | ✅ | Star System — Phase 4: Exclusion Zone + GameEventBus Integration | `spec/feature_spec-star_system.md` | Sonnet | `star_exclusion_entered(star_id, ship_id)` added to GameEventBus. `StarMesh._configure_exclusion()` enables monitoring, sets collision_mask=1, connects `body_entered` → emits signal filtered to `Ship` bodies. Boundary-force enforcement flagged as integration point for physics/nav specs. |
-| 22 | ✅ | Star System — Phase 5: LOD Crossfade + Performance Validation | `spec/feature_spec-star_system.md` | Sonnet | Per-star `blend_alpha` float; crossfade over `lod_crossfade_frames` using `mix()` in screen-pass and MultiMesh shaders. Profile `StarRegistry.lod_update` at 3000 stars — must be < 1ms. Add frustum-culling stub for `_screen_pass_stars` if `screen_pass_count` > ~200. Gate: no visible pop at LOD transitions; all four metrics in overlay; lod_update under 1ms. |
+| 18 | ✅ | Star System — Phase 1: Data + Generation + LOD 0 *(old spec — superseded)* | `spec/feature_spec-star_system.md` *(SUPERSEDED)* | Sonnet | `StarRecord.gd`, `StarRegistry.gd` skeleton, procedural catalog from seed (two-component bulge+disc distribution), `MultiMeshInstance3D` for galactic-scale point rendering. `world_config.json` galaxy fields. All four `StarRegistry.*` PerformanceMonitor metrics wired. Test scene: `test/StarSystemTest.tscn`. |
+| 19 | ✅ | Star System — Phase 2: Screen-Space Glow Shader (LOD 1) *(old spec — superseded)* | `spec/feature_spec-star_system.md` *(SUPERSEDED)* | **Opus** | `star_screen_pass.gdshader` — fullscreen `MeshInstance3D` quad parented to `Camera3D`; fragment uses built-in `PROJECTION_MATRIX * VIEW_MATRIX`; 256-star cap. **Deviation logged** (decisions_log 2026-05-01): SubViewport replaced with 3D fullscreen quad due to Godot 4.x CanvasLayer regression #67633. |
+| 20 | ✅ | Star System — Phase 3: StarMesh + Surface / Corona Shaders (LOD 2) *(old spec — superseded)* | `spec/feature_spec-star_system.md` *(SUPERSEDED)* | **Opus** | `core/stars/StarMesh.tscn` (3 concentric `SphereMesh` layers + corona `QuadMesh` + `OmniLight3D` + `Area3D` exclusion stub), `star_surface.gdshader` (object-local 3D fBm, TIME-driven flow), `star_corona.gdshader` (billboard, additive). |
+| 21 | ✅ | Star System — Phase 4: Exclusion Zone + GameEventBus Integration *(old spec — superseded)* | `spec/feature_spec-star_system.md` *(SUPERSEDED)* | Sonnet | `star_exclusion_entered(star_id, ship_id)` added to GameEventBus. `StarMesh._configure_exclusion()` wired with monitoring + collision_mask=1. |
+| 22 | ✅ | Star System — Phase 5: LOD Crossfade + Performance Validation *(old spec — superseded)* | `spec/feature_spec-star_system.md` *(SUPERSEDED)* | Sonnet | Per-star `blend_alpha` crossfade; `distance_squared_to()` perf opt; frustum-cull stub at >200 screen-pass stars. All four `StarRegistry.*` metrics in overlay; lod_update under 1ms. |
+
+> **Steps 18–22 were built from `feature_spec-star_system.md`, which has been superseded.** The `core/stars/` implementation is retained as reference code. Do not extend it. See steps 23–30 below.
+
+---
+
+## Next Steps — StarField System (step 25 in project build order)
+
+*Spec: `spec/feature_spec-star_field_2.md` — Session breakout: `spec/feature_spec-star_field-session_breakout.md`*
+
+Sessions 24 and 25 can run in parallel after session 23 completes.
+
+| # | Status | Session | Spec Reference | Model | Notes |
+|---|---|---|---|---|---|
+| 23 | 🔲 | StarField S1 — Galaxy Generator + Testable Map Scene | `spec/feature_spec-star_field_2.md` | Sonnet | Most important session. Delivers: `StarField.gd` (catalog generation only), `StarRecord.gd`, `NebulaVolume.gd`, four-zone generator (smoothstep blending, logarithmic spiral arms, Y-thickness profile, color gradient), separate RNG branches for backdrop / destination systems / nebulae, standalone test scene with `MultiMeshInstance3D` galaxy preview, pan+zoom. All params in `world_config.json` starfield block. **You validate:** Does it look like a galaxy? Are spiral arms visible? Is the core dense and red? Tune JSON until happy before proceeding. |
+| 24 | 🔲 | StarField S2 — Galactic Map UI Layer | `spec/feature_spec-star_field_2.md` | **Haiku** | Takes the S1 test scene and wraps it in a proper UI mode. Delivers: `GalacticMap.gd` / `GalacticMap.tscn` as `CanvasLayer`, toggle via `GameEventBus.galactic_map_toggled`, destination systems highlighted, reachable systems glow by warp range, pan + zoom, `warp_destination_selected(system_id)` emitted on selection, three zoom levels with information density scaling. **Runs in parallel with S3 after S1.** |
+| 25 | 🔲 | StarField S3 — Skybox + Nebula Rendering | `spec/feature_spec-star_field_2.md` | Sonnet | Visual centerpiece. Requires S1 catalog to be final. Delivers: `galaxy_sky.gdshader` (Godot `Sky` custom shader), backdrop stars via `sampler2D` texture upload (direction + color textures), domain-warped noise nebula field in galaxy space keyed off `player_galaxy_position`, nebula volume tinting, `map_zoom` uniform, `StarField.rebuild_skybox()` callable, placeholder warp trigger in test scene to simulate jumps. **You validate:** Does the sky look like you are inside a galaxy? Do nebulae have organic cloud shapes with dark voids? Does the sky shift plausibly on a simulated warp? **Runs in parallel with S2 after S1.** |
+| 26 | 🔲 | StarField S4 — Galactic Map Nebula + Polish | `spec/feature_spec-star_field_2.md` | **Haiku** | Connects S3 nebula rendering into S2 map zoom levels. Delivers: nebula color regions fade in at mid map zoom, `map_zoom` piped from GalacticMap zoom state to sky shader, nav path lines between reachable systems at mid/close zoom, all PerformanceMonitor metrics in overlay, full success criteria checklist run and checked off. |
+
+---
+
+## Next Steps — SolarSystem (step 26 in project build order)
+
+*Spec: `spec/feature_spec-solar_system.md` — Session breakout: `spec/feature_spec-solar_system-session_breakout.md`*
+
+**Before Session 27:** Add the Solar System and Warp signals to `GameEventBus.gd` (definitions are already in `feature_spec-game_event_bus_signals.md`). Sessions 28 and 29 can run in parallel after Session 27 completes.
+
+| # | Status | Session | Spec Reference | Model | Notes |
+|---|---|---|---|---|---|
+| 27 | 🔲 | SolarSystem A — Generator + Flyable Test Scene | `spec/feature_spec-solar_system.md` | Sonnet | Foundation. Delivers: `SolarSystemGenerator.gd` (pure generation logic; returns Dictionary manifest from `system_id` + `galaxy_seed`; checks `content/systems/<id>/system.json` override first), `SolarSystem.gd` (instantiates manifest), `Star.gd` (sphere at `Y = -star_center_depth`, `OmniLight3D`, visual exclusion ring), `Planet.gd` (orbital drift in `_process`, `moon_mode`), `Station.gd` (placement only), `solar_system_archetypes.json`, flyable test scene with player ship. **You validate:** Same seed + system_id = same layout. Star correctly below Y=0. Planets drift visibly. Binary stars produce two exclusion rings. |
+| 28 | 🔲 | SolarSystem B — Exclusion Zone + WarpDrive | `spec/feature_spec-solar_system.md` | Sonnet | Delivers: `Star.gd` XZ distance check in `_physics_process` + `ship.apply_damage()` call + `exclusion_zone_entered/exited` signals, `WarpDrive.gd` state machine (`IDLE → SPOOLING → ACTIVE → DECELERATING`), spool/decel timers, `warp_multiplier` integration with ship physics (read `feature_spec-physics_and_movement.md` first to determine cleanest hookup), interrupt conditions (damage + exclusion proximity), `warp_state_changed` / `warp_interrupted` signals emitted. **Runs in parallel with 29 after 27.** |
+| 29 | 🔲 | SolarSystem C — OriginShifter + ChunkStreamer Belt Integration | `spec/feature_spec-solar_system.md` | **Haiku** | Delivers: `OriginShifter.gd` (subscribes to `chunk_loaded`, shifts `"physics_bodies"` group + solar system visual root, emits `origin_shifted`), `add_to_group("physics_bodies")` in `Ship.gd` and `Asteroid.gd` (additive, no behavior changes), `SolarSystem.get_belt_context_at(world_pos)` method, `ChunkStreamer._populate_asteroids` modified to call `get_belt_context_at()` per chunk, `system_loaded` / `system_unloaded` signals emitted. **Runs in parallel with 28 after 27.** |
+| 30 | 🔲 | SolarSystem D — JSON Tuning Pass + Success Criteria | `spec/feature_spec-solar_system.md` | **Haiku** | Polish. Tune `solar_system_archetypes.json`: star depth/radius (reads as dangerous from pilot cam), planet radii/depths (visible from default camera angle), `warp_speed_multiplier` (30–90s to cross system at max warp), belt density (noticeably denser than open space), orbital speeds (visible drift over 5-minute session). Verify hand-authored override path. Confirm all PerformanceMonitor metrics in overlay; orbit update < 0.1ms at max system size (20 planets × 10 moons). Run full success criteria checklist. |
+
+---
+
 | — | 🔲 | Station & Loadout UI | Not yet specced | TBD | Post-MVP. Spec before building. |
 | — | 🔲 | Galactic Strategy | Not yet specced | TBD | Phase 3. Do not spec until MVP loop is proven. |
 
