@@ -1,7 +1,7 @@
 # Phase Plan — Combat VFX System
 *All Space Combat MVP — Step 17*
 
-**Spec:** `docs/feature_spec-combat_vfx.md`  
+**Spec:** `docs/spec/feature_spec-combat_vfx.md`  
 **Status:** 🔲 Ready to execute  
 **Model:** Session 1 = **Opus** (new autoload, signal contract changes, cross-system cache). Sessions 2–3 = **Sonnet**.
 
@@ -390,7 +390,7 @@ After each session, run these existing test scenes to ensure no breakage:
 
 ## 7. Success Criteria Checklist
 
-Directly from `feature_spec-combat_vfx.md` §10, mapped to sessions:
+Directly from `spec/feature_spec-combat_vfx.md` §10, mapped to sessions:
 
 | # | Criterion | Session | Verification |
 |---|---|---|---|
@@ -433,7 +433,7 @@ After all 3 sessions are ✅:
 
 1. **Update `docs/development_guide.md`** — add Step 17 row:
    ```
-   | 17 | ✅ | Combat VFX System | feature_spec-combat_vfx.md | Opus + Sonnet | Muzzle, beam, impact, shield, explosions. 3 sessions. |
+   | 17 | ✅ | Combat VFX System | spec/feature_spec-combat_vfx.md | Opus + Sonnet | Muzzle, beam, impact, shield, explosions. 3 sessions. |
    ```
 2. **Update `AGENTS.md`** if directory structure or autoload order changed.
 3. **Commit** with message: `feat(vfx): combat visual effects — muzzle, beam, impact, shield, explosions`

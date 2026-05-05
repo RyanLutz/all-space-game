@@ -473,7 +473,7 @@ Only add instrumentation if profiling reveals a frame budget problem in the UI l
 
 | Path | Description |
 |---|---|
-| `docs/feature_spec-ui_design.md` | This file |
+| `docs/spec/feature_spec-ui_design.md` | This file |
 | `ui/UITokens.gd` | Autoload — all color/font constants |
 | `ui/UITheme.tres` | Godot Theme resource — base styles |
 | `ui/PilotHUD.tscn` | Pilot mode HUD scene |

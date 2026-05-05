@@ -234,9 +234,13 @@ func _setup_multimesh() -> void:
 		_multimesh.set_instance_custom_data(i, star.color)
 
 	_multimesh_instance = MultiMeshInstance3D.new()
-	_multimesh_instance.name       = "StarMultiMesh"
-	_multimesh_instance.multimesh  = _multimesh
-	_multimesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_multimesh_instance.name             = "StarMultiMesh"
+	_multimesh_instance.multimesh        = _multimesh
+	_multimesh_instance.cast_shadow      = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# Prevent node-level frustum culling. The star_point shader writes POSITION
+	# directly in clip space (screen-space billboard), so stars outside the
+	# world-space AABB can still be on-screen. Max margin mirrors the screen-pass quad.
+	_multimesh_instance.extra_cull_margin = 16384.0
 	add_child(_multimesh_instance)
 
 

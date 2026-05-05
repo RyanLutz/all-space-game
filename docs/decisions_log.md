@@ -19,7 +19,7 @@ Spec updated: yes / no / pending
 
 Agent:   Claude Sonnet (Cursor)
 System:  StarMesh / GameEventBus
-Spec:    feature_spec-star_system.md § "Exclusion Zone"
+Spec:    docs/spec/feature_spec-star_system.md § "Exclusion Zone"
 Problem: Phase 3 left ExclusionArea.monitoring = false. Phase 4 wires it.
 Decision: Added `signal star_exclusion_entered(star_id: int, ship_id: int)` to
          `GameEventBus.gd` (World section). In `StarMesh.gd _configure_exclusion()`:
@@ -43,7 +43,7 @@ Spec updated: yes — LOD 2 + ExclusionArea description updated to remove "Phase
 
 Agent:   Claude Sonnet (Cursor)
 System:  star_screen_pass.gdshader (LOD 1)
-Spec:    feature_spec-star_system.md § "LOD 1 — Screen-Space Glow"
+Spec:    docs/spec/feature_spec-star_system.md § "LOD 1 — Screen-Space Glow"
 Problem: Stars (screen-pass glow) were rendering in front of opaque scene
          geometry. Phase 2 placed the fullscreen quad at clip z = 0.999,
          intending that to be "just inside the far plane" in standard forward-Z
@@ -60,7 +60,7 @@ Decision: Two changes to star_screen_pass.gdshader:
             reversed-Z scene objects write depth > 0, empty sky clears to 0),
             discard immediately. This replaces the implicit depth test, which
             is not reliable for transparent-pass objects in reversed-Z Godot 4.
-Spec updated: yes — feature_spec-star_system.md LOD 1 section updated with
+Spec updated: yes — docs/spec/feature_spec-star_system.md LOD 1 section updated with
          "Depth occlusion — manual depth texture check" paragraph explaining
          reversed-Z, the depth texture approach, and why z=0.999 was wrong.
 
@@ -70,7 +70,7 @@ Spec updated: yes — feature_spec-star_system.md LOD 1 section updated with
 
 Agent:   Claude Opus (Cursor) — Star System Phase 3 session
 System:  StarRegistry / StarMesh / star_surface + star_corona shaders (LOD 2)
-Spec:    feature_spec-star_system.md § "LOD 2 — Mesh + Light (close range)"
+Spec:    docs/spec/feature_spec-star_system.md § "LOD 2 — Mesh + Light (close range)"
 Problem: Phase 2 left LOD 2 as a placeholder: `_spawn_mesh()` was a no-op,
          `StarRecord` had no light range field, and there was no
          `star_mesh` tunable block in `world_config.json`. Implementing Phase
@@ -113,7 +113,7 @@ Decision: Implemented LOD 2 as a single reusable `StarMesh.tscn` consisting
          and falloff radii, light attenuation). Phase 3 leaves
          `ExclusionArea.monitoring = false`; Phase 4 will flip that and
          wire the signal to GameEventBus.
-Spec updated: yes — `feature_spec-star_system.md` LOD 2 section rewritten
+Spec updated: yes — `docs/spec/feature_spec-star_system.md` LOD 2 section rewritten
          to describe the layered shader strategy, the screen-pass-stays-on
          decision, and the Phase 3 / Phase 4 boundary on `ExclusionArea`;
          data model expanded with `light_range`; JSON section gains the
@@ -126,7 +126,7 @@ Spec updated: yes — `feature_spec-star_system.md` LOD 2 section rewritten
 
 Agent:   Claude Opus (Cursor) — Star System Phase 2 session
 System:  StarRegistry / star_screen_pass shader (LOD 1)
-Spec:    feature_spec-star_system.md § "LOD 1 — Screen-Space Glow (mid range)"
+Spec:    docs/spec/feature_spec-star_system.md § "LOD 1 — Screen-Space Glow (mid range)"
 Problem: Spec called for a "SubViewport full-screen shader" rendering "with no
          depth test — always behind scene geometry by compositing order." User
          initially approved a CanvasLayer (`layer = -1`) + ColorRect canvas-item
@@ -151,7 +151,7 @@ Decision: Implemented LOD 1 as a single `MeshInstance3D` fullscreen quad parente
          `glow_min_pixel_radius`, `glow_max_pixel_radius`, `glow_intensity`,
          `glow_core_radius`. Phase 2 verification scene at `test/StarSystemTest.tscn`
          (fly-cam + occluder boxes + PerformanceMonitor overlay).
-Spec updated: yes — `feature_spec-star_system.md` LOD 1 section rewritten to
+Spec updated: yes — `docs/spec/feature_spec-star_system.md` LOD 1 section rewritten to
          describe the fullscreen-quad mechanism and the rotation-lag-prevention
          rationale; Files table updated with `star_screen_pass.gdshader` (Phase
          2) and `StarSystemTest.tscn` paths; JSON section gains the new
@@ -226,7 +226,7 @@ Spec updated: yes — all fixes applied directly to spec files
 
 Agent:   Claude Opus (Claude Code) — Phase 4 implementation
 System:  Ship physics / ContentRegistry
-Spec:    feature_spec-physics_and_movement.md §JSON Data Format, feature_spec-ship_system.md §3
+Spec:    docs/spec/feature_spec-physics_and_movement.md §JSON Data Format, docs/spec/feature_spec-ship_system.md §3
 Problem: The physics spec defines the canonical JSON schema for ship hull physics
          stats, including `angular_drag`, `max_torque`, and `alignment_drag_base`.
          The ship system spec's `base_stats` section is incomplete — it references
@@ -245,7 +245,7 @@ Spec updated: no — ship system spec reconciliation deferred to Step 9
 
 Agent:   Claude Opus (Claude Code) — Phase 4 implementation
 System:  Ship physics
-Spec:    feature_spec-physics_and_movement.md §Key Algorithms (Thruster Budget Allocation)
+Spec:    docs/spec/feature_spec-physics_and_movement.md §Key Algorithms (Thruster Budget Allocation)
 Problem: The physics spec's `apply_thrust_forces()` uses `var fwd := -input_forward`
          with the comment "positive = thrust forward". Tracing the math:
          heading = -basis.z, fwd = -input_forward, so input_forward = 1.0 produces
@@ -264,7 +264,7 @@ Spec updated: no — will update spec after playtesting confirms the correct sig
 
 Agent:   Claude Opus (Claude Code) — Phase 5 implementation
 System:  NavigationController / PerformanceMonitor
-Spec:    feature_spec-nav_controller.md §6
+Spec:    docs/spec/feature_spec-nav_controller.md §6
 Problem: The nav controller spec shows `Performance.add_custom_monitor` in
          NavigationController's `_ready()`. However, multiple ship instances would
          each have a NavigationController, causing repeated registration of the
@@ -283,7 +283,7 @@ Superseded by: 2026-04-17 — Custom monitor registration moved to GameBootstrap
 
 Agent:   Claude Opus (Cursor) — Phase 5 follow-up
 System:  GameBootstrap / PerformanceMonitor / all systems that expose monitors
-Spec:    feature_spec-nav_controller.md §6, feature_spec-performance_monitor.md
+Spec:    docs/spec/feature_spec-nav_controller.md §6, docs/spec/feature_spec-performance_monitor.md
 Problem: `Performance.add_custom_monitor` calls were living inside
          `PerformanceMonitor.gd::_ready()`. That is an instrumentation-layer
          service — adding Godot-debugger wiring there conflates two concerns
@@ -308,7 +308,7 @@ Spec updated: no — implementation-layer ownership decision; spec intent fully
 
 Agent:   Claude Opus (Cursor) — Phase 5 follow-up
 System:  NavigationController / ContentRegistry / Ship
-Spec:    feature_spec-nav_controller.md §5
+Spec:    docs/spec/feature_spec-nav_controller.md §5
 Problem: Nav controller spec §5 places `arrival_distance` and
          `brake_safety_margin` in a `hull` sub-block. The existing
          `content/ships/corvette_patrol/ship.json` schema — which ContentRegistry
@@ -327,7 +327,7 @@ Spec updated: no — reconciliation deferred to Step 9
 
 Agent:   Claude Opus (Claude Code) — Step 6 implementation
 System:  ProjectileManager
-Spec:    feature_spec-weapons_and_projectiles.md §7
+Spec:    docs/spec/feature_spec-weapons_and_projectiles.md §7
 Problem: ProjectileManager needs `GetWorld3D()` to access
          `PhysicsDirectSpaceState3D` for sweep raycasts and hitscan. `Node` does
          not expose `GetWorld3D()`; `Node3D` is the minimal base class that does.
@@ -342,7 +342,7 @@ Spec updated: no — minor implementation detail
 
 Agent:   Claude Opus (Claude Code) — Step 6 implementation
 System:  ProjectileManager
-Spec:    feature_spec-weapons_and_projectiles.md §7
+Spec:    docs/spec/feature_spec-weapons_and_projectiles.md §7
 Problem: Spec struct shows `WeaponDataId: int` but the `request_spawn_dumb` signal
          passes `weapon_id: String`. Resolving weapon data per-collision via
          cross-language ContentRegistry calls would be expensive in the hot loop.
@@ -359,7 +359,7 @@ Spec updated: no — signal contract unchanged; struct is internal implementatio
 
 Agent:   Claude Opus (Claude Code) — Step 6 implementation
 System:  ProjectileManager
-Spec:    feature_spec-weapons_and_projectiles.md §7
+Spec:    docs/spec/feature_spec-weapons_and_projectiles.md §7
 Problem: `request_fire_hitscan` signal may be emitted during `_process()` by
          WeaponComponent. Physics raycasts via `PhysicsDirectSpaceState3D` are only
          valid during `_physics_process()`.
@@ -375,7 +375,7 @@ Spec updated: no — implementation detail; spec's immediate-fire illustration i
 
 Agent:   Claude Sonnet (Cursor) — Step 7 implementation
 System:  HardpointComponent / Ship / Weapon system
-Spec:    feature_spec-weapons_and_projectiles.md §4.2, feature_spec-ship_system.md §3
+Spec:    docs/spec/feature_spec-weapons_and_projectiles.md §4.2, docs/spec/feature_spec-ship_system.md §3
 Problem: The weapons spec JSON examples use 1-based indexing ("groups": [1], "groups": [2])
          and the success criteria say "left click fires group 1." But the ship system
          spec defines `input_fire: Array[bool]` as 0-based ([group0_active, group1_active,
@@ -394,7 +394,7 @@ Spec updated: pending — ship system spec needs `input_fire` comment updated to
 
 Agent:   Claude Sonnet (Cursor) — Step 8 implementation
 System:  GuidedProjectilePool.gd, WeaponComponent.gd
-Spec:    feature_spec-weapons_and_projectiles.md §7, §8
+Spec:    docs/spec/feature_spec-weapons_and_projectiles.md §7, §8
 Problem: PlayerState system does not exist yet (scheduled for later phase), but
          guided missiles in `track_cursor` and `click_lock` modes require
          querying `PlayerState.get_active_ship().get_aim_world_pos()` for aim
@@ -433,7 +433,7 @@ Spec updated: no — implementation detail only
 
 Agent:   Claude Sonnet (Cursor) — Phase 9 implementation
 System:  ShipFactory.gd, ContentRegistry.gd, PlayerState.gd, ServiceLocator.cs, ship_colorize.gdshader
-Spec:    feature_spec-ship_system.md §6, §8, §9, §11, §12
+Spec:    docs/spec/feature_spec-ship_system.md §6, §8, §9, §11, §12
 Problem: Phase 9 implementation required creating several new core services that
          were referenced but not yet implemented: ServiceLocator (C# singleton for
          service registry), ContentRegistry (content indexing), PlayerState (active
@@ -479,7 +479,7 @@ is simply longer and globally unique:
 `ship.json` references the full id in `hardpoint_types`, `default_loadout.weapons`,
 and `default_loadout.fire_groups`. No code changes required.
 
-Spec updated: yes — `feature_spec-ship_system.md` §5 naming convention, examples,
+Spec updated: yes — `docs/spec/feature_spec-ship_system.md` §5 naming convention, examples,
 and parser comment updated.
 
 ---
@@ -511,7 +511,7 @@ and parser comment updated.
 
 ### Spec compliance
 
-All success criteria from `feature_spec-camera_system.md` are addressed by the implementation. No conflicts with core spec or other feature specs were found. No deviations required.
+All success criteria from `docs/spec/feature_spec-camera_system.md` are addressed by the implementation. No conflicts with core spec or other feature specs were found. No deviations required.
 
 ---
 
@@ -540,7 +540,7 @@ All success criteria from `feature_spec-camera_system.md` are addressed by the i
 
 ### Spec compliance
 
-Aligned with `feature_spec-ai_patrol_behavior.md` intent; file any deviations in future sessions if spec audit finds gaps.
+Aligned with `docs/spec/feature_spec-ai_patrol_behavior.md` intent; file any deviations in future sessions if spec audit finds gaps.
 
 ---
 
@@ -560,7 +560,7 @@ Aligned with `feature_spec-ai_patrol_behavior.md` intent; file any deviations in
 
 Agent:   Claude Opus (Claude Code)
 System:  Fleet Command (camera + input layer), GameCamera, GameEventBus
-Spec:    `feature_spec-camera_system.md` §Future Extension, `feature_spec-fleet_command.md` §2–4
+Spec:    `docs/spec/feature_spec-camera_system.md` §Future Extension, `docs/spec/feature_spec-fleet_command.md` §2–4
 
 **Decision:** Implemented the tactical mode camera and input layer as Phase 13.
 
@@ -589,7 +589,7 @@ Spec:    `feature_spec-camera_system.md` §Future Extension, `feature_spec-fleet
 
 Agent:   Claude Opus (Claude Code)
 System:  Fleet Command, NavigationController, AIController, Ship, ProjectileManager, GuidedProjectilePool, ShipFactory
-Spec:    `feature_spec-fleet_command.md` §2–9
+Spec:    `docs/spec/feature_spec-fleet_command.md` §2–9
 
 **Decision:** Implemented the full RTS command layer (Phase 14).
 
@@ -632,7 +632,7 @@ Spec updated: no — implementation matches spec intent; file locations follow e
 
 Agent:   Claude Opus (Claude Code)
 System:  ChunkStreamer, Asteroid, Debris
-Spec:    feature_spec-chunk_streamer.md
+Spec:    docs/spec/feature_spec-chunk_streamer.md
 
 ### What was built
 1. **`data/world_config.json`** — all tunable values: chunk size (2000), load radius (2), asteroid field params, HP tiers, debris config.
@@ -652,7 +652,7 @@ Spec updated: no — no deviations
 
 Agent:   Claude Opus (Claude Code)
 System:  GameEventBus (cross-cutting)
-Spec:    feature_spec-game_event_bus_signals.md (all sections)
+Spec:    docs/spec/feature_spec-game_event_bus_signals.md (all sections)
 Problem: Spec was written before phases 12-15 and had drifted from reality. 12 signals
          existed in code but not in the spec. 3 signals had signature mismatches
          (missing queue_mode parameter). Emitter/listener columns were stale.
@@ -680,13 +680,13 @@ through phases 12-15). No code changes needed.
 ### Deviations
 - None. Spec-only update to match existing code.
 
-Spec updated: yes — feature_spec-game_event_bus_signals.md fully rewritten
+Spec updated: yes — docs/spec/feature_spec-game_event_bus_signals.md fully rewritten
 
 ## 2026-04-25 — Phase 17 Session 2: Local Effect Players
 
 Agent:   Claude Sonnet 4.6 (Claude Code)
 System:  Combat VFX
-Spec:    feature_spec-combat_vfx.md §3, §4
+Spec:    docs/spec/feature_spec-combat_vfx.md §3, §4
 Problem: Session 2 scope — create local effect players attached at assembly time.
 
 Decision:
@@ -717,7 +717,7 @@ Spec updated: no — spec unchanged; build status updated in agent_brief.md
 
 Agent:   Cursor agent (Composer)
 System:  ShipFactory / ship collision
-Spec:    feature_spec-ship_system.md §5 Parts GLB Structure (collision not previously specified)
+Spec:    docs/spec/feature_spec-ship_system.md §5 Parts GLB Structure (collision not previously specified)
 Problem:  Single placeholder `BoxShape3D` on `Ship.tscn` did not match variant part silhouettes;
           author wanted collision authored in Blender alongside meshes (`appendage_*-colonly`).
 Decision:  At spawn, for each variant part node `name`, look up `name-colonly` in the loaded
@@ -736,7 +736,7 @@ Spec updated:  pending — document `-colonly` naming and factory behavior in sh
 
 Agent:   Cursor agent (Sonnet)
 System:  UI — PilotHUD, Radar
-Spec:    feature_spec-ui_design.md §Pilot HUD Layout, §Indicator Types
+Spec:    docs/spec/feature_spec-ui_design.md §Pilot HUD Layout, §Indicator Types
 
 ### What was built
 
@@ -794,7 +794,7 @@ Spec updated: no — spec unchanged; build status updated in agent_brief.md
 
 Agent:   Cursor agent (Sonnet)
 System:  UI — tokens, theme, reusable components, mode switch
-Spec:    feature_spec-ui_design.md
+Spec:    docs/spec/feature_spec-ui_design.md
 
 ### What was built
 
@@ -867,7 +867,7 @@ Spec updated: no — spec unchanged; build status updated in agent_brief.md
 
 Agent:   Claude Sonnet (Cursor)
 System:  StarRegistry / StarMesh / star shaders
-Spec:    feature_spec-star_system.md § "LOD Crossfade", § "Performance Instrumentation"
+Spec:    docs/spec/feature_spec-star_system.md § "LOD Crossfade", § "Performance Instrumentation"
 Problem: LOD 0→1 and LOD 1→2 transitions produced a visible brightness/geometry pop.
          `lod_update` hot path called `distance_to()` (sqrt) for all 3000 stars per frame.
          `screen_pass_count` could exceed 200 with no culling, wasting shader iterations.

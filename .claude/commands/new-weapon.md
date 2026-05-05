@@ -7,7 +7,7 @@ Expected format: `<weapon_id> <archetype>`
 
 ## What to do
 
-1. Read `docs/feature_spec-weapons_and_projectiles.md` sections 5 and 11 to confirm the current schema before generating anything.
+1. Read `docs/spec/feature_spec-weapons_and_projectiles.md` sections 5 and 11 to confirm the current schema before generating anything.
 
 2. Create the folder `content/weapons/<weapon_id>/` if it does not exist.
 

@@ -634,7 +634,7 @@ Counters:
 Files modified:
 
 - `/core/GameEventBus.gd` — new signals and modified signatures (table below).
-- `/docs/feature_spec-game_event_bus_signals.md` — document the new signals.
+- `/docs/spec/feature_spec-game_event_bus_signals.md` — document the new signals.
 
 ### New / Modified Signals
 

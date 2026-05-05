@@ -218,19 +218,20 @@ They are non-negotiable.
 /all_space/
     CLAUDE.md                          ← Claude Code entry point; points to agent_brief.md
     /docs/
-        core_spec.md                   ← this file
         agent_brief.md                 ← universal agent brief: build status, rules, deviation protocol
         decisions_log.md               ← append-only decision and session history
-        feature_spec-performance_monitor.md
-        feature_spec-physics_and_movement.md
-        feature_spec-ship_system.md
-        feature_spec-weapons_and_projectiles.md
-        feature_spec-camera_system.md
-        feature_spec-ai_patrol_behavior.md
-        feature_spec-navigation_controller.md
-        feature_spec-chunk_streamer.md
-        feature_spec-fleet_command.md
-        feature_spec-game_event_bus_signals.md
+        /spec/
+            core_spec.md               ← this file
+            feature_spec-performance_monitor.md
+            feature_spec-physics_and_movement.md
+            feature_spec-ship_system.md
+            feature_spec-weapons_and_projectiles.md
+            feature_spec-camera_system.md
+            feature_spec-ai_patrol_behavior.md
+            feature_spec-nav_controller.md
+            feature_spec-chunk_streamer.md
+            feature_spec-fleet_command.md
+            feature_spec-game_event_bus_signals.md
     /.claude/
         /commands/
             new-ship.md                ← skill: generate ship class folder + ship.json

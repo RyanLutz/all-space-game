@@ -9,7 +9,7 @@ A top-down 3D space combat game built in Godot 4.6 / GDScript (C# for Projectile
 only). Ships, projectiles, and debris are full 3D physics objects constrained to the XZ
 plane (Y = 0). The camera is top-down perspective. There is no 2D physics layer anywhere.
 
-Full design intent: `docs/core_spec.md`
+Full design intent: `docs/spec/core_spec.md`
 
 ---
 
@@ -57,7 +57,7 @@ These apply to every agent, every session. Violating them corrupts the project.
 
 8. **PerformanceMonitor instrumentation is required.** Every system that does
    significant work must wrap it with `begin()` / `end()` pairs. See
-   `docs/feature_spec-performance_monitor.md` for canonical metric names.
+   `docs/spec/feature_spec-performance_monitor.md` for canonical metric names.
 
 9. **Specs are authoritative.** If a spec says to do something a particular way, do it
    that way. If you cannot, follow the deviation protocol below — do not silently resolve.
@@ -68,7 +68,7 @@ These apply to every agent, every session. Violating them corrupts the project.
 
 ## Build Status
 
-From `docs/core_spec.md` §19. Update this table at the end of every session.
+From `docs/spec/core_spec.md` §19. Update this table at the end of every session.
 
 | Step | System | Status |
 |---|---|---|
@@ -147,10 +147,10 @@ a new pattern, or requires updating a spec — flag it rather than deciding your
 
 | File | Purpose |
 |---|---|
-| `docs/core_spec.md` | Philosophy, architecture, cross-cutting rules |
+| `docs/spec/core_spec.md` | Philosophy, architecture, cross-cutting rules |
 | `docs/agent_brief.md` | This file — agent context, build status, deviation protocol |
 | `docs/decisions_log.md` | Full history of decisions and spec deviations |
-| `docs/feature_spec-*.md` | Per-system specifications |
+| `docs/spec/feature_spec-*.md` | Per-system specifications |
 | `docs/SYSTEMS.md` | Systems lookup — build step → spec, JSON ownership, PerformanceMonitor metrics |
 | `data/` | Global config JSON (damage types, AI profiles, world config, factions) |
 | `content/` | Per-item content folders (ships, weapons, modules) |
@@ -214,7 +214,7 @@ The most recent decisions are summarised here for quick context. Full history in
    ShipFactory assembles `part_name-colonly` meshes into child `CollisionShape3D` nodes on
    the ship `RigidBody3D`, removes the scene placeholder when any part defines collision,
    sets `part_category` meta for future use; whole-ship damage unchanged (raycast hits body).
-   axum-fighter-1 `parts.glb` + blender asset committed; `feature_spec-ship_system.md` not yet
+   axum-fighter-1 `parts.glb` + blender asset committed; `docs/spec/feature_spec-ship_system.md` not yet
    updated for this pipeline. See decisions_log.md.
 2. **2026-04-25 — Phase 17 Session 2: Combat VFX local players** —
    MuzzleFlashPlayer.gd (local GPUParticles3D per weapon, Muzzle-marker positioned),

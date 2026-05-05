@@ -2,7 +2,7 @@ Write the Fleet Command & Tactical Mode feature spec for All Space.
 
 ## Context
 
-`docs/feature_spec-fleet_command.md` currently exists as a stub — it names the
+`docs/spec/feature_spec-fleet_command.md` currently exists as a stub — it names the
 system and lists three MVP success criteria but has no architecture, no algorithms,
 and no data model. This session replaces that stub with a full spec.
 
@@ -13,13 +13,13 @@ systems are all built. The spec must be consistent with all of them.
 
 Read these files in full:
 1. `docs/agent_brief.md` — architecture rules, deviation protocol
-2. `docs/core_spec.md` §3 (Tactical Mode, Mode Transitions, Unified Ship Input Interface)
-3. `docs/feature_spec-camera_system.md` — tactical zoom and free-pan extension points
-4. `docs/feature_spec-ai_patrol_behavior.md` — NavigationController interface
-5. `docs/feature_spec-navigation_controller.md` — flight computer (must exist before writing this spec)
-6. `docs/feature_spec-game_event_bus_signals.md` — tactical order signals already defined
+2. `docs/spec/core_spec.md` §3 (Tactical Mode, Mode Transitions, Unified Ship Input Interface)
+3. `docs/spec/feature_spec-camera_system.md` — tactical zoom and free-pan extension points
+4. `docs/spec/feature_spec-ai_patrol_behavior.md` — NavigationController interface
+5. `docs/spec/feature_spec-nav_controller.md` — flight computer (must exist before writing this spec)
+6. `docs/spec/feature_spec-game_event_bus_signals.md` — tactical order signals already defined
 
-If `docs/feature_spec-navigation_controller.md` does not exist yet, stop and report
+If `docs/spec/feature_spec-nav_controller.md` does not exist yet, stop and report
 that it must be written first (use `/spec-nav-controller`).
 
 ## What Tactical mode is
@@ -71,7 +71,7 @@ mode variable that systems poll.
 
 ## Spec format
 
-Follow the format in `docs/core_spec.md` §18:
+Follow the format in `docs/spec/core_spec.md` §18:
 1. Overview
 2. Architecture
 3. Core properties / data model
@@ -83,7 +83,7 @@ Follow the format in `docs/core_spec.md` §18:
 9. Assumptions
 10. Success Criteria
 
-Output the completed spec to `docs/feature_spec-fleet_command.md`, replacing the
+Output the completed spec to `docs/spec/feature_spec-fleet_command.md`, replacing the
 existing stub content entirely.
 
 After writing the spec, append a session record to `docs/decisions_log.md` and

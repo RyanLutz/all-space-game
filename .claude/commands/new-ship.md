@@ -7,7 +7,7 @@ Expected format: `<class_id> <class_type>`
 
 ## What to do
 
-1. Read `docs/feature_spec-ship_system.md` sections 4–6 to confirm the current schema before generating anything.
+1. Read `docs/spec/feature_spec-ship_system.md` sections 4–6 to confirm the current schema before generating anything.
 
 2. Create the folder `content/ships/<class_id>/` if it does not exist.
 

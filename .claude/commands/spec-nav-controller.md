@@ -6,16 +6,16 @@ Write the NavigationController feature spec for All Space.
 destinations and a ship's raw thrust interface. It is build step 5 in the project
 build order. It currently has no spec of its own — its behaviour is described
 fragmentarily across three other specs. This session produces
-`docs/feature_spec-navigation_controller.md`.
+`docs/spec/feature_spec-nav_controller.md`.
 
 ## Before you write anything
 
 Read these files in full:
 1. `docs/agent_brief.md` — architecture rules, deviation protocol
-2. `docs/core_spec.md` §3 (Unified Ship Input Interface), §13 (Physics Summary)
-3. `docs/feature_spec-physics_and_movement.md` — the NavigationController section
-4. `docs/feature_spec-ai_patrol_behavior.md` — the NavigationController Interface section
-5. `docs/feature_spec-fleet_command.md` — how Tactical mode uses NavigationController
+2. `docs/spec/core_spec.md` §3 (Unified Ship Input Interface), §13 (Physics Summary)
+3. `docs/spec/feature_spec-physics_and_movement.md` — the NavigationController section
+4. `docs/spec/feature_spec-ai_patrol_behavior.md` — the NavigationController Interface section
+5. `docs/spec/feature_spec-fleet_command.md` — how Tactical mode uses NavigationController
 
 Collect every constraint, interface detail, and algorithm fragment mentioned across
 those files. The spec you write must be consistent with all of them.
@@ -82,7 +82,7 @@ The spec must define concrete algorithms for:
 
 ## Spec format
 
-Follow the format in `docs/core_spec.md` §18:
+Follow the format in `docs/spec/core_spec.md` §18:
 1. Overview
 2. Architecture
 3. Core properties / data model
@@ -94,7 +94,7 @@ Follow the format in `docs/core_spec.md` §18:
 9. Assumptions
 10. Success Criteria
 
-Output the spec to `docs/feature_spec-navigation_controller.md`.
+Output the spec to `docs/spec/feature_spec-nav_controller.md`.
 
 After writing the spec, append a session record to `docs/decisions_log.md` and
 update the build status in `docs/agent_brief.md` if applicable.

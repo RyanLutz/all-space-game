@@ -29,7 +29,6 @@ var _looking: bool = false
 var _star_registry: Node = null
 var _perf: Node = null
 
-
 func _ready() -> void:
 	var sl := Engine.get_singleton("ServiceLocator")
 	if sl:

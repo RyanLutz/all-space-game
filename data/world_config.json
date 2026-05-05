@@ -109,7 +109,7 @@
 
       "_screen_pass_comment": "LOD 0 + LOD 1 visual tunables. min_pixel_radius is the floor on a star's apparent size (in pixels) and is shared by BOTH the LOD 0 MultiMesh point shader AND the LOD 1 screen-pass glow shader so the LOD 0->1 handoff cannot have a size discontinuity. screen_pass_max_stars is capped to MAX_SCREEN_PASS_STARS in StarRegistry.gd (256). glow_world_radius_multiplier scales StarRecord.radius into a perceived glow halo radius. glow_max_pixel_radius clamps how big a near-LOD-2 star can get so it doesn't dominate the screen. glow_core_radius is the [0,1] threshold inside the glow disc where the bright inner core falls off into the soft halo.",
       "min_pixel_radius": 2.0,
-      "screen_pass_max_stars": 256,
+      "screen_pass_max_stars": 5280,
       "glow_world_radius_multiplier": 3.0,
       "glow_max_pixel_radius": 64.0,
       "glow_intensity": 1.5,

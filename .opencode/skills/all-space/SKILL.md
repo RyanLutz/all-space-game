@@ -82,19 +82,20 @@ These apply to every suggestion, every session, every agent:
 /all_space/
     CLAUDE.md                          ← agent entry point; points to agent_brief.md
     /docs/
-        core_spec.md                   ← authoritative source of truth
         agent_brief.md                 ← build status, rules, deviation protocol
         decisions_log.md               ← append-only decision history
-        feature_spec-performance_monitor.md
-        feature_spec-physics_and_movement.md
-        feature_spec-ship_system.md
-        feature_spec-weapons_and_projectiles.md
-        feature_spec-camera_system.md
-        feature_spec-ai_patrol_behavior.md
-        feature_spec-nav_controller.md
-        feature_spec-chunk_streamer.md
-        feature_spec-fleet_command.md
-        feature_spec-game_event_bus_signals.md
+        /spec/
+            core_spec.md               ← authoritative source of truth
+            feature_spec-performance_monitor.md
+            feature_spec-physics_and_movement.md
+            feature_spec-ship_system.md
+            feature_spec-weapons_and_projectiles.md
+            feature_spec-camera_system.md
+            feature_spec-ai_patrol_behavior.md
+            feature_spec-nav_controller.md
+            feature_spec-chunk_streamer.md
+            feature_spec-fleet_command.md
+            feature_spec-game_event_bus_signals.md
     /.claude/
         /commands/
             new-ship.md                ← slash command: generate ship folder + ship.json
@@ -179,16 +180,16 @@ These rules apply to every system, every session, every agent:
 
 | Spec | File | Spec | Impl |
 |---|---|---|---|
-| PerformanceMonitor | `feature_spec-performance_monitor.md` | ✅ | 🔲 |
-| Physics & Movement | `feature_spec-physics_and_movement.md` | ✅ | 🔲 |
-| Ship System | `feature_spec-ship_system.md` | ✅ | 🔲 |
-| Weapons & Projectiles | `feature_spec-weapons_and_projectiles.md` | ✅ | 🔲 |
-| Camera System | `feature_spec-camera_system.md` | ✅ | 🔲 |
-| AI & Patrol Behavior | `feature_spec-ai_patrol_behavior.md` | ✅ | 🔲 |
-| NavigationController | `feature_spec-nav_controller.md` | ✅ | 🔲 |
-| Chunk Streamer | `feature_spec-chunk_streamer.md` | ✅ | 🔲 |
-| Fleet Command | `feature_spec-fleet_command.md` | ✅ | 🔲 |
-| GameEventBus Signals | `feature_spec-game_event_bus_signals.md` | ✅ | 🔲 |
+| PerformanceMonitor | `spec/feature_spec-performance_monitor.md` | ✅ | 🔲 |
+| Physics & Movement | `spec/feature_spec-physics_and_movement.md` | ✅ | 🔲 |
+| Ship System | `spec/feature_spec-ship_system.md` | ✅ | 🔲 |
+| Weapons & Projectiles | `spec/feature_spec-weapons_and_projectiles.md` | ✅ | 🔲 |
+| Camera System | `spec/feature_spec-camera_system.md` | ✅ | 🔲 |
+| AI & Patrol Behavior | `spec/feature_spec-ai_patrol_behavior.md` | ✅ | 🔲 |
+| NavigationController | `spec/feature_spec-nav_controller.md` | ✅ | 🔲 |
+| Chunk Streamer | `spec/feature_spec-chunk_streamer.md` | ✅ | 🔲 |
+| Fleet Command | `spec/feature_spec-fleet_command.md` | ✅ | 🔲 |
+| GameEventBus Signals | `spec/feature_spec-game_event_bus_signals.md` | ✅ | 🔲 |
 | Station & Loadout UI | — | 🔲 | 🔲 |
 
 ---
@@ -331,20 +332,20 @@ Systems are sequenced by dependency. Build in this order.
 
 | Step | System | Spec |
 |---|---|---|
-| 1 | PerformanceMonitor | `feature_spec-performance_monitor.md` |
+| 1 | PerformanceMonitor | `spec/feature_spec-performance_monitor.md` |
 | 2 | ServiceLocator + GameEventBus + GameBootstrap | Core Spec |
-| 3 | ContentRegistry | `feature_spec-ship_system.md` |
-| 4 | SpaceBody + Ship (physics only, no weapons) | `feature_spec-physics_and_movement.md` |
-| 5 | NavigationController | `feature_spec-nav_controller.md` |
-| 6 | ProjectileManager (C#, dumb pool) | `feature_spec-weapons_and_projectiles.md` |
-| 7 | WeaponComponent + HardpointComponent | `feature_spec-weapons_and_projectiles.md` |
-| 8 | GuidedProjectilePool | `feature_spec-weapons_and_projectiles.md` |
-| 9 | ShipFactory + Ship visual assembly | `feature_spec-ship_system.md` |
-| 10 | GameCamera — Pilot mode | `feature_spec-camera_system.md` |
-| 11 | AIController + NavigationController integration | `feature_spec-ai_patrol_behavior.md` |
+| 3 | ContentRegistry | `spec/feature_spec-ship_system.md` |
+| 4 | SpaceBody + Ship (physics only, no weapons) | `spec/feature_spec-physics_and_movement.md` |
+| 5 | NavigationController | `spec/feature_spec-nav_controller.md` |
+| 6 | ProjectileManager (C#, dumb pool) | `spec/feature_spec-weapons_and_projectiles.md` |
+| 7 | WeaponComponent + HardpointComponent | `spec/feature_spec-weapons_and_projectiles.md` |
+| 8 | GuidedProjectilePool | `spec/feature_spec-weapons_and_projectiles.md` |
+| 9 | ShipFactory + Ship visual assembly | `spec/feature_spec-ship_system.md` |
+| 10 | GameCamera — Pilot mode | `spec/feature_spec-camera_system.md` |
+| 11 | AIController + NavigationController integration | `spec/feature_spec-ai_patrol_behavior.md` |
 | 12 | Test scene: player vs AI, full Pilot mode loop | — |
-| 13 | Tactical mode camera + input layer | `feature_spec-camera_system.md`, `feature_spec-fleet_command.md` |
-| 14 | ChunkStreamer + Asteroid + Debris | `feature_spec-chunk_streamer.md` |
+| 13 | Tactical mode camera + input layer | `spec/feature_spec-camera_system.md`, `spec/feature_spec-fleet_command.md` |
+| 14 | ChunkStreamer + Asteroid + Debris | `spec/feature_spec-chunk_streamer.md` |
 | — | Station & Loadout UI | Not yet specced |
 | — | Galactic Strategy | Phase 3 — not yet specced |
 
@@ -366,7 +367,7 @@ Play plane: XZ (Y = 0) — no entity voluntarily leaves this plane
 ## Architecture
 - ServiceLocator.gd — global service registry (autoload)
 - GameEventBus.gd — all cross-system comms go through here; no direct cross-system refs
-- PerformanceMonitor.gd — instrument every system; see feature_spec-performance_monitor.md
+- PerformanceMonitor.gd — instrument every system; see spec/feature_spec-performance_monitor.md
 - NavigationController.gd — shared flight computer for AI and Tactical mode orders
 - Ship.gd — unified input interface (input_forward, input_strafe, input_aim_target, input_fire)
 
@@ -406,6 +407,6 @@ proceeding.
 
 ## For More Detail
 
-Read the relevant feature spec from `/docs/` for any system. The core spec
-(`core_spec.md`) is the single source of truth — when any conflict arises between
+Read the relevant feature spec from `docs/spec/` for any system. The core spec
+(`docs/spec/core_spec.md`) is the single source of truth — when any conflict arises between
 memory, general knowledge, and spec files, the specs win.
