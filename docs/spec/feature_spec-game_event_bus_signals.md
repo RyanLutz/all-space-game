@@ -110,6 +110,17 @@ signal loadout_changed(ship: Node, slot_id: String, item_id: String)
 # ─── Player State ──────────────────────────────────────────────────────────────
 signal player_ship_changed(ship: Node)
 
+# ─── Solar System ──────────────────────────────────────────────────────────────
+signal system_loaded(system_id: String)
+signal system_unloaded(system_id: String)
+signal origin_shifted(offset: Vector3)
+signal exclusion_zone_entered(ship: Node, star_index: int)
+signal exclusion_zone_exited(ship: Node, star_index: int)
+
+# ─── Warp ───────────────────────────────────────────────────────────────────────
+signal warp_state_changed(ship: Node, old_state: String, new_state: String)
+signal warp_interrupted(ship: Node, reason: String)
+
 # ─── Debug ─────────────────────────────────────────────────────────────────────
 signal debug_toggled(visible: bool)
 ```
@@ -338,6 +349,53 @@ new ship. A `null` value is valid — signals that the player has no active ship
 
 ---
 
+## Solar System Signals
+
+These signals are required by `feature_spec-solar_system.md`. They must be added to
+`GameEventBus.gd` before any Solar System implementation begins.
+
+| Signal | Args | Emitted By | Listened By |
+|---|---|---|---|
+| `system_loaded` | `system_id: String` | SolarSystem | ChunkStreamer (begin streaming), AI, UI |
+| `system_unloaded` | `system_id: String` | SolarSystem | ChunkStreamer (clear chunks), AI |
+| `origin_shifted` | `offset: Vector3` | OriginShifter | Any system tracking absolute world positions |
+| `exclusion_zone_entered` | `ship: Node, star_index: int` | Star | VFX (heat shimmer), Audio (alarm), UI (warning) |
+| `exclusion_zone_exited` | `ship: Node, star_index: int` | Star | VFX, Audio (clear alarm), UI |
+
+**`origin_shifted` — `offset`:** The world-space translation applied to all physics
+bodies. Systems that cache absolute positions (e.g. AI waypoints, navigation targets)
+must subtract this offset from their stored values.
+
+**`exclusion_zone_entered` / `exited` — `star_index`:** Zero-based index into the
+system's star array. `0` for a single star; `0` or `1` for a binary pair. Listeners
+that need the star node call `SolarSystem.get_star(star_index)`.
+
+**Status:** Not yet implemented. These signals are reserved for the Solar System
+implementation phase (step 26).
+
+---
+
+## Warp Signals
+
+These signals are required by `feature_spec-solar_system.md` (WarpDrive state machine).
+They must be added to `GameEventBus.gd` before WarpDrive implementation begins.
+
+| Signal | Args | Emitted By | Listened By |
+|---|---|---|---|
+| `warp_state_changed` | `ship: Node, old_state: String, new_state: String` | WarpDrive | VFX (engine trail), Audio (warp hum), UI |
+| `warp_interrupted` | `ship: Node, reason: String` | WarpDrive | VFX (discharge flash), Audio (interrupt SFX) |
+
+**`warp_state_changed` — `new_state` / `old_state` values:** `"IDLE"`, `"SPOOLING"`,
+`"ACTIVE"`, `"DECELERATING"`.
+
+**`warp_interrupted` — `reason` values:** `"damage"` (hit above interrupt threshold),
+`"exclusion"` (approached star exclusion zone), `"input"` (player released key).
+
+**Status:** Not yet implemented. Reserved for the Solar System / WarpDrive
+implementation phase (step 26).
+
+---
+
 ## How to Add a New Signal
 
 1. Add the signal definition to `core/GameEventBus.gd` in the correct category block.
@@ -353,6 +411,12 @@ undocumented listeners create invisible dependencies that break future refactori
 ---
 
 ## Audit Log
+
+**2026-05-04 — Solar System + Warp signals added (spec-only):**
+Added `system_loaded`, `system_unloaded`, `origin_shifted`, `exclusion_zone_entered`,
+`exclusion_zone_exited` (Solar System) and `warp_state_changed`, `warp_interrupted`
+(WarpDrive) per `feature_spec-solar_system.md`. All are reserved — not yet implemented.
+Signal definitions added to the GDScript block above.
 
 **Phase 16 audit (2026-04-21):** Reconciled spec with code after phases 12-15.
 

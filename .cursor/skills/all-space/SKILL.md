@@ -180,17 +180,22 @@ These rules apply to every system, every session, every agent:
 
 | Spec | File | Spec | Impl |
 |---|---|---|---|
-| PerformanceMonitor | `spec/feature_spec-performance_monitor.md` | ✅ | 🔲 |
-| Physics & Movement | `spec/feature_spec-physics_and_movement.md` | ✅ | 🔲 |
-| Ship System | `spec/feature_spec-ship_system.md` | ✅ | 🔲 |
-| Weapons & Projectiles | `spec/feature_spec-weapons_and_projectiles.md` | ✅ | 🔲 |
-| Camera System | `spec/feature_spec-camera_system.md` | ✅ | 🔲 |
-| AI & Patrol Behavior | `spec/feature_spec-ai_patrol_behavior.md` | ✅ | 🔲 |
-| NavigationController | `spec/feature_spec-nav_controller.md` | ✅ | 🔲 |
-| Chunk Streamer | `spec/feature_spec-chunk_streamer.md` | ✅ | 🔲 |
-| Fleet Command | `spec/feature_spec-fleet_command.md` | ✅ | 🔲 |
-| GameEventBus Signals | `spec/feature_spec-game_event_bus_signals.md` | ✅ | 🔲 |
+| PerformanceMonitor | `spec/feature_spec-performance_monitor.md` | ✅ | ✅ |
+| Physics & Movement | `spec/feature_spec-physics_and_movement.md` | ✅ | ✅ |
+| Ship System | `spec/feature_spec-ship_system.md` | ✅ | ✅ |
+| Weapons & Projectiles | `spec/feature_spec-weapons_and_projectiles.md` | ✅ | ✅ |
+| Camera System | `spec/feature_spec-camera_system.md` | ✅ | ✅ |
+| AI & Patrol Behavior | `spec/feature_spec-ai_patrol_behavior.md` | ✅ | ✅ |
+| NavigationController | `spec/feature_spec-nav_controller.md` | ✅ | ✅ |
+| Chunk Streamer | `spec/feature_spec-chunk_streamer.md` | ✅ | ✅ |
+| Fleet Command | `spec/feature_spec-fleet_command.md` | ✅ | ✅ |
+| GameEventBus Signals | `spec/feature_spec-game_event_bus_signals.md` | ✅ | ✅ |
+| Combat VFX | — | 🔲 | 🔄 |
+| UI Design | `spec/feature_spec-ui_design.md` | ✅ | ✅ |
 | Station & Loadout UI | — | 🔲 | 🔲 |
+| StarField (galaxy, skybox, galactic map) | `spec/feature_spec-star_field_2.md` | ✅ | 🔲 |
+| SolarSystem + WarpDrive + OriginShifter | `spec/feature_spec-solar_system.md` | ✅ | 🔲 |
+| *(Star System — old spec, superseded)* | *`spec/feature_spec-star_system.md`* | *—* | *(ref only)* |
 
 ---
 
@@ -347,6 +352,8 @@ Systems are sequenced by dependency. Build in this order.
 | 13 | Tactical mode camera + input layer | `spec/feature_spec-camera_system.md`, `spec/feature_spec-fleet_command.md` |
 | 14 | ChunkStreamer + Asteroid + Debris | `spec/feature_spec-chunk_streamer.md` |
 | — | Station & Loadout UI | Not yet specced |
+| 25 | StarField — galaxy catalog, custom sky shader, nebula volumes, galactic map | `spec/feature_spec-star_field_2.md` (session breakout: `spec/feature_spec-star_field-session_breakout.md`) |
+| 26 | SolarSystem + WarpDrive + OriginShifter | `spec/feature_spec-solar_system.md` (session breakout: `spec/feature_spec-solar_system-session_breakout.md`) |
 | — | Galactic Strategy | Phase 3 — not yet specced |
 
 ---

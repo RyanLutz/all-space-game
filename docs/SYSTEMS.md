@@ -29,5 +29,8 @@ Quick lookup: build step → authoritative spec, JSON ownership, PerformanceMoni
 | 15 | ChunkStreamer + Asteroid + Debris | [`feature_spec-chunk_streamer.md`](spec/feature_spec-chunk_streamer.md) | `/data/world_config.json` | `ChunkStreamer.load`, `ChunkStreamer.unload`, `ChunkStreamer.loaded_chunks` |
 | 17 | Combat VFX | — | `/content/effects/` | — |
 | 18–19 | UI Foundation + Pilot HUD | [`feature_spec-ui_design.md`](spec/feature_spec-ui_design.md) | `/data/damage_types.json` (display only) | — |
+| *(20–24)* | *(Star System — old spec, superseded)* | *[`feature_spec-star_system.md`](spec/feature_spec-star_system.md) — SUPERSEDED* | *`data/world_config.json` (galaxy block)* | *`StarRegistry.lod_update`, `StarRegistry.generate`, `StarRegistry.screen_pass_count`, `StarRegistry.active_meshes`* |
+| 25 | StarField — galaxy, skybox, galactic map | [`feature_spec-star_field_2.md`](spec/feature_spec-star_field_2.md) | `data/world_config.json` (starfield block) | `StarField.generate`, `StarField.rebuild_skybox`, `StarField.backdrop_count`, `StarField.destination_count` |
+| 26 | SolarSystem + WarpDrive + OriginShifter | [`feature_spec-solar_system.md`](spec/feature_spec-solar_system.md) | `data/solar_system_archetypes.json`, `content/systems/*/system.json` | `SolarSystem.generate`, `SolarSystem.orbit_update`, `SolarSystem.origin_shift`, `SolarSystem.planet_count`, `SolarSystem.station_count`, `SolarSystem.belt_count` |
 
 > Signal contracts are not listed here — see [`feature_spec-game_event_bus_signals.md`](spec/feature_spec-game_event_bus_signals.md) for the full emitter/listener table.

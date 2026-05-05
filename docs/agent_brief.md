@@ -97,6 +97,11 @@ From `docs/spec/core_spec.md` §19. Update this table at the end of every sessio
 | 23 | Star System — Phase 4 (`star_exclusion_entered` signal in GameEventBus, `StarMesh` ExclusionArea live, collision_mask=1, body_entered handler filters to Ship, emits signal) | Implemented |
 | 24 | Star System — Phase 5 (per-star `blend_alpha` + `lod_prev_state` on `StarRecord`; `mix()` crossfade in `star_point.gdshader`, `star_screen_pass.gdshader`, `star_surface.gdshader`, `star_corona.gdshader`; delayed LOD 2 despawn; frustum-cull stub at >200 screen-pass stars; `distance_squared_to()` perf optimisation; all four `StarRegistry.*` metrics) | Implemented |
 
+> **Steps 20–24 are reference code from the superseded `feature_spec-star_system.md`.** The architecture built in these steps (`StarRegistry` world-space LOD system, screen-pass quad glow shader, `StarMesh` LOD 2) has been replaced by two new specs: `feature_spec-star_field_2.md` (step 25) and `feature_spec-solar_system.md` (step 26). The `core/stars/` implementation is retained for reference. Do not extend it. When StarField Session 1 begins, `StarField.gd` in `core/starfield/` supersedes `StarRegistry.gd`.
+
+| 25 | StarField — galaxy catalog, custom sky shader, nebula volumes, galactic map (see `feature_spec-star_field_2.md` + session breakout) | Not started |
+| 26 | SolarSystem + WarpDrive + OriginShifter + ChunkStreamer belt integration (see `feature_spec-solar_system.md` + session breakout) | Not started |
+
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 
 ---
