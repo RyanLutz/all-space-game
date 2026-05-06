@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://c_warpdrivetest"]
+
+[ext_resource type="Script" path="res://test/WarpDriveTest.gd" id="1_wdt"]
+
+[node name="WarpDriveTest" type="Node3D"]
+script = ExtResource("1_wdt")
+
+[node name="TopCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 25000, 0)
+current = true
+fov = 60.0
+far = 500000.0
+
+[node name="DebugOverlay" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="PanelContainer" parent="DebugOverlay"]
+offset_right = 650.0
+offset_bottom = 200.0
+
+[node name="Stats" type="Label" parent="DebugOverlay/Panel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 14
+text = "Loading..."

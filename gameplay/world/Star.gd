@@ -81,6 +81,44 @@ func _build_visuals() -> void:
 	add_child(_exclusion_ring)
 
 
+# ── Exclusion zone tracking ──────────────────────────────────────────────────
+var _ships_inside: Dictionary = {}   # { ship_instance_id: bool }
+var _event_bus: Node = null
+
+func _ready() -> void:
+	add_to_group("stars")
+	var sl := Engine.get_singleton("ServiceLocator")
+	if sl:
+		_event_bus = sl.GetService("GameEventBus")
+
+
+func _physics_process(delta: float) -> void:
+	var ships := get_tree().get_nodes_in_group("ships")
+	var my_pos_xz := Vector2(global_position.x, global_position.z)
+	var star_idx := get_index()
+
+	for ship in ships:
+		if not is_instance_valid(ship):
+			continue
+		var ship_pos_xz := Vector2(ship.global_position.x, ship.global_position.z)
+		var flat_dist := ship_pos_xz.distance_to(my_pos_xz)
+		var was_inside: bool = _ships_inside.get(ship.get_instance_id(), false)
+		var is_inside := flat_dist < exclusion_radius
+
+		if is_inside:
+			ship.apply_damage(damage_per_second * delta, "heat",
+				ship.global_position, 0.0, 0)
+
+		if is_inside and not was_inside:
+			_ships_inside[ship.get_instance_id()] = true
+			if _event_bus:
+				_event_bus.exclusion_zone_entered.emit(ship, star_idx)
+		elif was_inside and not is_inside:
+			_ships_inside.erase(ship.get_instance_id())
+			if _event_bus:
+				_event_bus.exclusion_zone_exited.emit(ship, star_idx)
+
+
 func _star_color() -> Color:
 	match star_type:
 		"yellow_dwarf":     return Color(1.00, 0.90, 0.40)

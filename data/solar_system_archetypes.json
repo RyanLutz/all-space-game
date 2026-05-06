@@ -84,11 +84,15 @@
   },
 
   "warp": {
-    "spool_time": 2.5,
-    "decel_time": 1.5,
-    "speed_multiplier": 80.0,
+    "charge_time": 2.5,
+    "thrust_multiplier": 8.0,
+    "damp_override": 0.0,
+    "max_warp_speed": 2500.0,
     "interrupt_damage_threshold": 20.0,
-    "exclusion_abort_radius_margin": 500.0
+    "exclusion_margin": 500.0,
+    "min_distance": 5000.0,
+    "charge_energy_rate": 15.0,
+    "hold_energy_rate": 5.0
   },
 
   "belt": {

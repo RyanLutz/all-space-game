@@ -206,6 +206,15 @@ func draw_power(amount: float) -> bool:
 	return false
 
 
+## Drain power per frame (rate in units/sec). Returns true if sufficient energy.
+func drain_power(rate: float, delta: float) -> bool:
+	var cost := rate * delta
+	if power_current >= cost:
+		power_current -= cost
+		return true
+	return false
+
+
 # ─── Damage (SpaceBody contract) ─────────────────────────────────────────────
 
 func apply_damage(amount: float, damage_type: String,
@@ -215,7 +224,7 @@ func apply_damage(amount: float, damage_type: String,
 
 	# Emit ship_damaged for stance system (defensive fan-out)
 	var attacker_node: Node = instance_from_id(attacker_id) if attacker_id != 0 else null
-	_event_bus.ship_damaged.emit(self, attacker_node)
+	_event_bus.ship_damaged.emit(self, attacker_node, amount)
 
 	# Shield absorption
 	if shield_hp > 0.0:

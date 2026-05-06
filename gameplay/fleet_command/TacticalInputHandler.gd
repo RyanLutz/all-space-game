@@ -140,8 +140,26 @@ func _on_right_click(screen_pos: Vector2) -> void:
 			_perf.end("FleetCommand.right_click_dispatch")
 			return
 
-	# No target or unclassified — empty-space move order
+	# No target or unclassified — empty-space move order or warp plot
 	var destination := _ray_plane_intersect(ray_origin, ray_dir, 0.0)
+
+	# Check if we're at system-scale zoom and destination is far enough for warp
+	var camera_height := camera.global_position.y
+	var player_ship := _get_player_ship()
+	var warp_min_dist := 5000.0
+	if player_ship:
+		var warp_drive: WarpDrive = player_ship.get_node_or_null("WarpDrive") as WarpDrive
+		if warp_drive:
+			warp_min_dist = warp_drive.min_distance
+
+	if camera_height > 5000.0 and player_ship != null:
+		var dist := Vector2(destination.x - player_ship.global_position.x,
+						destination.z - player_ship.global_position.z).length()
+		if dist >= warp_min_dist:
+			_show_warp_plot_menu(screen_pos, destination)
+			_perf.end("FleetCommand.right_click_dispatch")
+			return
+
 	_dispatch_move_order(destination)
 	_perf.end("FleetCommand.right_click_dispatch")
 
@@ -198,3 +216,21 @@ func _ray_plane_intersect(origin: Vector3, direction: Vector3, plane_y: float) -
 		return Vector3(origin.x, plane_y, origin.z)
 	var t := (plane_y - origin.y) / direction.y
 	return origin + direction * t
+
+
+func _get_player_ship() -> Node:
+	var sl := Engine.get_singleton("ServiceLocator")
+	if sl == null:
+		return null
+	var player_state: Node = sl.GetService("PlayerState")
+	if player_state == null:
+		return null
+	return player_state.get_active_ship()
+
+
+func _show_warp_plot_menu(screen_pos: Vector2, destination: Vector3) -> void:
+	var menu := WarpPlotMenu.new()
+	get_tree().get_root().add_child(menu)
+	menu.show_at(screen_pos, destination)
+	# Menu self-destructs after selection via popup hide
+	menu.popup_hide.connect(func(): menu.queue_free())

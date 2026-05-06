@@ -74,7 +74,7 @@ func _on_escort_stance_changed(stance: int) -> void:
 
 # ─── Defensive Fan-Out ────────────────────────────────────────────────────
 
-func _on_ship_damaged(victim: Node, attacker: Node) -> void:
+func _on_ship_damaged(victim: Node, attacker: Node, _amount: float) -> void:
 	_perf.begin("FleetCommand.stance_response")
 
 	if attacker == null:

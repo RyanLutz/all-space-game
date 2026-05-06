@@ -12,7 +12,7 @@ class_name NavigationController
 ##
 ## Tactical orders take priority over formation destinations.
 
-enum DriveMode { EXTERNAL, TACTICAL_ORDER, FORMATION }
+enum DriveMode { EXTERNAL, TACTICAL_ORDER, FORMATION, EMERGENCY_STOP }
 
 # ─── Drive state ───────────────────────────────────────────────────────────
 var _drive_mode: DriveMode = DriveMode.EXTERNAL
@@ -86,6 +86,11 @@ func _on_request_tactical_move(ship_ids: Array, destination: Vector3, _queue_mod
 	var my_id := get_parent().get_instance_id()
 	if my_id not in ship_ids:
 		return
+	# If warp is active, queue the move order instead of overriding
+	var warp: WarpDrive = get_parent().get_node_or_null("WarpDrive") as WarpDrive
+	if warp != null and warp.is_warp_active():
+		warp.queue_move(destination)
+		return
 	_destination = destination
 	_destination.y = 0.0
 	_arrived = false
@@ -135,7 +140,10 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	_perf.begin("Navigation.update")
-	_update_nav(_delta)
+	if _drive_mode == DriveMode.EMERGENCY_STOP:
+		_update_emergency_stop()
+	else:
+		_update_nav(_delta)
 	_perf.end("Navigation.update")
 
 
@@ -178,3 +186,22 @@ func _update_nav(_delta: float) -> void:
 		var dest_dir := to_dest.normalized()
 		ship.input_forward = dest_dir.dot(ship_forward) * _thrust_fraction
 		ship.input_strafe = dest_dir.dot(ship_right) * _thrust_fraction
+
+
+func _update_emergency_stop() -> void:
+	var ship := get_parent() as RigidBody3D
+	var velocity := ship.linear_velocity
+	velocity.y = 0.0
+	var speed := velocity.length()
+
+	if speed < 1.0:
+		ship.input_forward = 0.0
+		ship.input_strafe = 0.0
+		_arrived = true
+		return
+
+	var ship_forward := -ship.transform.basis.z
+	var ship_right := ship.transform.basis.x
+	var brake_dir := -velocity.normalized()
+	ship.input_forward = brake_dir.dot(ship_forward)
+	ship.input_strafe = brake_dir.dot(ship_right)

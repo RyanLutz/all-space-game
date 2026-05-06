@@ -116,6 +116,13 @@ func spawn_ship(
 		_attach_ai_components(ship, ai_profile_id)
 
 	ship.add_to_group("ships")
+	ship.add_to_group("physics_bodies")
+
+	# WarpDrive — attached to all ships for scalability (player + AI)
+	var warp := preload("res://gameplay/world/WarpDrive.gd").new()
+	warp.name = "WarpDrive"
+	warp.setup(resolved_stats.get("warp", {}))
+	ship.add_child(warp)
 
 	# Add to scene tree
 	get_tree().get_root().add_child.call_deferred(ship)

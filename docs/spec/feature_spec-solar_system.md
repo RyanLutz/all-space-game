@@ -177,12 +177,17 @@ systems — ChunkStreamer does not know about orbits, planets, or system archety
 
 | Property | Type | Description |
 |---|---|---|
-| `warp_state` | `String` | `"IDLE"`, `"SPOOLING"`, `"ACTIVE"`, `"DECELERATING"` |
-| `spool_time` | `float` | Seconds to engage from key-hold to active warp |
-| `decel_time` | `float` | Seconds to brake after warp disengages |
-| `speed_multiplier` | `float` | Max speed multiplier during active warp |
-| `interrupt_damage_threshold` | `float` | Hull damage amount that cancels warp |
-| `exclusion_abort_radius` | `float` | Distance from exclusion zone edge that auto-aborts warp |
+| `warp_state` | `String` | `"IDLE"`, `"CHARGING"`, `"READY"`, `"ACTIVE"`, `"DECELERATING"` |
+| `warp_mode` | `String` | `"PLOTTED"` or `"MANUAL"` |
+| `charge_time` | `float` | Seconds to fill charge bar |
+| `thrust_multiplier` | `float` | Multiplier on `thruster_force` during ACTIVE |
+| `damp_override` | `float` | `linear_damp` value during ACTIVE (0 = coast) |
+| `max_warp_speed` | `float` | Soft cap with cubic ease-out falloff |
+| `interrupt_damage_threshold` | `float` | Single-hit damage that triggers interrupt |
+| `exclusion_margin` | `float` | Distance beyond exclusion radius that auto-aborts |
+| `min_distance` | `float` | Minimum destination distance for warp plot eligibility |
+| `charge_energy_rate` | `float` | Energy drain per second while CHARGING |
+| `hold_energy_rate` | `float` | Energy drain per second while READY |
 
 ---
 
@@ -329,32 +334,51 @@ func get_belt_context_at(world_pos: Vector3) -> Dictionary:
     return { "in_belt": false, "density_multiplier": 1.0, "asteroid_type_weights": {} }
 ```
 
-### In-System Warp State Machine
+### Warp State Machine (Dual Mode)
 
-`WarpDrive.gd` is a component attached to the player ship node. It reads ship input
-and drives warp state transitions. It does not bypass the physics system — instead it
-sets a `warp_multiplier` property on the ship's physics component that scales `max_speed`.
-The unified input interface (`input_forward`, etc.) continues to drive thrust normally.
+`WarpDrive.gd` is a component attached to every ship node. It supports two warp modes
+that share a single state machine:
+
+- **PLOTTED:** Right-click a distant point (> `min_distance`) in Tactical mode →
+  select "Plot Warp Course" → charge builds → press **Y** to engage autopilot.
+- **MANUAL:** Hold **Y** to charge → release to disengage. Player steers manually
+  during ACTIVE with boosted thrust and zero damping.
 
 ```
-IDLE ──(hold warp key)──► SPOOLING ──(spool_time elapsed)──► ACTIVE
-  ▲                           │                                   │
-  │                    (release key / dmg)              (release key / dmg /
-  │                           │                          approach exclusion)
-  └──── IDLE ◄─── DECELERATING ◄─────────────────────────────────┘
+                         ┌─(Y held, no plot)────┐
+                         ▼                      │
+IDLE ──(plot dest)──► CHARGING ──(charge full)──► READY ──(Y press)──► ACTIVE
+  ▲                      │ (cancel / dmg / energy)                        │
+  │                      │ (release Y [manual])                           │
+  │                      ▼                                                  │
+  └───────────────── IDLE ◄─── DECELERATING ◄─────────────────────────────┘
+                              (arrive / release Y [manual] / dmg /
+                               exclusion proximity / energy depleted)
 ```
 
 State behaviors:
-- **SPOOLING:** Ship still moves normally. Spool VFX begin. Timer counts up.
-- **ACTIVE:** `warp_multiplier` ramps up to `speed_multiplier` value from JSON. Engine
-  VFX at max. StarField warp streaks begin (future pass). Player can still steer.
-- **DECELERATING:** `warp_multiplier` ramps back to 1.0 over `decel_time` seconds.
-- **Interrupts:** Taking damage above `interrupt_damage_threshold` in a single hit, or
-  approaching within `exclusion_abort_radius` of any star exclusion zone, forces
-  transition to DECELERATING immediately.
+- **CHARGING:** Ship moves normally. Charge timer increments. Energy drains at
+  `charge_energy_rate`. Cancelled by: releasing Y (manual), unselecting destination
+  (plotted), damage > threshold, or energy depletion.
+- **READY (plotted only):** Charge held at 100%. Low energy drain (`hold_energy_rate`).
+  Awaiting Y press to engage.
+- **ACTIVE:** `linear_damp = warp_damp_override` (0.0 = coast), `thruster_force` boosted
+  by `thrust_multiplier`. Thrust curve applies cubic ease-out falloff as velocity
+  approaches `max_warp_speed` — acceleration tapers but never truly stops.
+  - **PLOTTED:** NavigationController flies to destination; natural braking distance
+    produces accelerate-then-decelerate trajectory. Arrives cleanly.
+  - **MANUAL:** Player inputs drive thrust directly. Release Y → DECELERATING.
+  Weapons disabled during ACTIVE.
+- **DECELERATING:** Stats restored. NavigationController emergency-brakes against
+  current velocity until stopped. Returns to IDLE when speed < 1.0.
 
-Warp is a speed mode, not a teleport. The player points their ship at a destination
-and holds the warp key. Time-to-cross a system is a balance tuning concern.
+Interrupts (all modes):
+- Damage in a single hit > `interrupt_damage_threshold` → immediate DECELERATING
+- Approach within `exclusion_margin` of any star exclusion zone → DECELERATING
+- Energy depleted → DECELERATING (or IDLE if in CHARGING/READY)
+
+Queued actions: tactical move orders issued during CHARGING/READY/ACTIVE do not
+cancel warp. They are deferred and executed after warp returns to IDLE.
 
 ---
 
@@ -448,11 +472,15 @@ and holds the warp key. Time-to-cross a system is a balance tuning concern.
   },
 
   "warp": {
-    "spool_time": 2.5,
-    "decel_time": 1.5,
-    "speed_multiplier": 80.0,
+    "charge_time": 2.5,
+    "thrust_multiplier": 8.0,
+    "damp_override": 0.0,
+    "max_warp_speed": 2500.0,
     "interrupt_damage_threshold": 20.0,
-    "exclusion_abort_radius_margin": 500.0
+    "exclusion_margin": 500.0,
+    "min_distance": 5000.0,
+    "charge_energy_rate": 15.0,
+    "hold_energy_rate": 5.0
   },
 
   "belt": {
@@ -573,6 +601,7 @@ signal exclusion_zone_exited(ship: Node, star_index: int)
 # ─── Warp ──────────────────────────────────────────────────────────────────────
 signal warp_state_changed(ship: Node, old_state: String, new_state: String)
 signal warp_interrupted(ship: Node, reason: String)
+signal warp_destination_plotted(destination: Vector3)
 ```
 
 | Signal | Emitted By | Listened By |
@@ -584,6 +613,7 @@ signal warp_interrupted(ship: Node, reason: String)
 | `exclusion_zone_exited` | Star | VFX, Audio (clear alarm), UI |
 | `warp_state_changed` | WarpDrive | VFX (engine trail), Audio (warp hum), UI |
 | `warp_interrupted` | WarpDrive | VFX (discharge flash), Audio (interrupt SFX) |
+| `warp_destination_plotted` | WarpPlotMenu | WarpDrive (sets destination and enters CHARGING) |
 
 ---
 
@@ -706,10 +736,17 @@ signal warp_interrupted(ship: Node, reason: String)
 - [ ] After an origin shift, ships continue behaving correctly — no visible pop, no
   physics jitter
 - [ ] Stations remain correctly parented to their planet and follow its orbital drift
-- [ ] In-system warp engages after `spool_time` seconds of holding the warp key and
-  visibly increases ship speed by approximately `speed_multiplier`
+- [ ] **Plotted warp:** Right-click > `min_distance` away → "Plot Warp Course" →
+  charge fills over `charge_time` → press Y → ship autopilots to destination with
+  accelerate-then-decelerate trajectory
+- [ ] **Manual warp:** Hold Y to charge → release Y to disengage. Ship has zero damp
+  + boosted thrust, player steers manually. Thrust tapers via cubic ease-out as
+  velocity approaches `max_warp_speed`
+- [ ] Energy drains at `charge_energy_rate` during CHARGING and `hold_energy_rate`
+  during READY; energy depletion interrupts warp
+- [ ] Weapons are disabled during ACTIVE warp (both modes)
 - [ ] Taking a hit above `interrupt_damage_threshold` while warping transitions warp
-  to DECELERATING state
+  to DECELERATING state (or IDLE if in CHARGING/READY)
 - [ ] Approaching a star exclusion zone while warping auto-aborts warp before the ship
   crosses the exclusion boundary
 - [ ] `PerformanceMonitor` overlay (F3) shows `SolarSystem.orbit_update`,

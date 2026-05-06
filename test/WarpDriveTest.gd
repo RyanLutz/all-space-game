@@ -1,18 +1,11 @@
 extends Node3D
 
-## SolarSystem Session A test scene.
+## WarpDrive test scene. Extends SolarSystemTest with warp-specific HUD and
+## manual warp controls.
 ##
-## Validates: deterministic generation, star depth/exclusion ring, planet orbital
-## drift, binary star pairs, belt region count.
-##
-## Controls:
-##   WASD / Arrow keys  — pan camera
-##   Mouse wheel        — zoom
-##   Shift              — fast pan
-##   R                  — regenerate current system_id with new random seed
-##   N                  — next system (increments system index)
-##   B                  — cycle forced archetype override (or "random")
-##   Space              — toggle between top-down and 45° perspective
+## Controls (in addition to SolarSystemTest):
+##   Y                  — hold to charge/initiate manual warp
+##   Right-click (high zoom) — plot warp destination
 
 @export var galaxy_seed: int = 8675309
 @export var start_system_id: String = "sys_00000"
@@ -48,7 +41,7 @@ func _ready() -> void:
 
 	_archetype_cfg = _load_archetypes()
 	if _archetype_cfg.is_empty():
-		push_error("SolarSystemTest: cannot load solar_system_archetypes.json")
+		push_error("WarpDriveTest: cannot load solar_system_archetypes.json")
 		return
 
 	_rebuild_system()
@@ -97,7 +90,6 @@ func _rebuild_system() -> void:
 
 	var cfg := _archetype_cfg.duplicate(true)
 
-	# Inject forced archetype if set: override all archetype weights to 0 except chosen
 	if _forced_archetype != "":
 		var archs: Dictionary = cfg.get("archetypes", {})
 		for key in archs:
@@ -117,12 +109,15 @@ func _try_spawn_ship() -> void:
 		return
 	var factory = sl.GetService("ShipFactory")
 	if factory == null:
-		return
+		factory = ShipFactory.new()
+		factory.name = "ShipFactory"
+		add_child(factory)
 	_player_ship = factory.spawn_ship(
 		ship_class_id, ship_variant_id,
 		Vector3(5000.0, 0.0, 0.0),
 		"player", true)
 	# ShipFactory already adds ship to scene tree via root.add_child.call_deferred
+	# Do NOT add it again here
 
 
 func _input(event: InputEvent) -> void:
@@ -139,13 +134,16 @@ func _input(event: InputEvent) -> void:
 			KEY_R:
 				galaxy_seed += 1
 				_rebuild_system()
+				_try_spawn_ship()
 			KEY_N:
 				_system_index += 1
 				_rebuild_system()
+				_try_spawn_ship()
 			KEY_B:
 				_archetype_cycle_idx = (_archetype_cycle_idx + 1) % _archetypes_cycle.size()
 				_forced_archetype = _archetypes_cycle[_archetype_cycle_idx]
 				_rebuild_system()
+				_try_spawn_ship()
 			KEY_SPACE:
 				_top_down = not _top_down
 				if _top_down:
@@ -202,6 +200,12 @@ func _update_overlay() -> void:
 		gen_ms       = float(_perf.get_avg_ms("SolarSystem.generate"))
 		planet_count = int(_perf.get_count("SolarSystem.planet_count"))
 
+	var warp_status := ""
+	if _player_ship != null:
+		var warp := _player_ship.get_node_or_null("WarpDrive") as WarpDrive
+		if warp != null and warp.is_warp_active():
+			warp_status = " | WARP: %s (%.0f%%)" % [warp.get_state_name(), warp.get_charge_ratio() * 100.0]
+
 	var arch_label := ("forced: %s" % _forced_archetype) \
 		if _forced_archetype != "" else "random"
 	var seed_label := "seed: %d" % galaxy_seed
@@ -209,9 +213,10 @@ func _update_overlay() -> void:
 	_stats_label.text = (
 		"FPS: %d  |  %s  |  %s\n" % [fps, seed_label, arch_label]
 		+ "system: %s  |  archetype: %s  |  stars: %d\n" % [sys_id, archtype, n_stars]
-		+ "planets: %d  |  belts: %d\n" % [n_planets, n_belts]
+		+ "planets: %d  |  belts: %d%s\n" % [n_planets, n_belts, warp_status]
 		+ "SolarSystem.generate: %.2f ms\n" % gen_ms
 		+ "---\n"
 		+ "WASD=pan  Wheel=zoom  Shift=fast\n"
-		+ "R=new seed  N=next system  B=cycle archetype  Space=toggle view"
+		+ "R=new seed  N=next system  B=cycle archetype  Space=toggle view\n"
+		+ "Y=manual warp  Right-click (high zoom)=plot warp"
 	)

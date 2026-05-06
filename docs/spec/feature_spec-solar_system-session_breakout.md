@@ -52,35 +52,46 @@ integration, `GameEventBus` signals.
 
 ---
 
-## Session B — Star Exclusion Zone + WarpDrive State Machine
+## Session B — Star Exclusion Zone + WarpDrive State Machine (Dual Mode)
 **Model: Claude Sonnet** (state machine logic, physics integration novelty)
 **Effort: Medium**
 
-Wires the star as a danger and gives the player in-system fast travel. Requires
-Session A's test scene and the player ship having `apply_damage()`.
+Wires the star as a danger and gives the player two warp modes: plotted autopilot
+and manual speed boost. Requires Session A's test scene and the player ship having
+`apply_damage()`.
 
 **Delivers:**
 - `Star.gd` exclusion zone: `_physics_process` checks XZ distance to all ships in
-  group `"ships"`; calls `ship.apply_damage(damage_per_second * delta, "heat", pos)`
-  for ships inside `exclusion_radius`
+  group `"ships"`; calls `ship.apply_damage(damage_per_second * delta, "heat", pos,
+  0.0, 0)` for ships inside `exclusion_radius`
 - `GameEventBus.exclusion_zone_entered` and `exclusion_zone_exited` emitted when ships
-  cross the boundary (add these to `GameEventBus.gd` per the signals spec)
-- `WarpDrive.gd` — component attached to the player ship node; reads ship input;
-  state machine: `IDLE → SPOOLING → ACTIVE → DECELERATING`
-- Spool VFX placeholder (print to console or simple color tint; full VFX deferred)
-- `warp_multiplier` property set on the ship's physics component during ACTIVE state;
-  review `feature_spec-physics_and_movement.md` and the existing implementation to
-  determine the cleanest integration point for speed scaling
-- Interrupt conditions: single-hit damage above `interrupt_damage_threshold` (listen
-  to `ship_damaged`) and approach within `exclusion_abort_radius` of any star
-- `GameEventBus.warp_state_changed` and `warp_interrupted` emitted on transitions
-- All warp parameters in `solar_system_archetypes.json` `warp` block — no hardcoded values
-- `PerformanceMonitor` — no new hot-path metrics; warp state transitions are rare events
+  cross the boundary
+- `WarpDrive.gd` — component attached to every ship node; dual-mode state machine:
+  `IDLE → CHARGING → READY → ACTIVE → DECELERATING` (PLOTTED) and
+  `IDLE → CHARGING → ACTIVE → DECELERATING` (MANUAL)
+- **PLOTTED mode:** `WarpPlotMenu.gd` shown on right-click > `min_distance`.
+  "Plot Warp Course" emits `warp_destination_plotted`, WarpDrive charges, press Y
+  to engage. NavigationController flies to destination.
+- **MANUAL mode:** Hold Y to charge, release Y to disengage. Player steers manually.
+- Physics override during ACTIVE: `linear_damp = damp_override`, `thruster_force`
+  boosted by `thrust_multiplier`. Cubic ease-out falloff as velocity approaches
+  `max_warp_speed`. Weapons disabled during ACTIVE.
+- Energy drain: `charge_energy_rate` during CHARGING, `hold_energy_rate` during READY.
+  Energy depletion interrupts warp.
+- Interrupt conditions: damage > threshold (via `ship_damaged` with amount), exclusion
+  zone proximity, energy depletion, releasing Y (manual), unselecting destination (plotted)
+- `NavigationController.gd` — add `EMERGENCY_STOP` drive mode for DECELERATING
+- `GameEventBus.warp_state_changed`, `warp_interrupted`, `warp_destination_plotted`
+- `ship_damaged` signature updated to `(victim, attacker, amount)` across all listeners
+- All warp parameters in `solar_system_archetypes.json` `warp` block and `ship.json`
+  per-ship override — no hardcoded values
 
-**You validate:** Fly into the exclusion zone — does the ship take continuous heat
-damage? Hold warp key for `spool_time` seconds — does warp engage and visibly increase
-speed? Take a large hit during ACTIVE warp — does it cancel to DECELERATING? Approach
-the star exclusion zone at warp — does auto-abort trigger before crossing the boundary?
+**You validate:**
+- Fly into exclusion zone → continuous heat damage?
+- Plotted warp: right-click distant point → plot → charge → Y → autopilot arrives cleanly?
+- Manual warp: hold Y → charge → ship boosts with tapering accel → release Y → brakes?
+- Damage/energy/exclusion interrupts behave correctly in both modes?
+- Weapons disabled during ACTIVE?
 
 **Not in scope:** OriginShifter, ChunkStreamer belt integration, VFX effects.
 
@@ -176,7 +187,7 @@ Before any session begins, confirm the following are available:
   `feature_spec-game_event_bus_signals.md`; added 2026-05-04)
 - `PerformanceMonitor.gd` — registered and available via ServiceLocator
 - `ChunkStreamer` implementation — exists and streams asteroid content
-- `Ship.apply_damage(amount: float, type: String, position: Vector3)` — method exists
+- `Ship.apply_damage(amount: float, type: String, position: Vector3, component_ratio: float, attacker_id: int)` — method exists
   on Ship.gd (needed by Session B exclusion zone damage)
 - `feature_spec-physics_and_movement.md` — read before Session B; determine the correct
   mechanism for `warp_multiplier` integration with the existing physics system

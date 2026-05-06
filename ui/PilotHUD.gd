@@ -90,6 +90,7 @@ func _ready() -> void:
 	_build_vessel_status()
 	_build_weapon_systems()
 	_build_radar()
+	_build_warp_panel()
 
 	# Event bus subscriptions
 	if _event_bus:
@@ -112,10 +113,12 @@ func _process(delta: float) -> void:
 		_update_vessel_status()
 		_update_weapon_slots()
 		_update_coords()
+		_update_warp_panel()
 	elif _player_ship != null:
 		# Ship was freed without a player_ship_changed event (e.g. destroyed)
 		_player_ship = null
 		_hardpoints.clear()
+		_warp_panel.visible = false
 
 	_perf.end("UI.pilot_hud_update")
 
@@ -439,7 +442,7 @@ func _on_game_mode_changed(_old_mode: String, new_mode: String) -> void:
 	visible = (new_mode == "pilot")
 
 
-func _on_ship_damaged(victim: Node, _attacker: Node) -> void:
+func _on_ship_damaged(victim: Node, _attacker: Node, _amount: float) -> void:
 	if victim == _player_ship:
 		_trigger_hit_flash()
 
@@ -535,3 +538,86 @@ func _make_stat_readout(parent: HBoxContainer, field_name: String) -> Label:
 	col.add_child(val)
 
 	return val
+
+
+# ─── Warp Panel ──────────────────────────────────────────────────────────────
+
+var _warp_panel: PanelContainer
+var _warp_state_label: Label
+var _warp_charge_bar: ColorRect
+var _warp_charge_track: Control
+var _warp_info_label: Label
+
+func _build_warp_panel() -> void:
+	_warp_panel = _make_panel(0, 0, 0, 0, 0, 0, 0, 0, 0)
+	_warp_panel.anchor_left   = 1.0
+	_warp_panel.anchor_top    = 0.0
+	_warp_panel.anchor_right  = 1.0
+	_warp_panel.anchor_bottom = 0.0
+	_warp_panel.offset_left   = -180 - MARGIN
+	_warp_panel.offset_top    = MARGIN + TAG_H + 12
+	_warp_panel.offset_right  = -MARGIN
+	_warp_panel.offset_bottom = MARGIN + TAG_H + 12 + 64
+	_warp_panel.visible = false
+
+	var margin := _panel_margin(_warp_panel)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 4)
+	margin.add_child(vbox)
+
+	_warp_state_label = Label.new()
+	_warp_state_label.text = "WARP: IDLE"
+	_warp_state_label.add_theme_color_override("font_color", UITokens.GREY_80)
+	UITokens.apply_font_label(_warp_state_label, UITokens.SIZE_PANEL_HDR)
+	vbox.add_child(_warp_state_label)
+
+	_warp_charge_track = Control.new()
+	_warp_charge_track.custom_minimum_size = Vector2(0, 4)
+	_warp_charge_track.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vbox.add_child(_warp_charge_track)
+
+	_warp_charge_bar = ColorRect.new()
+	_warp_charge_bar.color = Color(0.25, 0.82, 1.0, 1.0)
+	_warp_charge_bar.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_warp_charge_track.add_child(_warp_charge_bar)
+
+	_warp_info_label = Label.new()
+	_warp_info_label.text = ""
+	_warp_info_label.add_theme_color_override("font_color", UITokens.GREY_50)
+	UITokens.apply_font_data(_warp_info_label, UITokens.SIZE_COORD)
+	vbox.add_child(_warp_info_label)
+
+
+func _update_warp_panel() -> void:
+	if _player_ship == null:
+		_warp_panel.visible = false
+		return
+
+	var warp := _player_ship.get_node_or_null("WarpDrive") as WarpDrive
+	if warp == null:
+		_warp_panel.visible = false
+		return
+
+	var state := warp.get_state_name()
+	if state == "IDLE":
+		_warp_panel.visible = false
+		return
+
+	_warp_panel.visible = true
+	_warp_state_label.text = "WARP: %s" % state
+
+	var charge_ratio := warp.get_charge_ratio()
+	if _warp_charge_track.size.x > 0.0:
+		_warp_charge_bar.size.x = _warp_charge_track.size.x * charge_ratio
+
+	match state:
+		"CHARGING":
+			_warp_info_label.text = "Charging... %.0f%%" % (charge_ratio * 100.0)
+		"READY":
+			_warp_info_label.text = "Press Y to engage"
+		"ACTIVE":
+			_warp_info_label.text = "Warp active"
+		"DECELERATING":
+			_warp_info_label.text = "Braking..."
+		_:
+			_warp_info_label.text = ""

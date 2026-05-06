@@ -22,7 +22,7 @@ class_name GameCamera
 @export_group("Tactical")
 @export var tactical_height: float = 900.0          # zoom-out target on entering tactical
 @export var tactical_height_min: float = 500.0      # zoom floor in tactical mode
-@export var tactical_height_max: float = 2000.0     # zoom ceiling in tactical mode
+@export var tactical_height_max: float = 120000.0   # zoom ceiling in tactical mode (system scale)
 @export var pan_speed: float = 800.0                # world units/sec for WASD pan
 @export var edge_scroll_margin: float = 20.0        # pixels from screen edge to trigger scroll
 @export var edge_scroll_speed: float = 600.0        # world units/sec for edge scroll
