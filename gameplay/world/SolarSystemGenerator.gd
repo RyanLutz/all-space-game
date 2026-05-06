@@ -106,8 +106,8 @@ func _generate_planets(rng: RandomNumberGenerator, archetype: String,
 	var station_max: int = int(gen.get("station_count_per_planet_max_absolute", 12))
 
 	var moon_range: Array = gen.get("moon_count_per_planet", [0, 4])
-	var moon_r_min := float(gen.get("moon_orbit_radius_min", 400.0))
-	var moon_r_max := float(gen.get("moon_orbit_radius_max", 1400.0))
+	var moon_r_min_mult := float(gen.get("moon_orbit_radius_min_multiplier", 2.5))
+	var moon_r_max_mult := float(gen.get("moon_orbit_radius_max_multiplier", 6.0))
 	var moon_spd_min := float(gen.get("orbit_speed_min", 0.002)) * 3.0
 	var moon_spd_max := float(gen.get("orbit_speed_max", 0.015)) * 3.0
 	var moon_vis_min := float(vis.get("moon_visual_radius_min", 60.0))
@@ -143,8 +143,10 @@ func _generate_planets(rng: RandomNumberGenerator, archetype: String,
 		for _j in moon_count:
 			var m_dep := rng.randf_range(moon_dep_min, moon_dep_max)
 			var m_vr  := minf(rng.randf_range(moon_vis_min, moon_vis_max), m_dep * 0.85)
+			# Orbit radius scales with parent planet radius — moons never clip surface.
+			# min = planet_r * min_mult guarantees clearance even at max moon size.
 			moons.append({
-				"orbit_radius": rng.randf_range(moon_r_min, moon_r_max),
+				"orbit_radius": rng.randf_range(vr * moon_r_min_mult, vr * moon_r_max_mult),
 				"orbit_angle":  rng.randf() * TAU,
 				"orbit_speed":  rng.randf_range(moon_spd_min, moon_spd_max),
 				"visual_radius": m_vr,

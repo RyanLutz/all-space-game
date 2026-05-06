@@ -53,8 +53,8 @@
     "orbit_radius_step_max": 12000.0,
     "orbit_speed_min": 0.002,
     "orbit_speed_max": 0.015,
-    "moon_orbit_radius_min": 400.0,
-    "moon_orbit_radius_max": 1400.0
+    "moon_orbit_radius_min_multiplier": 2.5,
+    "moon_orbit_radius_max_multiplier": 6.0
   },
 
   "visual": {
