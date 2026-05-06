@@ -196,9 +196,140 @@ func get_galaxy_seed() -> int:
 func get_config() -> Dictionary:
 	return _config
 
-## Placeholder — will be implemented in Session 3 (Skybox + Nebula Rendering).
-func rebuild_skybox(_system_position: Vector3) -> void:
-	pass
+## Rebuilds the skybox from the given system position.
+##
+## Called by the Warp system after a jump completes, and by the test scene
+## to simulate warps. Packs star directions into two sampler2D textures and
+## uploads all nebula uniforms to sky_material. Runs once per warp — zero
+## per-frame CPU cost during gameplay.
+##
+## sky_material must be set before calling this (see StarFieldTest._setup_skybox).
+func rebuild_skybox(system_position: Vector3) -> void:
+	if sky_material == null:
+		return
+
+	if _perf:
+		_perf.begin("StarField.rebuild_skybox")
+
+	# Build the list of stars to pack into the skybox textures.
+	# Always include all destination systems so navigable stars appear in the
+	# sky. Then fill remaining slots with backdrop stars.
+	var sky_cfg: Dictionary = _config.get("nebula_sky_shader", {})
+	var skybox_limit: int   = int(sky_cfg.get("skybox_star_limit", 3000))
+
+	var backdrop_slots: int = max(0, skybox_limit - _destinations.size())
+	var skybox_stars: Array[SFStarRecord] = []
+
+	var added_backdrops := 0
+	for star: SFStarRecord in _catalog:
+		if star.is_destination:
+			continue
+		if added_backdrops >= backdrop_slots:
+			break
+		skybox_stars.append(star)
+		added_backdrops += 1
+	# Destinations appended after backdrops so they're always represented
+	skybox_stars.append_array(_destinations)
+
+	# Pack into textures — width fixed at 64, height computed from star count
+	var count: int = skybox_stars.size()
+	var tex_w: int = 64
+	var tex_h: int = max(1, int(ceil(float(count) / float(tex_w))))
+
+	var dir_image := Image.create(tex_w, tex_h, false, Image.FORMAT_RGBAF)
+	var col_image := Image.create(tex_w, tex_h, false, Image.FORMAT_RGBA8)
+
+	for j in count:
+		var star: SFStarRecord = skybox_stars[j]
+		star.sky_direction = (star.galaxy_position - system_position).normalized()
+		var x: int = j % tex_w
+		var y: int = int(float(j) / float(tex_w))
+		dir_image.set_pixel(x, y, Color(
+			star.sky_direction.x,
+			star.sky_direction.y,
+			star.sky_direction.z,
+			star.apparent_size))
+		col_image.set_pixel(x, y, Color(
+			star.color.r,
+			star.color.g,
+			star.color.b,
+			star.brightness))
+
+	sky_material.set_shader_parameter("star_directions",
+		ImageTexture.create_from_image(dir_image))
+	sky_material.set_shader_parameter("star_colors",
+		ImageTexture.create_from_image(col_image))
+	sky_material.set_shader_parameter("star_count", count)
+	sky_material.set_shader_parameter("tex_width",  tex_w)
+	sky_material.set_shader_parameter("tex_height", tex_h)
+
+	# Galaxy-space position shifts the noise field so the nebula sky changes
+	# plausibly on warp: short jump = subtle shift, long jump = different sky
+	sky_material.set_shader_parameter("player_galaxy_position", system_position)
+	sky_material.set_shader_parameter("galaxy_noise_influence",
+		float(sky_cfg.get("galaxy_noise_influence", 0.00002)))
+	sky_material.set_shader_parameter("coarse_frequency",
+		float(sky_cfg.get("coarse_frequency", 1.2)))
+	sky_material.set_shader_parameter("fine_frequency",
+		float(sky_cfg.get("fine_frequency", 4.5)))
+	sky_material.set_shader_parameter("noise_warp_strength",
+		float(sky_cfg.get("noise_warp_strength", 0.6)))
+	sky_material.set_shader_parameter("nebula_base_opacity",
+		float(sky_cfg.get("nebula_base_opacity", 0.35)))
+
+	_upload_nebula_uniforms(system_position)
+
+	if _perf:
+		_perf.end("StarField.rebuild_skybox")
+
+
+## Packs nebula volume data into parallel uniform arrays for the sky shader.
+## Must be called after star textures are uploaded — both are part of one logical
+## rebuild operation. Nebula directions and angular radii are recalculated relative
+## to the player's current system position.
+func _upload_nebula_uniforms(system_position: Vector3) -> void:
+	if sky_material == null:
+		return
+
+	const MAX_NEBULAE := 32
+
+	var dirs   := PackedVector3Array()
+	var colors := PackedColorArray()
+	var radii  := PackedFloat32Array()
+	dirs.resize(MAX_NEBULAE)
+	colors.resize(MAX_NEBULAE)
+	radii.resize(MAX_NEBULAE)
+
+	# Zero-fill (GDScript does not guarantee default init of packed arrays)
+	for i in MAX_NEBULAE:
+		dirs[i]   = Vector3.ZERO
+		colors[i] = Color(0.0, 0.0, 0.0, 0.0)
+		radii[i]  = 0.0
+
+	var count := 0
+	for vol: SFNebulaVolume in _nebulae:
+		if count >= MAX_NEBULAE:
+			break
+		var offset := vol.galaxy_position - system_position
+		var dist   := offset.length()
+		if dist < 1.0:
+			count += 1
+			continue
+
+		dirs[count]  = offset / dist  # normalized direction
+		var c        := vol.color
+		c.a          = vol.opacity
+		colors[count] = c
+		# Angular radius: physical radius / distance (chord ≈ radians for small angles).
+		# When inside a nebula (dist < vol.radius), angular_r > 1 — the whole sky
+		# is tinted by that nebula, which is the correct behavior.
+		radii[count] = vol.radius / dist
+		count += 1
+
+	sky_material.set_shader_parameter("nebula_count",          count)
+	sky_material.set_shader_parameter("nebula_dirs",           dirs)
+	sky_material.set_shader_parameter("nebula_colors",         colors)
+	sky_material.set_shader_parameter("nebula_angular_radii",  radii)
 
 
 # ---------------------------------------------------------------------------

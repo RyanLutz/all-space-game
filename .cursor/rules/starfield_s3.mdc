@@ -1,0 +1,90 @@
+---
+name: starfield-s3-skybox
+description: >
+  Context for the StarField S3 skybox / nebula system. Load when working
+  on galaxy_sky.gdshader, StarField.rebuild_skybox(), nebula uniforms,
+  or any session that touches the in-game sky (S4, SolarSystem warp trigger).
+---
+
+# StarField S3 — Skybox + Nebula Rendering
+
+## Files Owned
+
+| File | Purpose |
+|---|---|
+| `core/starfield/galaxy_sky.gdshader` | Custom `sky` shader; renders backdrop stars + domain-warped nebula noise |
+| `core/starfield/StarField.gd` | Autoload; owns `rebuild_skybox()` and `_upload_nebula_uniforms()` |
+| `core/starfield/StarRecord.gd` | Data class — `SFStarRecord`; includes `sky_direction` runtime field |
+| `core/starfield/NebulaVolume.gd` | Data class — `SFNebulaVolume` |
+| `test/StarFieldTest.gd` | Test scene with skybox setup + warp simulation |
+
+## Architecture Decisions
+
+- `StarField` is an **autoload** registered in `project.godot` as `"*res://core/starfield/StarField.gd"`.
+- `sky_material: ShaderMaterial` on `StarField` must be wired externally before calling `rebuild_skybox()`. The test scene creates and wires it in `_setup_skybox()`. The future Warp system does the same in the main game scene.
+- `rebuild_skybox(system_position: Vector3)` is **not** called per frame — only once per warp.
+- Star textures are **RGBAF** (directions + apparent_size) and **RGBA8** (color + brightness). Width = 64, height = `ceil(count / 64)`. Both `tex_width` and `tex_height` are passed as shader uniforms.
+- Nebula volumes use **parallel uniform arrays** of size 32 (`vec3[32]`, `vec4[32]`, `float[32]`). Always pass `PackedVector3Array`, `PackedColorArray`, `PackedFloat32Array` of exactly 32 elements — unused slots are zeroed.
+- `skybox_star_limit` (default 3000) lives in `world_config.json → starfield → nebula_sky_shader`. Destinations are always included first; backdrop stars fill remaining slots. Tune this for performance vs. star density.
+
+## Shader Uniforms Reference
+
+| Uniform | Type | Set by |
+|---|---|---|
+| `star_directions` | `sampler2D` | `rebuild_skybox()` — RGBAF direction + apparent_size |
+| `star_colors` | `sampler2D` | `rebuild_skybox()` — RGBA8 color + brightness |
+| `star_count` | `int` | `rebuild_skybox()` |
+| `tex_width` / `tex_height` | `int` | `rebuild_skybox()` |
+| `player_galaxy_position` | `vec3` | `rebuild_skybox()` — shifts noise field on warp |
+| `galaxy_noise_influence` | `float` | `rebuild_skybox()` from `world_config.json` |
+| `coarse_frequency` | `float` | `rebuild_skybox()` from `world_config.json` |
+| `fine_frequency` | `float` | `rebuild_skybox()` from `world_config.json` |
+| `noise_warp_strength` | `float` | `rebuild_skybox()` from `world_config.json` |
+| `nebula_base_opacity` | `float` | `rebuild_skybox()` from `world_config.json` |
+| `nebula_count` | `int` | `_upload_nebula_uniforms()` |
+| `nebula_dirs[32]` | `vec3[]` | `_upload_nebula_uniforms()` |
+| `nebula_colors[32]` | `vec4[]` | `_upload_nebula_uniforms()` |
+| `nebula_angular_radii[32]` | `float[]` | `_upload_nebula_uniforms()` |
+| `map_zoom` | `float` | GalacticMap (S2/S4) — 0 = full view, 1 = close zoom |
+
+## Key Invariants — Never Violate
+
+- `rebuild_skybox()` is the only entry point for sky updates — never set shader parameters directly on `sky_material` from outside `StarField.gd`.
+- `nebula_angular_radii[n]` = `vol.radius / dist_to_center` — chord approximation is valid for all galaxy-scale distances (always small angle).
+- `sky_material` must be a `ShaderMaterial` with `galaxy_sky.gdshader`. Any other shader will produce incorrect results.
+- `map_zoom` is controlled by `GalacticMap` only. Default during gameplay: `0.0`.
+
+## Performance Contract
+
+- `StarField.rebuild_skybox` PerformanceMonitor metric tracks skybox rebuild time.
+- Expected rebuild time at `skybox_star_limit = 3000`: < 5ms CPU.
+- Zero per-frame CPU cost during gameplay — sky shader runs entirely on GPU.
+- GPU cost of star loop is effectively a one-time cost per warp (Godot renders sky to cubemap, not per-frame).
+
+## Warp Integration (future — SolarSystem / WarpDrive sessions)
+
+When the Warp system (session 28) is implemented:
+1. WarpDrive completes its `ACTIVE → DECELERATING` transition
+2. Warp system calls `StarField.rebuild_skybox(new_system.galaxy_position)`
+3. No other code needs to know about the sky shader
+
+## Test Scene Warp Controls
+
+| Key | Action |
+|---|---|
+| `Space` | Warp to next destination system (cycles through all 400) |
+| `Backspace` | Warp to galaxy center (Vector3.ZERO) |
+| `R` | Regenerate catalog + rebuild skybox from current position |
+
+## Tuning
+
+All shader behavior can be tuned via `world_config.json → starfield → nebula_sky_shader`:
+
+| Key | Effect |
+|---|---|
+| `skybox_star_limit` | Stars rendered in skybox (default 3000; includes all destinations) |
+| `galaxy_noise_influence` | How much galaxy position shifts the noise field (default 0.00002) |
+| `coarse_frequency` | Large cloud mass scale (default 1.2) |
+| `fine_frequency` | Internal wisp scale (default 4.5) |
+| `noise_warp_strength` | Domain warp intensity — higher = more organic clouds (default 0.6) |
+| `nebula_base_opacity` | Nebula opacity at map_zoom=0 (default 0.35) |
