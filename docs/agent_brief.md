@@ -99,7 +99,7 @@ From `docs/spec/core_spec.md` §19. Update this table at the end of every sessio
 
 > **Steps 20–24 are reference code from the superseded `feature_spec-star_system.md`.** The architecture built in these steps (`StarRegistry` world-space LOD system, screen-pass quad glow shader, `StarMesh` LOD 2) has been replaced by two new specs: `feature_spec-star_field_2.md` (step 25) and `feature_spec-solar_system.md` (step 26). The `core/stars/` implementation is retained for reference. Do not extend it. When StarField Session 1 begins, `StarField.gd` in `core/starfield/` supersedes `StarRegistry.gd`.
 
-| 25 | StarField S1 (galaxy catalog + test scene) — Implemented. S2 (galactic map UI) — Implemented. S3 (galaxy_sky.gdshader + rebuild_skybox) — Implemented. S4 (nebula map wiring) — Not started. | In progress |
+| 25 | StarField S1–S4 complete: galaxy catalog, galactic map UI, galaxy sky shader, nebula map zoom wiring. All four PerformanceMonitor metrics in overlay. | Implemented |
 | 26 | SolarSystem + WarpDrive + OriginShifter + ChunkStreamer belt integration (see `feature_spec-solar_system.md` + session breakout) | Not started |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`

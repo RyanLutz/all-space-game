@@ -77,6 +77,8 @@ func _on_map_toggled(open: bool) -> void:
 		_sync_current_system()
 		_reset_view()
 		queue_redraw()
+	else:
+		_push_map_zoom_to_shader(0.0)
 
 
 func _reset_view() -> void:
@@ -101,6 +103,12 @@ func _recalc_map_zoom() -> void:
 	var base := (size.y * 0.45) / maxf(_galaxy_radius(), 1.0)
 	# map_zoom: 0 at base scale, 1 at 10× base
 	map_zoom = clampf((_scale / maxf(base, 1e-9) - 1.0) / 9.0, 0.0, 1.0)
+	_push_map_zoom_to_shader(map_zoom)
+
+
+func _push_map_zoom_to_shader(zoom: float) -> void:
+	if _starfield != null and _starfield.sky_material != null:
+		_starfield.sky_material.set_shader_parameter("map_zoom", zoom)
 
 
 # ── Input ────────────────────────────────────────────────────────────────────

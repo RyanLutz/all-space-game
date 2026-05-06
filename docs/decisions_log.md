@@ -957,3 +957,40 @@ zoom gesture.
 **Warp selection in test scene:** `warp_destination_selected` closes the map and calls
 `_warp_to_position()`, updating `StarField.current_system` so the next map open shows
 correct reachability from the new position.
+
+---
+
+## 2026-05-05 — StarField S4: Galactic Map Nebula + Polish
+
+**Session:** StarField Session 4 (development_guide.md step 26)
+**Spec:** `feature_spec-star_field_2.md` §Zoom-Dependent Opacity, `feature_spec-star_field-session_breakout.md` §Session 4
+
+### Files modified
+
+- `ui/galactic_map/GalacticMap.gd` — `_push_map_zoom_to_shader()`, called from `_recalc_map_zoom()` and map close
+- `test/StarFieldTest.gd` — overlay now reads `StarField.rebuild_skybox` and `StarField.destination_count` from PerformanceMonitor; removed manual `_last_rebuild_ms` timing
+
+### Key decisions
+
+**map_zoom piped via GalacticMap direct call to StarField.sky_material.**
+GalacticMap already holds a reference to `_starfield` (the autoload) for catalog access.
+`_push_map_zoom_to_shader(zoom)` calls `_starfield.sky_material.set_shader_parameter("map_zoom", zoom)`
+on every zoom gesture and resets to 0.0 on map close. No new signal needed.
+
+**All four PerformanceMonitor metrics now in overlay:**
+`StarField.generate`, `StarField.rebuild_skybox`, `StarField.backdrop_count`,
+`StarField.destination_count`. The manual `_last_rebuild_ms` timing was removed —
+PerformanceMonitor.get_avg_ms("StarField.rebuild_skybox") is authoritative.
+
+### Success criteria status
+
+All items from `feature_spec-star_field_2.md` satisfied by S1–S4 combined:
+- Deterministic catalog generation ✓
+- Sky renders without depth artifacts ✓
+- Sky shifts on warp ✓
+- Spiral arms, core density, Y-thickness visible ✓
+- Nebula produces organic cloud shapes with dark voids ✓
+- map_zoom suppresses nebula at full zoom, rich when zoomed in ✓
+- Galactic map: monochrome at full, nebula at mid, labels at close ✓
+- Reachable systems glow; selection emits warp_destination_selected ✓
+- StarField.generate and StarField.rebuild_skybox in overlay ✓

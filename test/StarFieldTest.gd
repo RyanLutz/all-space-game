@@ -47,7 +47,6 @@ var _orbit_pitch := -PI / 2.0
 var _sky_material: ShaderMaterial = null
 var _warp_dest_idx: int = 0
 var _current_system_pos: Vector3 = Vector3.ZERO
-var _last_rebuild_ms: float = 0.0
 
 # Galactic map state
 var _map_open: bool = false
@@ -279,13 +278,11 @@ func _on_warp_destination_selected(system_id: StringName) -> void:
 			return
 
 
-## Rebuilds the skybox from `pos` and records timing for the overlay.
+## Rebuilds the skybox from `pos`. Timing tracked via StarField.rebuild_skybox PerformanceMonitor metric.
 func _do_rebuild_skybox(pos: Vector3) -> void:
 	if _starfield == null or _sky_material == null:
 		return
-	var t0 := Time.get_ticks_usec()
 	_starfield.rebuild_skybox(pos)
-	_last_rebuild_ms = float(Time.get_ticks_usec() - t0) / 1000.0
 
 
 ## Advance to the next destination system and rebuild the skybox from there.
@@ -415,23 +412,26 @@ func _update_overlay() -> void:
 	var fps: int = int(Engine.get_frames_per_second())
 
 	var gen_ms := 0.0
+	var rebuild_ms := 0.0
 	var backdrop_count := 0
+	var destination_count := 0
 	if _perf:
-		gen_ms = float(_perf.get_avg_ms("StarField.generate"))
+		gen_ms         = float(_perf.get_avg_ms("StarField.generate"))
+		rebuild_ms     = float(_perf.get_avg_ms("StarField.rebuild_skybox"))
 		backdrop_count = int(_perf.get_count("StarField.backdrop_count"))
+		destination_count = int(_perf.get_count("StarField.destination_count"))
 
-	var dests: Array = _starfield.get_destinations()
+	var nebulae_count := nebulae.size()
 	var view_mode := "destinations only" if _show_destinations_only else "all stars"
 	var seed_val: int = _starfield.get_galaxy_seed()
 
-	var rebuild_ms := _last_rebuild_ms
-	var sys_pos    := _current_system_pos
+	var sys_pos := _current_system_pos
 
 	stats_label.text = (
 		"FPS: %d  |  seed: %d  |  view: %s\n" % [fps, seed_val, view_mode]
 		+ "catalog: %d  |  backdrops: %d  |  destinations: %d  |  nebulae: %d\n" % [
-			catalog.size(), backdrop_count, dests.size(), nebulae.size()]
-		+ "generate_ms: %.2f  |  skybox_rebuild_ms: %.2f\n" % [gen_ms, rebuild_ms]
+			catalog.size(), backdrop_count, destination_count, nebulae_count]
+		+ "StarField.generate: %.2f ms  |  StarField.rebuild_skybox: %.2f ms\n" % [gen_ms, rebuild_ms]
 		+ "current system: (%.0f, %.0f, %.0f)\n" % [sys_pos.x, sys_pos.y, sys_pos.z]
 		+ "cam height: %.0f  |  target: (%.0f, %.0f)\n" % [
 			_cam_height, _cam_target.x, _cam_target.z]
