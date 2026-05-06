@@ -53,7 +53,29 @@ func _ready() -> void:
 
 	_rebuild_system()
 	_try_spawn_ship()
+	_spawn_play_plane()
 	_update_camera()
+
+
+func _spawn_play_plane() -> void:
+	var mi := MeshInstance3D.new()
+	mi.name = "PlayPlane"
+
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(80000.0, 80000.0)
+	plane.subdivide_width = 0
+	plane.subdivide_depth = 0
+	mi.mesh = plane
+
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = Color(0.3, 0.6, 1.0, 0.08)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.no_depth_test = false
+	mi.material_override = mat
+	mi.position = Vector3.ZERO
+	add_child(mi)
 
 
 func _load_archetypes() -> Dictionary:
