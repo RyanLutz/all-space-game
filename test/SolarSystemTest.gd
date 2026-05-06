@@ -1,0 +1,196 @@
+extends Node3D
+
+## SolarSystem Session A test scene.
+##
+## Validates: deterministic generation, star depth/exclusion ring, planet orbital
+## drift, binary star pairs, belt region count.
+##
+## Controls:
+##   WASD / Arrow keys  — pan camera
+##   Mouse wheel        — zoom
+##   Shift              — fast pan
+##   R                  — regenerate current system_id with new random seed
+##   N                  — next system (increments system index)
+##   B                  — cycle forced archetype override (or "random")
+##   Space              — toggle between top-down and 45° perspective
+
+@export var galaxy_seed: int = 8675309
+@export var start_system_id: String = "sys_00000"
+@export var ship_class_id: String = "axum-fighter-1"
+@export var ship_variant_id: String = "axum_fighter_interceptor"
+
+@onready var _camera: Camera3D = $TopCamera
+@onready var _stats_label: Label = $DebugOverlay/Panel/Stats
+
+var _solar_system: SolarSystem = null
+var _player_ship: Node3D = null
+var _perf: Node = null
+
+var _archetype_cfg: Dictionary = {}
+var _system_index: int = 0
+var _forced_archetype: String = ""
+var _archetypes_cycle: Array[String] = ["", "barren", "inhabited",
+	"industrial", "frontier", "anomaly"]
+var _archetype_cycle_idx: int = 0
+
+var _cam_target   := Vector3.ZERO
+var _cam_height   := 25000.0
+var _pan_speed    := 500.0
+var _orbit_yaw    := 0.0
+var _orbit_pitch  := -PI / 2.0
+var _top_down     := true
+
+
+func _ready() -> void:
+	var sl := Engine.get_singleton("ServiceLocator")
+	if sl:
+		_perf = sl.GetService("PerformanceMonitor")
+
+	_archetype_cfg = _load_archetypes()
+	if _archetype_cfg.is_empty():
+		push_error("SolarSystemTest: cannot load solar_system_archetypes.json")
+		return
+
+	_rebuild_system()
+	_try_spawn_ship()
+	_update_camera()
+
+
+func _load_archetypes() -> Dictionary:
+	var file := FileAccess.open("res://data/solar_system_archetypes.json", FileAccess.READ)
+	if not file:
+		return {}
+	var json := JSON.new()
+	if json.parse(file.get_as_text()) != OK:
+		file.close()
+		return {}
+	file.close()
+	return json.data
+
+
+func _rebuild_system() -> void:
+	if _solar_system != null:
+		_solar_system.queue_free()
+		_solar_system = null
+
+	var cfg := _archetype_cfg.duplicate(true)
+
+	# Inject forced archetype if set: override all archetype weights to 0 except chosen
+	if _forced_archetype != "":
+		var archs: Dictionary = cfg.get("archetypes", {})
+		for key in archs:
+			archs[key]["weight"] = 1.0 if key == _forced_archetype else 0.0
+
+	var system_id := "sys_%05d" % _system_index
+
+	_solar_system = SolarSystem.new()
+	_solar_system.name = "SolarSystem"
+	add_child(_solar_system)
+	_solar_system.load_system(system_id, galaxy_seed, cfg)
+
+
+func _try_spawn_ship() -> void:
+	var sl := Engine.get_singleton("ServiceLocator")
+	if sl == null:
+		return
+	var factory = sl.GetService("ShipFactory")
+	if factory == null:
+		return
+	_player_ship = factory.spawn_ship(
+		ship_class_id, ship_variant_id,
+		Vector3(5000.0, 0.0, 0.0),
+		"player", true)
+	if _player_ship:
+		add_child(_player_ship)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		match event.button_index:
+			MOUSE_BUTTON_WHEEL_UP:
+				_cam_height = maxf(_cam_height * 0.85, 800.0)
+				_update_camera()
+			MOUSE_BUTTON_WHEEL_DOWN:
+				_cam_height = minf(_cam_height * 1.18, 200000.0)
+				_update_camera()
+	elif event is InputEventKey and event.pressed and not event.echo:
+		match event.physical_keycode:
+			KEY_R:
+				galaxy_seed += 1
+				_rebuild_system()
+			KEY_N:
+				_system_index += 1
+				_rebuild_system()
+			KEY_B:
+				_archetype_cycle_idx = (_archetype_cycle_idx + 1) % _archetypes_cycle.size()
+				_forced_archetype = _archetypes_cycle[_archetype_cycle_idx]
+				_rebuild_system()
+			KEY_SPACE:
+				_top_down = not _top_down
+				if _top_down:
+					_orbit_pitch = -PI / 2.0
+					_orbit_yaw = 0.0
+				else:
+					_orbit_pitch = -PI / 4.0
+				_update_camera()
+
+
+func _process(delta: float) -> void:
+	_handle_pan(delta)
+	_update_overlay()
+
+
+func _handle_pan(delta: float) -> void:
+	var speed := _pan_speed * (_cam_height / 10000.0)
+	if Input.is_key_pressed(KEY_SHIFT):
+		speed *= 4.0
+	var move := Vector3.ZERO
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):    move.z -= 1.0
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):  move.z += 1.0
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):  move.x -= 1.0
+	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT): move.x += 1.0
+	if move != Vector3.ZERO:
+		_cam_target += move.normalized() * speed * delta
+		_update_camera()
+
+
+func _update_camera() -> void:
+	var dir := Vector3(
+		cos(_orbit_pitch) * sin(_orbit_yaw),
+		sin(-_orbit_pitch),
+		cos(_orbit_pitch) * cos(_orbit_yaw))
+	_camera.global_position = _cam_target + dir * _cam_height
+	_camera.look_at(_cam_target, Vector3.UP)
+
+
+func _update_overlay() -> void:
+	if _solar_system == null or _stats_label == null:
+		return
+
+	var manifest := _solar_system.get_manifest()
+	var fps      := int(Engine.get_frames_per_second())
+	var archtype := _solar_system.archetype
+	var sys_id   := _solar_system.system_id
+	var n_stars  := manifest.get("stars", []).size()
+	var n_planets := _solar_system._planets.size()
+	var n_belts  := _solar_system._belt_regions.size()
+
+	var gen_ms := 0.0
+	var planet_count := 0
+	if _perf:
+		gen_ms       = float(_perf.get_avg_ms("SolarSystem.generate"))
+		planet_count = int(_perf.get_count("SolarSystem.planet_count"))
+
+	var arch_label := ("forced: %s" % _forced_archetype) \
+		if _forced_archetype != "" else "random"
+	var seed_label := "seed: %d" % galaxy_seed
+
+	_stats_label.text = (
+		"FPS: %d  |  %s  |  %s\n" % [fps, seed_label, arch_label]
+		+ "system: %s  |  archetype: %s  |  stars: %d\n" % [sys_id, archtype, n_stars]
+		+ "planets: %d  |  belts: %d\n" % [n_planets, n_belts]
+		+ "SolarSystem.generate: %.2f ms\n" % gen_ms
+		+ "---\n"
+		+ "WASD=pan  Wheel=zoom  Shift=fast\n"
+		+ "R=new seed  N=next system  B=cycle archetype  Space=toggle view"
+	)

@@ -994,3 +994,51 @@ All items from `feature_spec-star_field_2.md` satisfied by S1–S4 combined:
 - Galactic map: monochrome at full, nebula at mid, labels at close ✓
 - Reachable systems glow; selection emits warp_destination_selected ✓
 - StarField.generate and StarField.rebuild_skybox in overlay ✓
+
+---
+
+## 2026-05-05 — SolarSystem Session A: Generator + Flyable Test Scene
+
+**Session:** SolarSystem Session A (development_guide.md step 27)
+**Spec:** `feature_spec-solar_system.md`, `feature_spec-solar_system-session_breakout.md` §Session A
+
+### Prerequisites added
+
+`GameEventBus.gd` — Solar System signals (system_loaded, system_unloaded, origin_shifted,
+exclusion_zone_entered, exclusion_zone_exited) and Warp signals (warp_state_changed,
+warp_interrupted) added as required before Session A.
+
+### Files created
+
+- `gameplay/world/SolarSystemGenerator.gd` — pure generation logic, returns Dictionary manifest
+- `gameplay/world/SolarSystem.gd` — scene manager, instantiates nodes from manifest
+- `gameplay/world/Star.gd` — star sphere mesh at Y=-depth, OmniLight3D, exclusion ring disc
+- `gameplay/world/Planet.gd` — sphere mesh, orbital drift in _process, moon_mode support
+- `gameplay/world/Station.gd` — placement stub (docking deferred to Station spec)
+- `data/solar_system_archetypes.json` — all archetypes, generation ranges, visual block
+- `test/SolarSystemTest.gd` + `test/SolarSystemTest.tscn` — flyable test scene
+
+### Key decisions
+
+**SolarSystem builds its node tree programmatically (no .tscn).** SolarSystem.gd creates
+StarGroup and PlanetGroup in _ready(); load_system() calls the generator and instantiates
+nodes. Avoids needing a complex scene file that would need constant sync with code.
+
+**planet_center_depth_min bumped from spec's 400 → 600.** Original spec values allowed
+visual_radius (up to 1800) to exceed planet_depth (min 400), causing sphere to intersect
+Y=0. Also added generator constraint: visual_radius = min(visual_radius, planet_depth * 0.90).
+Spec notes these are placeholder values requiring tuning.
+
+**Moon orbit center Y = 0, not parent's Y.** Moon's _process formula: global_pos.y =
+center.y - moon.planet_depth. Setting center.y = 0 places moon at Y = -moon.planet_depth
+(correctly below play plane). Using parent's global_pos.y (which is at -parent_depth) would
+double-dip the depth, placing moons too far underground.
+
+**ExclusionRingMesh uses flat CylinderMesh disc.** A solid flat disc at Y=0 with radius =
+exclusion_radius clearly shows the danger zone from the top-down camera. Proper ring
+geometry (TorusMesh, ImmediateMesh) deferred as Session A is visual-only; damage and
+proper ring geometry come in Session B.
+
+**PerformanceMonitor wrapped in SolarSystem, not SolarSystemGenerator.** Generator is a
+pure RefCounted with no Node access; PerformanceMonitor begin/end live in SolarSystem.gd
+which wraps the generate() call.

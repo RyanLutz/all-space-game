@@ -67,6 +67,17 @@ signal navigation_order_completed(ship_id: int)
 # ─── Damage ───────────────────────────────────────────────────────────────────
 signal ship_damaged(victim: Node, attacker: Node)
 
+# ─── Solar System ──────────────────────────────────────────────────────────────
+signal system_loaded(system_id: String)
+signal system_unloaded(system_id: String)
+signal origin_shifted(offset: Vector3)
+signal exclusion_zone_entered(ship: Node, star_index: int)
+signal exclusion_zone_exited(ship: Node, star_index: int)
+
+# ─── Warp ──────────────────────────────────────────────────────────────────────
+signal warp_state_changed(ship: Node, old_state: String, new_state: String)
+signal warp_interrupted(ship: Node, reason: String)
+
 # ─── Station ───────────────────────────────────────────────────────────────────
 signal dock_requested(ship: Node, station: Node)
 signal dock_complete(ship: Node, station: Node)

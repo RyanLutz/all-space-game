@@ -219,5 +219,12 @@
 
       "light_attenuation": 1.0
     }
+  },
+
+  "solar_system": {
+    "origin_shift_threshold": 1000.0,
+    "physics_bodies_group": "physics_bodies",
+    "icon_lod_distance": 8000.0,
+    "warp_key": "warp"
   }
 }
