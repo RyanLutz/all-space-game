@@ -917,3 +917,43 @@ all wired with `PerformanceMonitor.begin/end/set_count`.
 
 Spec updated: yes — `lod_update` and crossfade sections already describe Phase 5 intent;
 build status updated in agent_brief.md and development_guide.md.
+
+---
+
+## 2026-05-05 — StarField S2: Galactic Map UI Layer
+
+**Session:** StarField Session 2 (development_guide.md step 24)
+**Spec:** `feature_spec-star_field_2.md` §Galactic Map, `feature_spec-star_field-session_breakout.md` §Session 2
+
+### Files created / modified
+
+- `ui/galactic_map/GalacticMap.gd` — new
+- `ui/galactic_map/GalacticMap.tscn` — new
+- `core/GameEventBus.gd` — added `galactic_map_toggled(open: bool)` and `warp_destination_selected(system_id: StringName)`
+- `test/StarFieldTest.gd` — M key, `_setup_galactic_map()`, `_on_warp_destination_selected()`
+- `.cursor/rules/starfield_s2.mdc` — new
+
+### Key decisions
+
+**GalacticMap extends Control, not CanvasLayer.**
+CanvasLayer cannot call `_draw()` directly. Following the established PilotHUD pattern:
+GalacticMap.tscn root is a Control; the test scene wraps it in a programmatically created
+CanvasLayer (layer 10). No spec deviation — spec says "as a CanvasLayer" meaning it lives
+in one, not that it extends one.
+
+**Projection:** top-down XZ with `_ISO_Y = 0.15` Y-offset for slight isometric feel
+as specified. Zoom-to-cursor uses the invariant that the galaxy point under the cursor
+must remain fixed through the scale change.
+
+**Continuous zoom with three density thresholds:**
+- `map_zoom < 0.15`: full-out (monochrome backdrop, no paths)
+- `0.15 < map_zoom < 0.55`: mid (nav paths fade in, reachable systems glow)
+- `map_zoom > 0.55`: close (star colors, system ID labels, jump distance)
+
+**No nebula color in map (S2 scope).** S4 wires `GalacticMap.map_zoom` into the sky
+shader to drive nebula opacity. The property is already exposed and updated on every
+zoom gesture.
+
+**Warp selection in test scene:** `warp_destination_selected` closes the map and calls
+`_warp_to_position()`, updating `StarField.current_system` so the next map open shows
+correct reachability from the new position.

@@ -1,0 +1,74 @@
+---
+name: starfield-s2-galactic-map
+description: >
+  Context for the StarField S2 galactic map overlay. Load when working on
+  GalacticMap.gd, galactic_map_toggled / warp_destination_selected signals,
+  or any session that touches the galactic map UI (S4 nebula wiring, zoom levels).
+---
+
+# StarField S2 — Galactic Map UI
+
+## Files Owned
+
+| File | Purpose |
+|---|---|
+| `ui/galactic_map/GalacticMap.gd` | Control node; full-viewport map with custom _draw(), zoom/pan, selection |
+| `ui/galactic_map/GalacticMap.tscn` | Scene — Control root; instantiate inside a CanvasLayer (layer 10) |
+
+## Architecture
+
+- `GalacticMap` extends **Control**, not CanvasLayer. Caller adds it inside a CanvasLayer.
+- Toggle by emitting `GameEventBus.galactic_map_toggled(open: bool)`.
+- In test scene (`StarFieldTest.gd`): M key emits the signal; CanvasLayer + GalacticMap created programmatically in `_setup_galactic_map()`.
+- `warp_destination_selected(system_id: StringName)` emitted by GalacticMap on click; test scene connects and calls `_warp_to_position()`.
+
+## Key Invariants — Never Violate
+
+- GalacticMap reads catalog from `StarField` autoload (`/root/StarField`). Never duplicate or cache the catalog.
+- `set_current_system(record)` or `_sync_current_system()` must be called before/on open — GalacticMap relies on `StarField.current_system` for reachability.
+- `map_zoom` property `[0..1]` drives information density. S4 reads this to pipe into the sky shader — do not rename it.
+- Selection only fires `warp_destination_selected` for **reachable** systems (`dist_gal <= star.warp_range`).
+
+## Projection
+
+```gdscript
+func _galaxy_to_screen(p: Vector3) -> Vector2:
+    return Vector2(
+        p.x * _scale + size.x * 0.5 + _pan.x,
+        (p.z - p.y * 0.15) * _scale + size.y * 0.5 + _pan.y)
+```
+
+`_ISO_Y = 0.15` — Y coordinate in galaxy space adds a slight isometric offset.
+
+## Zoom Math
+
+```
+base_scale = (viewport_height * 0.45) / galaxy_radius   # fits galaxy in view
+map_zoom   = clamp((_scale / base_scale - 1.0) / 9.0, 0.0, 1.0)
+```
+
+Zoom-to-cursor pan update:
+```gdscript
+var ratio := new_scale / _scale
+_pan = (pivot - center) * (1.0 - ratio) + _pan * ratio
+```
+
+## Information Density Thresholds
+
+| `map_zoom` range | Rendering |
+|---|---|
+| 0.0 – 0.15 | Full out: monochrome backdrop cloud, dest points dim, no paths |
+| 0.15 – 0.55 | Mid: nav paths fade in, reachable systems brighten, glow rings |
+| 0.55 – 1.0 | Close: star colors, system ID labels with jump distance |
+
+## GameEventBus Signals Added (S2)
+
+| Signal | Emitter | Listener |
+|---|---|---|
+| `galactic_map_toggled(open: bool)` | M key (test scene), Esc (GalacticMap) | GalacticMap._on_map_toggled |
+| `warp_destination_selected(system_id: StringName)` | GalacticMap._try_select | Warp system (future), test scene |
+
+## S4 Integration Point
+
+S4 pipes `GalacticMap.map_zoom` into `sky_material.set_shader_parameter("map_zoom", ...)`.
+GalacticMap already updates `map_zoom` on every zoom gesture — S4 just reads it.

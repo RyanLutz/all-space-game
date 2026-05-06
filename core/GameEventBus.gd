@@ -41,6 +41,10 @@ signal star_exclusion_entered(star_id: int, ship_id: int)
 # ─── Game Mode ─────────────────────────────────────────────────────────────────
 signal game_mode_changed(old_mode: String, new_mode: String)
 
+# ─── Galactic Map ────────────────────────────────────────────────────────────
+signal galactic_map_toggled(open: bool)
+signal warp_destination_selected(system_id: StringName)
+
 # ─── Tactical Orders ───────────────────────────────────────────────────────────
 signal request_tactical_move(ship_ids: Array, destination: Vector3, queue_mode: String)
 signal request_tactical_attack(ship_ids: Array, target_id: int, queue_mode: String)
