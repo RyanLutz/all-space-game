@@ -171,9 +171,9 @@ func _update_overlay() -> void:
 	var fps      := int(Engine.get_frames_per_second())
 	var archtype := _solar_system.archetype
 	var sys_id   := _solar_system.system_id
-	var n_stars  := manifest.get("stars", []).size()
-	var n_planets := _solar_system._planets.size()
-	var n_belts  := _solar_system._belt_regions.size()
+	var n_stars: int  = (manifest.get("stars", []) as Array).size()
+	var n_planets: int = _solar_system._planets.size()
+	var n_belts: int  = _solar_system._belt_regions.size()
 
 	var gen_ms := 0.0
 	var planet_count := 0
