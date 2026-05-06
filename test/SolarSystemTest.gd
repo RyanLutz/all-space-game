@@ -62,7 +62,7 @@ func _spawn_play_plane() -> void:
 	mi.name = "PlayPlane"
 
 	var plane := PlaneMesh.new()
-	plane.size = Vector2(80000.0, 80000.0)
+	plane.size = Vector2(220000.0, 220000.0)
 	plane.subdivide_width = 0
 	plane.subdivide_depth = 0
 	mi.mesh = plane
