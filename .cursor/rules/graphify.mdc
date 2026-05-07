@@ -3,8 +3,12 @@ description: graphify knowledge graph context
 alwaysApply: true
 ---
 
-This project has a graphify knowledge graph at graphify-out/.
+This project has a graphify knowledge graph at `graphify-out/`.
 
-- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
-- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
-- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
+**Before any codebase exploration** (architecture questions, file lookup, understanding system relationships):
+1. Read `graphify-out/GRAPH_REPORT.md` — god nodes and community structure tell you where things live
+2. If `graphify-out/wiki/index.md` exists, navigate it instead of reading raw files
+3. Only fall back to glob/grep/read if the graph is missing or doesn't answer the question
+
+**Before ending any session** in which you modified code files:
+- Run `graphify update .` to keep the graph current (AST-only, no API cost)
