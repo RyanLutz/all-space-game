@@ -12,6 +12,7 @@ var archetype: String = ""
 
 var _stars: Array[Node3D]       = []
 var _planets: Array[Node3D]     = []
+var _orbiters: Array[Node3D]    = []
 var _belt_regions: Array        = []
 var _world_origin: Vector3      = Vector3.ZERO
 var _manifest: Dictionary       = {}
@@ -22,12 +23,16 @@ var _star_group: Node3D
 var _planet_group: Node3D
 
 var _perf: Node = null
+var _event_bus: Node = null
 
 
 func _ready() -> void:
+	add_to_group("solar_systems")
+
 	var sl := Engine.get_singleton("ServiceLocator")
 	if sl:
-		_perf = sl.GetService("PerformanceMonitor")
+		_perf      = sl.GetService("PerformanceMonitor")
+		_event_bus = sl.GetService("GameEventBus")
 
 	_solar_system_root = Node3D.new()
 	_solar_system_root.name = "SolarSystemRoot"
@@ -40,6 +45,27 @@ func _ready() -> void:
 	_planet_group = Node3D.new()
 	_planet_group.name = "PlanetGroup"
 	_solar_system_root.add_child(_planet_group)
+
+	var shifter := OriginShifter.new()
+	shifter.name = "OriginShifter"
+	add_child(shifter)
+
+
+func _exit_tree() -> void:
+	if _event_bus and system_id != "":
+		_event_bus.system_unloaded.emit(system_id)
+
+
+func _process(delta: float) -> void:
+	if _orbiters.is_empty():
+		return
+	if _perf:
+		_perf.begin("SolarSystem.orbit_update")
+	for body in _orbiters:
+		if is_instance_valid(body):
+			(body as PlanetBody).update_orbit(delta, _world_origin)
+	if _perf:
+		_perf.end("SolarSystem.orbit_update")
 
 
 ## Generate and instantiate a system from (system_id, galaxy_seed, archetype_config).
@@ -70,6 +96,9 @@ func load_system(p_system_id: String, galaxy_seed: int,
 		_perf.set_count("SolarSystem.belt_count",    _belt_regions.size())
 		_perf.set_count("SolarSystem.station_count", _count_stations())
 
+	if _event_bus:
+		_event_bus.system_loaded.emit(system_id)
+
 
 # ── Scene construction ───────────────────────────────────────────────────────
 
@@ -97,6 +126,7 @@ func _build_planets() -> void:
 	for c in _planet_group.get_children():
 		c.queue_free()
 	_planets.clear()
+	_orbiters.clear()
 
 	var planet_datas: Array = _manifest.get("planets", [])
 	for i in planet_datas.size():
@@ -104,6 +134,7 @@ func _build_planets() -> void:
 		var planet := _spawn_planet(data, _planet_group, false)
 		planet.name = "Planet_%d" % i
 		_planets.append(planet)
+		_orbiters.append(planet)
 
 		# Moon group
 		var moon_group := Node3D.new()
@@ -114,6 +145,7 @@ func _build_planets() -> void:
 		for j in moons.size():
 			var moon := _spawn_planet(moons[j], moon_group, true)
 			moon.name = "Moon_%d" % j
+			_orbiters.append(moon)
 
 		# Station group
 		var station_group := Node3D.new()

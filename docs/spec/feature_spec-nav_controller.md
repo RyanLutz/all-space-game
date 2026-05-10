@@ -1,6 +1,12 @@
 # Navigation Controller — Feature Specification
 *All Space Combat MVP — Ship Flight Computer*
 
+> **DEPRECATED 2026-05-07.** NavigationController was dissolved and folded
+> into `AIController`. See
+> [`feature_spec-ai_flight_refactor.md`](feature_spec-ai_flight_refactor.md)
+> for the replacement design. This file is retained for historical reference
+> only — do not implement against it.
+
 ---
 
 ## 1. Overview

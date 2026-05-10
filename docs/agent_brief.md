@@ -40,13 +40,13 @@ From `docs/spec/core_spec.md` §19. Update this table at the end of every sessio
 | 2 | ServiceLocator + GameEventBus + GameBootstrap | Implemented |
 | 3 | ContentRegistry | Implemented |
 | 4 | SpaceBody + Ship (physics only, no weapons) | Implemented |
-| 5 | NavigationController | Implemented |
+| 5 | ~~NavigationController~~ | Dissolved — folded into AIController (see step 11) |
 | 6 | ProjectileManager (C#, dumb pool) | Implemented |
 | 7 | WeaponComponent + HardpointComponent | Implemented |
 | 8 | GuidedProjectilePool | Implemented |
 | 9 | ShipFactory + ship assembly (GLB parts + `-colonly` → RigidBody3D collision) | Implemented |
 | 10 | GameCamera — Pilot mode | Implemented |
-| 11 | AIController + NavigationController integration | Implemented |
+| 11 | AIController (flight + state machine, post-refactor) | Implemented |
 | 12 | Test scene: player vs AI, full Pilot mode loop | Implemented |
 | 13 | Tactical mode camera + input layer | Implemented |
 | 14 | Fleet Command — selection, orders, stance, escort queue | Implemented |
@@ -64,7 +64,7 @@ From `docs/spec/core_spec.md` §19. Update this table at the end of every sessio
 > **Steps 20–24 are reference code from the superseded `feature_spec-star_system.md`.** The architecture built in these steps (`StarRegistry`, screen-pass quad glow shader, `StarMesh` LOD 2) has been replaced by `feature_spec-star_field_2.md` (step 25) and `feature_spec-solar_system.md` (step 26). The `core/stars/` implementation is retained for reference. Do not extend it.
 
 | 25 | StarField S1–S4 complete: galaxy catalog, galactic map UI, galaxy sky shader, nebula map zoom wiring. All four PerformanceMonitor metrics in overlay. | Implemented |
-| 26 | SolarSystem A (generator + flyable test scene) — Implemented. B (exclusion zone + WarpDrive), C (OriginShifter + ChunkStreamer), D (tuning) — Not started. | In progress |
+| 26 | SolarSystem A–D complete. | Implemented |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 
@@ -173,7 +173,26 @@ The most recent decisions are summarised here for quick context. Full history in
 `docs/decisions_log.md`.
 
 <!-- RECENT-DECISIONS-START -->
-1. **2026-05-02 — Star System Phase 5: LOD crossfade + perf** —
+1. **2026-05-06 — SolarSystem Session D: Tuning + SolarPlayTest scene** —
+   `interrupt_damage_threshold` → `interrupt_damage` key fix (WarpDrive never read
+   the JSON value). `origin_shift_threshold` 1000 → 10000 (was sub-chunk-size, triggered
+   every load). `max_warp_speed` 2500 kept — ~34s for 5-planet system. Hand-authored
+   override: `content/systems/test_authored/system.json` (neutron star, 2 planets, 1 belt).
+   New `test/SolarPlayTest.tscn` combines full pilot+tactical loop with SolarSystem +
+   ChunkStreamer — use this for ongoing solar system play testing and tuning.
+   Spec updated: yes.
+2. **2026-05-06 — SolarSystem Session C: OriginShifter + ChunkStreamer belt integration** —
+   `OriginShifter.gd` created; parented to `SolarSystem` in `_ready()`. Shifts all
+   `physics_bodies` group nodes + `SolarSystemRoot` when player exceeds `shift_threshold`
+   (from `world_config.json`). `Ship.gd` + `Asteroid.gd` add `physics_bodies` group.
+   `Planet._process` replaced with `update_orbit(delta, system_origin)` called from
+   `SolarSystem._process` (flat `_orbiters` list, one perf timer for all orbital math).
+   `SolarSystem` emits `system_loaded`/`system_unloaded`. `ChunkStreamer` gates streaming
+   until `system_loaded`, stores SolarSystem ref, calls `get_belt_context_at()` per chunk,
+   scales `max_fields` by `density_multiplier`. 5 perf monitors added to `GameBootstrap`.
+   Note: `origin_shift_threshold` at 1000 is too low — tune in Session D.
+   Spec updated: yes.
+2. **2026-05-02 — Star System Phase 5: LOD crossfade + perf** —
    `StarRecord` gains `blend_alpha` (0→1 settling progress) and `lod_prev_state`.
    `StarRegistry._update_lod()` drives crossfade: delayed mesh despawn (LOD 2→1
    fades out over `lod_crossfade_frames` before queue_free), per-star

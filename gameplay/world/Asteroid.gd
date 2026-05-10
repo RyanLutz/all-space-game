@@ -32,6 +32,7 @@ func _ready() -> void:
 	angular_velocity = Vector3(0.0, randf_range(-0.3, 0.3), 0.0)
 
 	add_to_group("asteroids")
+	add_to_group("physics_bodies")
 
 	var service_locator := Engine.get_singleton("ServiceLocator")
 	if service_locator:

@@ -1,5 +1,4 @@
 extends Node3D
-class_name StarField
 
 ## Procedurally generated star field rendered as a large point-cloud ArrayMesh.
 ## Stars are real 3D geometry at genuine depth — the renderer provides true

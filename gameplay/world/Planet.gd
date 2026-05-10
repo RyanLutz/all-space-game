@@ -47,27 +47,27 @@ func _build_visual() -> void:
 	add_child(_mesh_instance)
 
 
-func _process(delta: float) -> void:
+## Called each frame by SolarSystem._process — not a built-in _process.
+## system_origin is SolarSystem._world_origin (cumulative origin-shift offset).
+## Passing it here keeps non-moon orbit centers correct after origin shifts.
+func update_orbit(delta: float, system_origin: Vector3 = Vector3.ZERO) -> void:
 	orbit_angle += orbit_speed * delta
-	var c := _get_orbit_center()
+	var c := _get_orbit_center(system_origin)
 	global_position = Vector3(
 		c.x + cos(orbit_angle) * orbit_radius,
 		c.y - planet_depth,
 		c.z + sin(orbit_angle) * orbit_radius)
 
 
-func _get_orbit_center() -> Vector3:
+func _get_orbit_center(system_origin: Vector3) -> Vector3:
 	if moon_mode:
 		var p := get_parent()
-		# Walk up past intermediate group nodes to the parent PlanetBody
 		while p != null and not (p is PlanetBody):
 			p = p.get_parent()
 		if p is PlanetBody:
 			var pp: Vector3 = (p as PlanetBody).global_position
-			# Y = 0 so the formula `center.y - moon.planet_depth` gives
-			# moon.global_pos.y = -moon.planet_depth (below play plane).
 			return Vector3(pp.x, 0.0, pp.z)
-	return Vector3.ZERO
+	return Vector3(system_origin.x, 0.0, system_origin.z)
 
 
 func _planet_color() -> Color:

@@ -19,9 +19,7 @@
 		"shield_max": 80,
 		"shield_regen_rate": 10,
 		"shield_regen_delay": 3.0,
-		"shield_regen_power_draw": 14,
-		"arrival_distance": 20.0,
-		"brake_safety_margin": 1.2
+		"shield_regen_power_draw": 14
 	},
 
 	"variants": {

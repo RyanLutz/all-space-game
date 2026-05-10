@@ -5,7 +5,7 @@ class_name InputManager
 ##
 ## In Pilot mode: reads WASD + mouse and writes to the player ship's unified
 ## input interface. In Tactical mode: writes nothing — the ship idles or
-## follows NavigationController orders.
+## follows AIController autopilot orders.
 ##
 ## This node must be a child of the test/game scene. It needs a reference to
 ## the GameCamera for cursor-to-world conversion.
@@ -52,6 +52,12 @@ func _input(event: InputEvent) -> void:
 			_player_ship.input_fire[0] = false
 			_player_ship.input_fire[1] = false
 			_player_ship.input_fire[2] = false
+
+		# Entering pilot mode cancels any autopilot — player takes manual control.
+		if _current_mode == "pilot" and _player_ship and is_instance_valid(_player_ship):
+			var ai: AIController = _player_ship.get_node_or_null("AIController") as AIController
+			if ai != null:
+				ai.cancel_flight_override()
 
 		print("[InputManager] Mode: %s → %s" % [old_mode, _current_mode])
 

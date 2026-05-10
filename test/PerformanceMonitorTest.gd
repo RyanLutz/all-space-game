@@ -26,7 +26,6 @@ func _process(delta: float) -> void:
 	_simulate_ai_controller()
 	_simulate_physics()
 	_simulate_chunk_streamer()
-	_simulate_navigation()
 
 	# Update count metrics every 30 frames
 	if _frame_counter % 30 == 0:
@@ -96,12 +95,3 @@ func _simulate_chunk_streamer() -> void:
 		# Simulate chunk cleanup
 		_perf.end("ChunkStreamer.unload")
 
-func _simulate_navigation() -> void:
-	_perf.begin("Navigation.update")
-
-	# Simulate pathfinding for AI ships
-	for i in range(_fake_ai_ships):
-		var target = Vector3(i * 10, 0, i * 10)
-		var distance = target.length()
-
-	_perf.end("Navigation.update")

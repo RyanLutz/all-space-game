@@ -1,5 +1,4 @@
 extends Control
-class_name PilotHUD
 
 var _player_ship: Ship = null
 

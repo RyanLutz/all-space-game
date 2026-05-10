@@ -1,0 +1,99 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/tools/ui/ControlPanel.gd" id="1_ctrlpanel"]
+
+[node name="ControlPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -280.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("1_ctrlpanel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="BaseLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Base Hull"
+
+[node name="BaseColorPicker" type="ColorPickerButton" parent="VBoxContainer"]
+layout_mode = 2
+text = "Base Hull"
+edit_alpha = false
+
+[node name="AccentLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Accent"
+
+[node name="AccentColorPicker" type="ColorPickerButton" parent="VBoxContainer"]
+layout_mode = 2
+text = "Accent"
+edit_alpha = false
+
+[node name="GlowLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Glow"
+
+[node name="GlowColorPicker" type="ColorPickerButton" parent="VBoxContainer"]
+layout_mode = 2
+text = "Glow"
+edit_alpha = false
+
+[node name="WindowLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Window"
+
+[node name="WindowColorPicker" type="ColorPickerButton" parent="VBoxContainer"]
+layout_mode = 2
+text = "Window"
+edit_alpha = false
+
+[node name="DamageLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Damage"
+
+[node name="DamageSlider" type="HSlider" parent="VBoxContainer"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+
+[node name="RotLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Rotation"
+
+[node name="RotXSlider" type="HSlider" parent="VBoxContainer"]
+layout_mode = 2
+min_value = -180.0
+max_value = 180.0
+step = 1.0
+
+[node name="RotYSlider" type="HSlider" parent="VBoxContainer"]
+layout_mode = 2
+min_value = -180.0
+max_value = 180.0
+step = 1.0
+
+[node name="RotZSlider" type="HSlider" parent="VBoxContainer"]
+layout_mode = 2
+min_value = -180.0
+max_value = 180.0
+step = 1.0
+
+[node name="FireButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Fire Weapons"
+disabled = true

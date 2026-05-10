@@ -107,13 +107,12 @@ func spawn_ship(
 		ship.add_to_group("player_fleet")
 		_player_state.set_active_ship(ship)
 
-		# Player ship gets a NavigationController for tactical move orders
-		var nav := NavigationController.new()
-		nav.name = "NavigationController"
-		ship.add_child(nav)
+		# Player ship gets an AIController in autopilot-only mode for tactical
+		# move orders, formation following, and warp emergency-stop.
+		_attach_ai_components(ship, ai_profile_id, true)
 	else:
 		ship.add_to_group("ai_ships")
-		_attach_ai_components(ship, ai_profile_id)
+		_attach_ai_components(ship, ai_profile_id, false)
 
 	ship.add_to_group("ships")
 	ship.add_to_group("physics_bodies")
@@ -134,32 +133,29 @@ func spawn_ship(
 
 # ─── AI Component Attachment ────────────────────────────────────────────────
 
-func _attach_ai_components(ship: RigidBody3D, profile_id: String) -> void:
+func _attach_ai_components(ship: RigidBody3D, profile_id: String, is_player: bool) -> void:
 	var profile_data: Dictionary = _content_registry.get_ai_profile(profile_id)
 	if profile_data.is_empty():
 		push_warning("ShipFactory: AI profile '%s' not found, using empty profile" % profile_id)
 
-	# NavigationController — flight computer
-	var nav := NavigationController.new()
-	nav.name = "NavigationController"
-	ship.add_child(nav)
+	# DetectionVolume — only for combat AI ships, not the player.
+	if not is_player:
+		var detection := Area3D.new()
+		detection.name = "DetectionVolume"
+		detection.collision_layer = 0
+		detection.collision_mask = 1  # detect player physics layer
+		detection.monitoring = true
+		detection.monitorable = false
 
-	# DetectionVolume — Area3D with SphereShape3D for player detection
-	var detection := Area3D.new()
-	detection.name = "DetectionVolume"
-	detection.collision_layer = 0
-	detection.collision_mask = 1  # detect player physics layer
-	detection.monitoring = true
-	detection.monitorable = false
+		var shape := CollisionShape3D.new()
+		var sphere := SphereShape3D.new()
+		sphere.radius = profile_data.get("detection_range", 800.0)
+		shape.shape = sphere
+		detection.add_child(shape)
+		ship.add_child(detection)
 
-	var shape := CollisionShape3D.new()
-	var sphere := SphereShape3D.new()
-	sphere.radius = profile_data.get("detection_range", 800.0)
-	shape.shape = sphere
-	detection.add_child(shape)
-	ship.add_child(detection)
-
-	# AIController — state machine (must be added after nav + detection)
+	# AIController — flight + state machine (autopilot-only on player ships).
+	# Must be added after DetectionVolume so its _ready() can find the sibling.
 	var ai := AIController.new()
 	ai.name = "AIController"
 	ai.profile = profile_data

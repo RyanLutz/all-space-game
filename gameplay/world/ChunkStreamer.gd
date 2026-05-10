@@ -17,6 +17,12 @@ var _config: Dictionary = {}
 var _event_bus: Node
 var _perf: Node
 
+# SolarSystem integration
+var _solar_system: SolarSystem = null
+# Gate is false when a SolarSystem is in-tree but system_loaded hasn't fired yet.
+# Ensures first chunk pass uses correct belt regions.
+var _system_streaming_gate: bool = true
+
 
 func _ready() -> void:
 	var service_locator := Engine.get_singleton("ServiceLocator")
@@ -26,6 +32,9 @@ func _ready() -> void:
 
 	if _event_bus:
 		_event_bus.player_ship_changed.connect(_on_player_ship_changed)
+		_event_bus.system_loaded.connect(_on_system_loaded)
+		_event_bus.system_unloaded.connect(_on_system_unloaded)
+		_event_bus.origin_shifted.connect(_on_origin_shifted)
 
 	_load_config()
 
@@ -41,13 +50,31 @@ func _ready() -> void:
 
 func set_follow_target(target: Node3D) -> void:
 	_follow_target = target
-	# Force re-evaluation on next physics frame
 	_last_center_chunk = Vector2i(999999, 999999)
 
 
 func _on_player_ship_changed(ship: Node) -> void:
 	if ship is Node3D:
 		set_follow_target(ship)
+	# If a SolarSystem is in-tree but hasn't finished loading, wait for system_loaded.
+	var systems := get_tree().get_nodes_in_group("solar_systems")
+	if systems.size() > 0 and _solar_system == null:
+		_system_streaming_gate = false
+
+
+func _on_system_loaded(system_id: String) -> void:
+	var systems := get_tree().get_nodes_in_group("solar_systems")
+	_solar_system = systems[0] as SolarSystem if systems.size() > 0 else null
+	_system_streaming_gate = true
+	_last_center_chunk = Vector2i(999999, 999999)
+
+
+func _on_system_unloaded(_system_id: String) -> void:
+	_solar_system = null
+
+
+func _on_origin_shifted(_offset: Vector3) -> void:
+	_last_center_chunk = Vector2i(999999, 999999)
 
 
 func _load_config() -> void:
@@ -71,6 +98,8 @@ func _load_config() -> void:
 
 func _physics_process(_delta: float) -> void:
 	if not is_instance_valid(_follow_target):
+		return
+	if not _system_streaming_gate:
 		return
 
 	var current_chunk := _world_to_chunk(_follow_target.global_position)
@@ -130,13 +159,13 @@ func _load_chunk(coord: Vector2i) -> void:
 
 	var chunk_node := Node3D.new()
 	chunk_node.name = "Chunk_%d_%d" % [coord.x, coord.y]
-	chunk_node.global_position = origin
 	add_child(chunk_node)
+	chunk_node.global_position = origin
 
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(coord)
 
-	_populate_asteroids(chunk_node, rng)
+	_populate_asteroids(chunk_node, rng, origin)
 	_populate_spawn_points(chunk_node, rng)
 
 	_loaded_chunks[coord] = chunk_node
@@ -157,9 +186,17 @@ func _unload_chunk(coord: Vector2i) -> void:
 
 # ─── Asteroid field population ────────────────────────────────────────────────
 
-func _populate_asteroids(chunk_node: Node3D, rng: RandomNumberGenerator) -> void:
+func _populate_asteroids(chunk_node: Node3D, rng: RandomNumberGenerator,
+		chunk_origin: Vector3 = Vector3.ZERO) -> void:
 	var fields_cfg: Dictionary = _config.get("asteroid_fields", {})
-	var max_fields: int = int(fields_cfg.get("max_fields_per_chunk", 3))
+	var base_max_fields: int = int(fields_cfg.get("max_fields_per_chunk", 3))
+
+	var belt_ctx := {}
+	if is_instance_valid(_solar_system):
+		belt_ctx = (_solar_system as SolarSystem).get_belt_context_at(chunk_origin)
+	var density_mult: float = float(belt_ctx.get("density_multiplier", 1.0))
+
+	var max_fields: int = int(round(float(base_max_fields) * density_mult))
 	var field_count: int = rng.randi_range(0, max_fields)
 
 	var field_radius_min: float = fields_cfg.get("field_radius_min", 80.0)

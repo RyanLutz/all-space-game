@@ -549,7 +549,7 @@ var _warp_charge_track: Control
 var _warp_info_label: Label
 
 func _build_warp_panel() -> void:
-	_warp_panel = _make_panel(0, 0, 0, 0, 0, 0, 0, 0, 0)
+	_warp_panel = _make_panel(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 	_warp_panel.anchor_left   = 1.0
 	_warp_panel.anchor_top    = 0.0
 	_warp_panel.anchor_right  = 1.0

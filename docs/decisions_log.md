@@ -1042,3 +1042,141 @@ proper ring geometry come in Session B.
 **PerformanceMonitor wrapped in SolarSystem, not SolarSystemGenerator.** Generator is a
 pure RefCounted with no Node access; PerformanceMonitor begin/end live in SolarSystem.gd
 which wraps the generate() call.
+
+---
+
+## 2026-05-06 — SolarSystem Session C: OriginShifter + ChunkStreamer Belt Integration
+
+**Session:** 29
+**Spec updated:** yes (`feature_spec-solar_system.md` — session C delivered as specced)
+
+**OriginShifter.gd created at `gameplay/world/OriginShifter.gd`.** Extends Node3D,
+parented to SolarSystem in `_ready()`. Subscribes to `chunk_loaded` (trigger) and
+`player_ship_changed` (player ref). On chunk_loaded: checks player XZ distance against
+`shift_threshold` (loaded from `world_config.json` `solar_system.origin_shift_threshold`,
+default 1000). When triggered: shifts all `physics_bodies` group members + SolarSystemRoot
+by `-player_pos`, calls `SolarSystem.update_world_origin(-offset)`, emits `origin_shifted`.
+PerformanceMonitor `SolarSystem.origin_shift` wired.
+
+**Ship.gd and Asteroid.gd both add_to_group("physics_bodies") in _ready().** Additive — no
+behavior changes. Ships and asteroids shift together on origin shift.
+
+**Planet._process replaced with Planet.update_orbit(delta, system_origin).** Centralized
+orbit updates in SolarSystem._process (flat `_orbiters` array, includes moons). Enables
+single perf timer `SolarSystem.orbit_update` wrapping all orbital math. `system_origin`
+parameter (= `SolarSystem._world_origin`) corrects non-moon orbit centers after origin
+shifts. Moon orbit center still derived from parent PlanetBody.global_position — correct
+because parent's global_position already reflects SolarSystemRoot's shifted position.
+
+**SolarSystem.gd gains:** `_orbiters: Array[Node3D]` (flat planet+moon list populated in
+`_build_planets()`); `_event_bus` cache; `add_to_group("solar_systems")` in `_ready()`;
+`_process` wrapping all orbit updates with perf timing; `system_loaded` emitted at end of
+`load_system()`; `system_unloaded` emitted in `_exit_tree()`.
+
+**ChunkStreamer.gd gains:** `_solar_system: SolarSystem` ref (populated on `system_loaded`);
+`_system_streaming_gate` flag (false when solar_systems group is non-empty but system_loaded
+hasn't fired, ensuring first chunk pass uses correct belt regions); `origin_shifted`
+subscription resets `_last_center_chunk`; `_populate_asteroids` accepts `chunk_origin` and
+calls `get_belt_context_at()`, scales `max_fields_per_chunk` by `density_multiplier`.
+
+**GameBootstrap.gd gains 5 SolarSystem perf monitors:** `solar_planet_count`,
+`solar_belt_count`, `solar_station_count`, `solar_orbit_update_ms`, `solar_origin_shift_ms`.
+
+**`world_config.json` `solar_system.origin_shift_threshold` pre-existing at 1000.0.**
+This is below chunk_size (2000) and will trigger very frequently. Flagged for tuning in
+Session D — correct value is likely 4000–8000 (2–4× chunk_size).
+
+---
+
+## 2026-05-06 — SolarSystem Session D: Tuning Pass + SolarPlayTest Scene
+
+**Session:** 30
+**Spec updated:** yes (build status; hand-authored override system created)
+
+**`interrupt_damage_threshold` key renamed to `interrupt_damage`** in
+`solar_system_archetypes.json`. WarpDrive._load_archetype_defaults() reads
+`"interrupt_damage"` — the old key caused the JSON value to be silently ignored
+and the default (20.0) used instead. Key now matches.
+
+**`origin_shift_threshold` tuned from 1000 → 10000** in
+`world_config.json` solar_system block. 1000 was below chunk_size (2000) and
+would trigger an origin shift every time a chunk loaded. 10000 = 5× chunk_size,
+which is a reasonable float-precision threshold for this scale.
+
+**`max_warp_speed` kept at 2500 u/s.** Typical 5-planet system diameter ≈ 84000
+units → ~34s crossing time. Within 30-90s target. Small systems (1-2 planets)
+will be faster; user should tune down if it feels too quick after play testing.
+
+**Hand-authored override system created:** `content/systems/test_authored/system.json`.
+Neutron star + 2 planets (molten + ice with moon) + 1 belt. Load via
+`start_system_id = "test_authored"` in SolarPlayTest inspector.
+
+**New test scene created: `test/SolarPlayTest.tscn` + `test/SolarPlayTest.gd`.**
+Combines full pilot/tactical mode loop (all of PilotLoopTest) with SolarSystem +
+ChunkStreamer belt integration. Exports: galaxy_seed, start_system_id, player ship
+class/variant, spawn_fleet toggle. F3 = performance overlay. ChunkStreamer gates
+automatically on system_loaded (session 29 logic).
+
+---
+
+## 2026-05-07 — NavigationController dissolved into AIController
+
+**Session:** AI flight refactor
+**Spec:** [`docs/spec/feature_spec-ai_flight_refactor.md`](spec/feature_spec-ai_flight_refactor.md)
+**Spec updated:** yes
+
+**Problem:** NavigationController was a thin wrapper around projection-based
+flight that duplicated state with AIController. The split between "decide
+where to go" and "decide how to get there" added no value at this scale and
+required two-way coupling (AIController called nav.update; nav called back via
+has_tactical_order). Worse, signal listeners on NavigationController meant
+TacticalInputHandler emits → nav listens → updates ship; if AIController had
+its own opinion on where to fly, it had to pre-check nav state. A bug surfaced
+when player ships in tactical autopilot mode strafed instead of turn-and-burning
+because NavigationController never wrote `input_aim_target`.
+
+**Decision:** Deleted `NavigationController.gd`. AIController now owns the
+full flight loop on every ship (player + AI):
+
+- New `FlightMode` enum: NONE / TACTICAL_ORDER / FORMATION / EMERGENCY_STOP.
+  Priority stack: EMERGENCY_STOP > TACTICAL_ORDER > FORMATION > NONE.
+  EMERGENCY_STOP wins absolutely; TACTICAL_ORDER preempts FORMATION; only NONE
+  runs the AI combat state machine.
+- AIController subscribes directly to `request_tactical_move`,
+  `request_tactical_stop`, and `request_formation_destination`. Emits
+  `navigation_order_completed` on tactical-order arrival (EscortQueue contract
+  preserved).
+- Player ships now get an AIController via ShipFactory in autopilot-only mode
+  (skips DetectionVolume, attack-signal subscription, wander target init).
+- WarpDrive's interrupt path replaces `_nav._drive_mode = EMERGENCY_STOP` with
+  `ai.request_emergency_stop()`. Plotted-warp arrival check uses warp's own
+  `arrival_distance` config field (loaded from `solar_system_archetypes.json`
+  warp block); previously read `Ship.arrival_distance` which has been removed.
+- `arrival_distance` and `brake_safety_margin` moved from `ship.json` `base_stats`
+  into per-profile fields in `ai_profiles.json`. `Ship.gd` no longer has these
+  fields — flight tuning is the AI/autopilot's concern, not the hull's.
+- Added `formation_thrust_fraction` and `autopilot_thrust_fraction` to AI profiles.
+- Removed `Navigation.update` PerformanceMonitor metric. Flight cost now lives
+  under existing `AIController.state_updates` wrapper.
+- `InputManager._input` clears autopilot via `ai.cancel_flight_override()` on
+  pilot mode entry — pilot input always wins over autopilot.
+
+**Files touched:**
+- Deleted: `gameplay/ai/NavigationController.gd` (+ .uid)
+- Modified: `gameplay/ai/AIController.gd` (full rewrite — flight loop + signal
+  listeners + emergency stop)
+- Modified: `gameplay/world/WarpDrive.gd` (replace `_nav` with `_ai`,
+  `request_emergency_stop`, `is_idle` poll, own arrival_distance)
+- Modified: `gameplay/entities/ShipFactory.gd` (player gets AIController;
+  `_attach_ai_components` takes `is_player` flag, gates DetectionVolume)
+- Modified: `gameplay/entities/Ship.gd` (drop `arrival_distance`, `brake_safety_margin`)
+- Modified: `gameplay/fleet_command/InputManager.gd` (cancel autopilot on pilot
+  mode entry)
+- Modified: `data/ai_profiles.json` (new flight fields per profile)
+- Modified: `content/ships/{axum-fighter-1,corvette_patrol}/ship.json` (drop nav fields)
+- Modified: `core/GameBootstrap.gd` (drop `nav_update_ms` monitor)
+- Modified: `core/services/PerformanceMonitor.gd` (doc-comment fix)
+- Modified: `ui/debug/PerformanceOverlay.gd` (drop `Navigation.update` row)
+- Modified: `test/ShipPhysicsTest.gd` (rebuilt around AIController autopilot)
+- Modified: `test/PerformanceMonitorTest.gd` (drop nav simulation)
+- Modified: `docs/SYSTEMS.md`, `docs/agent_brief.md` (build status)

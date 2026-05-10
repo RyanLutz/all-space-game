@@ -9,7 +9,7 @@ extends Node
 ##
 ## During ACTIVE: linear_damp overridden, thruster_force boosted, thrust curve
 ## applies cubic ease-out falloff as velocity approaches max_warp_speed.
-## Weapons are disabled. NavigationController emergency-brakes on interrupt.
+## Weapons are disabled. AIController emergency-brakes on interrupt.
 
 enum State { IDLE, CHARGING, READY, ACTIVE, DECELERATING }
 enum Mode { NONE, PLOTTED, MANUAL }
@@ -24,6 +24,7 @@ var exclusion_margin: float = 500.0
 var min_distance: float = 5000.0
 var charge_energy_rate: float = 15.0
 var hold_energy_rate: float = 5.0
+var arrival_distance: float = 250.0
 
 # ─── Runtime state ───────────────────────────────────────────────────────────
 var _state: State = State.IDLE
@@ -41,14 +42,14 @@ var _has_queued_move: bool = false
 
 # ─── Cached references ───────────────────────────────────────────────────────
 var _ship: Ship = null
-var _nav: NavigationController = null
+var _ai: AIController = null
 var _event_bus: Node = null
 
 
 func _ready() -> void:
 	_ship = get_parent() as Ship
 	if _ship:
-		_nav = _ship.get_node_or_null("NavigationController") as NavigationController
+		_ai = _ship.get_node_or_null("AIController") as AIController
 
 	var sl := Engine.get_singleton("ServiceLocator")
 	if sl:
@@ -72,6 +73,7 @@ func setup(stats: Dictionary) -> void:
 	min_distance         = float(stats.get("min_distance",         min_distance))
 	charge_energy_rate   = float(stats.get("charge_energy_rate",   charge_energy_rate))
 	hold_energy_rate     = float(stats.get("hold_energy_rate",     hold_energy_rate))
+	arrival_distance     = float(stats.get("arrival_distance",     arrival_distance))
 
 
 # ─── Public query ────────────────────────────────────────────────────────────
@@ -97,7 +99,7 @@ func queue_move(destination: Vector3) -> void:
 
 # ─── Input handling ──────────────────────────────────────────────────────────
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not _ship or not _ship.is_player:
 		return
 
@@ -201,15 +203,16 @@ func _update_active(delta: float) -> void:
 	if _mode == Mode.PLOTTED:
 		var to_dest := _plotted_destination - _ship.global_position
 		to_dest.y = 0.0
-		if to_dest.length() <= _ship.arrival_distance:
+		if to_dest.length() <= arrival_distance:
 			_enter_decelerating("arrived")
 
 
 func _update_decelerating() -> void:
-	if _nav == null:
+	if _ai == null:
 		_enter_idle()
 		return
-	if _nav.has_arrived():
+	# AIController returns to NONE flight_mode once velocity drops below threshold.
+	if _ai.is_idle():
 		_enter_idle()
 
 
@@ -256,9 +259,12 @@ func _enter_active() -> void:
 	var old_state := _state_to_string(_state)
 	_state = State.ACTIVE
 
-	if _mode == Mode.PLOTTED and _nav != null:
-		_nav.set_destination(_plotted_destination)
-		_nav.set_thrust_fraction(1.0)
+	# Plotted-warp flight is driven by warp's thrust boost + Ship.gd's input_forward.
+	# Set the player ship to thrust forward at full while warping plotted.
+	if _mode == Mode.PLOTTED and _ship != null:
+		_ship.input_aim_target = _plotted_destination
+		_ship.input_forward = 1.0
+		_ship.input_strafe = 0.0
 
 	if _event_bus:
 		_event_bus.warp_state_changed.emit(_ship, old_state, "ACTIVE")
@@ -269,9 +275,8 @@ func _enter_decelerating(reason: String) -> void:
 	var old_state := _state_to_string(_state)
 	_state = State.DECELERATING
 
-	if _nav != null:
-		_nav._drive_mode = NavigationController.DriveMode.EMERGENCY_STOP
-		_nav._arrived = false
+	if _ai != null:
+		_ai.request_emergency_stop()
 
 	if _event_bus:
 		_event_bus.warp_state_changed.emit(_ship, old_state, "DECELERATING")
@@ -335,3 +340,4 @@ func _load_archetype_defaults() -> void:
 	min_distance       = float(w.get("min_distance",       min_distance))
 	charge_energy_rate = float(w.get("charge_energy_rate", charge_energy_rate))
 	hold_energy_rate   = float(w.get("hold_energy_rate",   hold_energy_rate))
+	arrival_distance   = float(w.get("arrival_distance",   arrival_distance))

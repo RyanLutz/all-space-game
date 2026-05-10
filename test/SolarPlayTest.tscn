@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3 uid="uid://c_solarplaytest"]
+
+[ext_resource type="Script" path="res://test/SolarPlayTest.gd" id="1_spt"]
+[ext_resource type="Script" path="res://gameplay/camera/GameCamera.gd" id="2_gc"]
+[ext_resource type="PackedScene" path="res://ui/PilotHUD.tscn" id="4_hud"]
+[ext_resource type="PackedScene" path="res://ui/debug/PerformanceOverlay.tscn" id="5_perf"]
+
+[node name="SolarPlayTest" type="Node3D"]
+script = ExtResource("1_spt")
+
+[node name="GameCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 500, 0)
+current = true
+fov = 60.0
+far = 500000.0
+script = ExtResource("2_gc")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 200, 0)
+light_energy = 1.5
+shadow_enabled = true
+
+[node name="HUDLayer" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="PilotHUD" parent="HUDLayer" instance=ExtResource("4_hud")]
+
+[node name="PerformanceOverlay" parent="." instance=ExtResource("5_perf")]

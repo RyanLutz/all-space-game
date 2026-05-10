@@ -222,7 +222,7 @@
   },
 
   "solar_system": {
-    "origin_shift_threshold": 1000.0,
+    "origin_shift_threshold": 10000.0,
     "physics_bodies_group": "physics_bodies",
     "icon_lod_distance": 8000.0,
     "warp_key": "warp"

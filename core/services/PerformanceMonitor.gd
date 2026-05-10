@@ -6,8 +6,8 @@ const WINDOW_SIZE = 60
 ##
 ## Godot-facing Performance.add_custom_monitor registrations are owned by
 ## GameBootstrap._register_custom_monitors() to avoid duplicate-registration
-## errors when multiple instances of a system exist (NavigationController,
-## AIController, etc.). Systems call begin/end/set_count here per-instance.
+## errors when multiple instances of a system exist (AIController per-ship,
+## etc.). Systems call begin/end/set_count here per-instance.
 
 var _timers: Dictionary = {}
 var _samples: Dictionary = {}

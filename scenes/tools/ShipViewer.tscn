@@ -1,0 +1,59 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scenes/tools/ShipViewer.gd" id="1_shipviewer"]
+[ext_resource type="Script" path="res://scenes/tools/ViewerCamera.gd" id="2_viewercam"]
+[ext_resource type="PackedScene" path="res://scenes/tools/ui/ShipGrid.tscn" id="3_shipgrid"]
+[ext_resource type="PackedScene" path="res://scenes/tools/ui/ControlPanel.tscn" id="4_controlpanel"]
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.05, 0.05, 0.08, 1.0)
+ambient_light_source = 2
+ambient_light_color = Color(0.3, 0.3, 0.35, 1.0)
+
+[node name="ShipViewer" type="Node3D"]
+script = ExtResource("1_shipviewer")
+
+[node name="ViewerCamera" type="Camera3D" parent="."]
+script = ExtResource("2_viewercam")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 10, 0)
+light_energy = 1.5
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="ShipStage" type="Node3D" parent="."]
+
+[node name="ShipPivot" type="Node3D" parent="ShipStage"]
+
+[node name="ViewerUI" type="CanvasLayer" parent="."]
+
+[node name="ShipGridToggle" type="Button" parent="ViewerUI"]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 24.0
+offset_bottom = 0.0
+grow_vertical = 2
+text = ">"
+
+[node name="ShipGrid" parent="ViewerUI" instance=ExtResource("3_shipgrid")]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_right = 324.0
+offset_bottom = 0.0
+grow_vertical = 2
+
+[node name="ControlPanel" parent="ViewerUI" instance=ExtResource("4_controlpanel")]
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 0
+grow_vertical = 2

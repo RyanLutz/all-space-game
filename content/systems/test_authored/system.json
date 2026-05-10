@@ -1,0 +1,60 @@
+{
+  "_comment": "Hand-authored system for Session D override-path verification. Load as system_id='test_authored'. Expect: 1 neutron star, 2 planets, 1 belt, no stations.",
+
+  "seed": 999,
+  "archetype": "anomaly",
+
+  "stars": [
+    {
+      "star_type": "neutron",
+      "star_center_depth": 1800.0,
+      "visual_radius": 800.0,
+      "exclusion_radius": 3000.0,
+      "damage_per_second": 300.0,
+      "light_energy": 2.5,
+      "light_range": 80000.0,
+      "position_offset": [0.0, 0.0, 0.0]
+    }
+  ],
+
+  "planets": [
+    {
+      "planet_type": "molten",
+      "orbit_radius": 18000.0,
+      "orbit_angle": 0.5,
+      "orbit_speed": 0.012,
+      "planet_depth": 900.0,
+      "visual_radius": 700.0,
+      "moons": [],
+      "stations": []
+    },
+    {
+      "planet_type": "ice",
+      "orbit_radius": 42000.0,
+      "orbit_angle": 2.1,
+      "orbit_speed": 0.004,
+      "planet_depth": 1400.0,
+      "visual_radius": 1100.0,
+      "moons": [
+        {
+          "planet_type": "barren",
+          "orbit_radius": 3200.0,
+          "orbit_angle": 0.0,
+          "orbit_speed": 0.025,
+          "planet_depth": 300.0,
+          "visual_radius": 200.0
+        }
+      ],
+      "stations": []
+    }
+  ],
+
+  "belts": [
+    {
+      "inner_radius": 24000.0,
+      "outer_radius": 36000.0,
+      "density_multiplier": 3.5,
+      "asteroid_type_weights": { "small": 0.50, "medium": 0.40, "large": 0.10 }
+    }
+  ]
+}

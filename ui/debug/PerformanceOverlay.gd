@@ -22,7 +22,6 @@ const METRIC_DISPLAY_NAMES = {
 	"ProjectileManager.active_count": "Projectiles active",
 	"AIController.state_updates": "AI state updates",
 	"AIController.active_count": "AI ships",
-	"Navigation.update": "Navigation",
 	"Physics.thruster_allocation": "Physics (thrusters)",
 	"Physics.active_bodies": "Physics bodies",
 	"HitDetection.component_resolve": "Hit detection",

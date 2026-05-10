@@ -31,22 +31,21 @@ void vertex() {
 	// produce artefacts after the perspective divide.
 	if (center_clip.w <= 0.0) {
 		POSITION = vec4(2.0, 2.0, 0.0, 1.0);
-		return;
+	} else {
+		// Compute clip-space offset for min_pixel_radius pixels.
+		// NDC spans [-1, 1] over VIEWPORT_SIZE pixels → 1 pixel = 2/VIEWPORT_SIZE NDC units.
+		// In clip space (before w-divide), NDC offset must be premultiplied by w.
+		// VERTEX.xy from a unit QuadMesh spans [-0.5, 0.5], so the factor is ×2 to reach ±1.
+		float sx = VERTEX.x * 2.0 * min_pixel_radius * (2.0 / VIEWPORT_SIZE.x) * center_clip.w;
+		float sy = VERTEX.y * 2.0 * min_pixel_radius * (2.0 / VIEWPORT_SIZE.y) * center_clip.w;
+
+		// Pin to a fixed far-plane depth instead of the star's actual world depth.
+		// Godot 4 Forward+ reversed-Z: near=1.0, far=0.0, sky clear=0.0.
+		// Using 0.0001 (matching star_screen_pass) keeps every star safely inside the
+		// far clip plane regardless of real distance and above the sky clear value so
+		// the depth test reliably passes.
+		POSITION = vec4(center_clip.x + sx, center_clip.y + sy, 0.0001 * center_clip.w, center_clip.w);
 	}
-
-	// Compute clip-space offset for min_pixel_radius pixels.
-	// NDC spans [-1, 1] over VIEWPORT_SIZE pixels → 1 pixel = 2/VIEWPORT_SIZE NDC units.
-	// In clip space (before w-divide), NDC offset must be premultiplied by w.
-	// VERTEX.xy from a unit QuadMesh spans [-0.5, 0.5], so the factor is ×2 to reach ±1.
-	float sx = VERTEX.x * 2.0 * min_pixel_radius * (2.0 / VIEWPORT_SIZE.x) * center_clip.w;
-	float sy = VERTEX.y * 2.0 * min_pixel_radius * (2.0 / VIEWPORT_SIZE.y) * center_clip.w;
-
-	// Pin to a fixed far-plane depth instead of the star's actual world depth.
-	// Godot 4 Forward+ reversed-Z: near=1.0, far=0.0, sky clear=0.0.
-	// Using 0.0001 (matching star_screen_pass) keeps every star safely inside the
-	// far clip plane regardless of real distance and above the sky clear value so
-	// the depth test reliably passes.
-	POSITION = vec4(center_clip.x + sx, center_clip.y + sy, 0.0001 * center_clip.w, center_clip.w);
 }
 
 void fragment() {

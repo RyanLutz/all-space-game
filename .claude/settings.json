@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(godot --headless --check-only --quit *)"
+      "Bash(godot --headless --check-only --quit *)",
+      "Bash(backslash-escaped whitespace:*)"
     ]
   }
 }

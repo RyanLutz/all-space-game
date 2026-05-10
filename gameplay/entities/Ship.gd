@@ -16,8 +16,6 @@ var is_player: bool = false
 var thruster_force: float = 0.0
 var torque_thrust_ratio: float = 0.0
 var max_torque: float = 0.0
-var arrival_distance: float = 25.0
-var brake_safety_margin: float = 1.25
 
 # ─── Combat resources ────────────────────────────────────────────────────────
 var hull_hp: float = 0.0
@@ -54,6 +52,8 @@ func _ready() -> void:
 	_perf = service_locator.GetService("PerformanceMonitor")
 	_event_bus = service_locator.GetService("GameEventBus")
 
+	add_to_group("physics_bodies")
+
 	_active_ship_count += 1
 	if _perf:
 		_perf.set_count("Ships.active_count", _active_ship_count)
@@ -78,8 +78,6 @@ func initialize_stats(stats: Dictionary) -> void:
 	thruster_force = stats.get("thruster_force", 12000.0)
 	torque_thrust_ratio = stats.get("torque_thrust_ratio", 0.3)
 	max_torque = stats.get("max_torque", 4000.0)
-	arrival_distance = stats.get("arrival_distance", 25.0)
-	brake_safety_margin = stats.get("brake_safety_margin", 1.25)
 
 	# Combat
 	hull_max = stats.get("hp", 100.0)

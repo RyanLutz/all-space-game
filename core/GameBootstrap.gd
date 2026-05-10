@@ -96,8 +96,6 @@ func _register_custom_monitors() -> void:
 		func(): return perf.get_avg_ms("AIController.state_updates"))
 	Performance.add_custom_monitor("AllSpace/physics_ms",
 		func(): return perf.get_avg_ms("Physics.thruster_allocation"))
-	Performance.add_custom_monitor("AllSpace/nav_update_ms",
-		func(): return perf.get_avg_ms("Navigation.update"))
 	Performance.add_custom_monitor("AllSpace/ship_assembly_ms",
 		func(): return perf.get_avg_ms("ShipFactory.assemble"))
 	Performance.add_custom_monitor("AllSpace/content_load_ms",
@@ -118,3 +116,13 @@ func _register_custom_monitors() -> void:
 		func(): return perf.get_count("StarRegistry.screen_pass_count"))
 	Performance.add_custom_monitor("AllSpace/star_active_meshes",
 		func(): return perf.get_count("StarRegistry.active_meshes"))
+	Performance.add_custom_monitor("AllSpace/solar_planet_count",
+		func(): return perf.get_count("SolarSystem.planet_count"))
+	Performance.add_custom_monitor("AllSpace/solar_belt_count",
+		func(): return perf.get_count("SolarSystem.belt_count"))
+	Performance.add_custom_monitor("AllSpace/solar_station_count",
+		func(): return perf.get_count("SolarSystem.station_count"))
+	Performance.add_custom_monitor("AllSpace/solar_orbit_update_ms",
+		func(): return perf.get_avg_ms("SolarSystem.orbit_update"))
+	Performance.add_custom_monitor("AllSpace/solar_origin_shift_ms",
+		func(): return perf.get_avg_ms("SolarSystem.origin_shift"))

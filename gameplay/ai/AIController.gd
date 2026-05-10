@@ -1,35 +1,35 @@
 extends Node
 class_name AIController
 
-## State-machine-driven AI controller. Populates the ship's unified input
-## interface (input_aim_target, input_fire) and delegates movement to
-## NavigationController (input_forward, input_strafe).
+## Unified flight + AI controller. Owns the full flight loop:
+##   - AI state machine (IDLE / PURSUE / ENGAGE / TACTICAL_ATTACK)
+##   - Tactical-order autopilot   (player + AI ships, signal-driven)
+##   - Formation following        (escort queue ships, signal-driven)
+##   - Emergency stop             (warp interrupt)
 ##
-## Attached as a child of the ship RigidBody3D by ShipFactory for AI ships.
-## DetectionVolume (Area3D) is a sibling node — signals are connected in _ready().
+## Replaces the dissolved NavigationController. AIController is attached to
+## every ship (player + AI). Player ships skip the combat state machine but
+## still receive flight overrides via signals.
 
 # ─── State Machine ─────────────────────────────────────────────────────────
 enum State { IDLE, PURSUE, ENGAGE, FLEE, REGROUP, SEARCH, ORBIT, TACTICAL_ATTACK }
 
-const TRANSITIONS: Dictionary = {
-	State.IDLE: {
-		"player_detected": State.PURSUE,
-	},
-	State.PURSUE: {
-		"in_engage_range":  State.ENGAGE,
-		"target_leashed":   State.IDLE,
-	},
-	State.ENGAGE: {
-		"target_lost":       State.IDLE,
-		"target_destroyed":  State.IDLE,
-	},
-}
+# ─── Flight Override Stack ─────────────────────────────────────────────────
+# Priority (highest first): EMERGENCY_STOP > TACTICAL_ORDER > FORMATION > NONE.
+# TACTICAL_ATTACK is a state-machine state, not a flight override — it shares
+# the AI ship's state machine slot and is set by signal.
+enum FlightMode { NONE, TACTICAL_ORDER, FORMATION, EMERGENCY_STOP }
+
+var _flight_mode: FlightMode = FlightMode.NONE
+var _destination: Vector3 = Vector3.ZERO
+var _arrived: bool = false
+var _thrust_fraction: float = 1.0
 
 var _current_state: State = State.IDLE
 
 # ─── References ────────────────────────────────────────────────────────────
-var nav_controller: NavigationController
 var profile: Dictionary = {}
+var _is_player: bool = false
 
 # ─── Detection ─────────────────────────────────────────────────────────────
 var _target_detected: bool = false
@@ -60,40 +60,144 @@ func _ready() -> void:
 	_stance_controller = service_locator.GetService("StanceController")
 
 	var ship := get_parent()
+	_is_player = ship.is_player if "is_player" in ship else false
 	_spawn_position = ship.global_position
 	_spawn_position.y = 0.0
 
-	# Find sibling NavigationController
-	nav_controller = ship.get_node("NavigationController") as NavigationController
-
-	# Connect DetectionVolume signals
-	var detection := ship.get_node_or_null("DetectionVolume")
-	if detection:
-		detection.body_entered.connect(_on_detection_volume_body_entered)
-		detection.body_exited.connect(_on_detection_volume_body_exited)
-
-	# Tactical order signals
+	# Flight-mode signal listeners — both player and AI react.
 	if _event_bus:
-		_event_bus.connect("request_tactical_attack", _on_request_tactical_attack)
+		_event_bus.connect("request_tactical_move", _on_request_tactical_move)
 		_event_bus.connect("request_tactical_stop", _on_request_tactical_stop)
+		_event_bus.connect("request_formation_destination", _on_request_formation_destination)
 
-	# Cache primary weapon muzzle speed for aim prediction
-	_cache_primary_muzzle_speed(ship)
+	# Combat-only init: detection, attack signals, wander target.
+	if not _is_player:
+		var detection := ship.get_node_or_null("DetectionVolume")
+		if detection:
+			detection.body_entered.connect(_on_detection_volume_body_entered)
+			detection.body_exited.connect(_on_detection_volume_body_exited)
 
-	_pick_new_wander_target()
-	_current_state = State.IDLE
+		if _event_bus:
+			_event_bus.connect("request_tactical_attack", _on_request_tactical_attack)
+
+		_cache_primary_muzzle_speed(ship)
+		_pick_new_wander_target()
+		_current_state = State.IDLE
+
+
+# ─── Public API ────────────────────────────────────────────────────────────
+
+func is_idle() -> bool:
+	return _flight_mode == FlightMode.NONE
+
+
+func request_emergency_stop() -> void:
+	_flight_mode = FlightMode.EMERGENCY_STOP
+	_arrived = false
+
+
+func cancel_flight_override() -> void:
+	# Called by InputManager when player takes manual control.
+	if _flight_mode != FlightMode.NONE:
+		_flight_mode = FlightMode.NONE
+		_arrived = true
 
 
 # ─── Physics Process ───────────────────────────────────────────────────────
 
 func _physics_process(delta: float) -> void:
 	_perf.begin("AIController.state_updates")
-	match _current_state:
-		State.IDLE:             _idle_process(delta)
-		State.PURSUE:           _pursue_process(delta)
-		State.ENGAGE:           _engage_process(delta)
-		State.TACTICAL_ATTACK:  _tactical_attack_process(delta)
+	match _flight_mode:
+		FlightMode.EMERGENCY_STOP:
+			_emergency_stop_update()
+		FlightMode.TACTICAL_ORDER:
+			_face_destination()
+			_flight_update()
+			if _arrived:
+				_flight_mode = FlightMode.NONE
+				_event_bus.navigation_order_completed.emit(get_parent().get_instance_id())
+		FlightMode.FORMATION:
+			_face_destination()
+			_flight_update()
+			# Formation refreshes destination each tick — no completion signal.
+		FlightMode.NONE:
+			if not _is_player:
+				match _current_state:
+					State.IDLE:             _idle_process(delta)
+					State.PURSUE:           _pursue_process(delta)
+					State.ENGAGE:           _engage_process(delta)
+					State.TACTICAL_ATTACK:  _tactical_attack_process(delta)
 	_perf.end("AIController.state_updates")
+
+
+# ─── Flight Methods ────────────────────────────────────────────────────────
+
+func _face_destination() -> void:
+	var ship := get_parent()
+	if ship and "input_aim_target" in ship:
+		ship.input_aim_target = _destination
+
+
+func _flight_update() -> void:
+	var ship := get_parent() as RigidBody3D
+
+	var to_dest: Vector3 = _destination - ship.global_position
+	to_dest.y = 0.0
+	var distance: float = to_dest.length()
+
+	var arrival_distance: float = float(profile.get("arrival_distance", 25.0))
+	if distance <= arrival_distance:
+		ship.input_forward = 0.0
+		ship.input_strafe = 0.0
+		_arrived = true
+		return
+
+	_arrived = false
+
+	# Braking distance from constant-decel approximation, padded by margin.
+	var velocity: Vector3 = ship.linear_velocity
+	velocity.y = 0.0
+	var speed: float = velocity.length()
+
+	var max_decel: float = (ship.thruster_force * _thrust_fraction) / maxf(ship.mass, 0.001)
+	var brake_safety: float = float(profile.get("brake_safety_margin", 1.25))
+	var braking_distance: float = 0.0
+	if max_decel > 0.0:
+		braking_distance = (speed * speed) / (2.0 * max_decel) * brake_safety
+
+	var ship_forward: Vector3 = -ship.transform.basis.z
+	var ship_right: Vector3 = ship.transform.basis.x
+
+	if distance <= braking_distance and speed > 0.1:
+		var brake_dir: Vector3 = -velocity.normalized()
+		ship.input_forward = brake_dir.dot(ship_forward) * _thrust_fraction
+		ship.input_strafe = brake_dir.dot(ship_right) * _thrust_fraction
+	else:
+		var dest_dir: Vector3 = to_dest / distance
+		ship.input_forward = dest_dir.dot(ship_forward) * _thrust_fraction
+		ship.input_strafe = dest_dir.dot(ship_right) * _thrust_fraction
+
+
+func _emergency_stop_update() -> void:
+	var ship := get_parent() as RigidBody3D
+	var velocity: Vector3 = ship.linear_velocity
+	velocity.y = 0.0
+	var speed: float = velocity.length()
+	if speed < 1.0:
+		ship.input_forward = 0.0
+		ship.input_strafe = 0.0
+		_flight_mode = FlightMode.NONE
+		return
+	var brake_dir: Vector3 = -velocity.normalized()
+	ship.input_forward = brake_dir.dot(-ship.transform.basis.z)
+	ship.input_strafe = brake_dir.dot(ship.transform.basis.x)
+
+
+# ─── Internal flight setters (for combat states) ──────────────────────────
+
+func _set_flight_target(dest: Vector3, thrust_fraction: float) -> void:
+	_destination = Vector3(dest.x, 0.0, dest.z)
+	_thrust_fraction = clampf(thrust_fraction, 0.0, 1.0)
 
 
 # ─── State: IDLE ───────────────────────────────────────────────────────────
@@ -101,10 +205,6 @@ func _physics_process(delta: float) -> void:
 func _idle_process(delta: float) -> void:
 	if _target_detected:
 		_transition_to(State.PURSUE)
-		return
-
-	# If NavigationController has a tactical move order, don't override it
-	if nav_controller and nav_controller.has_tactical_order():
 		return
 
 	var ship := get_parent() as RigidBody3D
@@ -115,16 +215,13 @@ func _idle_process(delta: float) -> void:
 		if _wander_pause_timer <= 0.0:
 			_pick_new_wander_target()
 		# Hold position while paused
-		nav_controller.set_destination(ship.global_position)
-		nav_controller.set_thrust_fraction(0.0)
+		_set_flight_target(ship.global_position, 0.0)
 	else:
-		nav_controller.set_destination(_wander_target)
-		nav_controller.set_thrust_fraction(profile.get("wander_thrust_fraction", 0.4))
+		_set_flight_target(_wander_target, profile.get("wander_thrust_fraction", 0.4))
 
 	# Face direction of travel while wandering
 	ship.input_aim_target = _wander_target
-
-	nav_controller.update(delta)
+	_flight_update()
 
 
 func _pick_new_wander_target() -> void:
@@ -139,13 +236,9 @@ func _pick_new_wander_target() -> void:
 
 # ─── State: PURSUE ─────────────────────────────────────────────────────────
 
-func _pursue_process(delta: float) -> void:
+func _pursue_process(_delta: float) -> void:
 	if not is_instance_valid(_target):
 		_transition_to(State.IDLE)
-		return
-
-	# If NavigationController has a tactical move order, don't override it
-	if nav_controller and nav_controller.has_tactical_order():
 		return
 
 	var ship := get_parent() as RigidBody3D
@@ -161,17 +254,14 @@ func _pursue_process(delta: float) -> void:
 		_transition_to(State.ENGAGE)
 		return
 
-	nav_controller.set_destination(_target.global_position)
-	nav_controller.set_thrust_fraction(profile.get("pursue_thrust_fraction", 0.85))
-	nav_controller.update(delta)
-
-	# Face the target while closing
+	_set_flight_target(_target.global_position, profile.get("pursue_thrust_fraction", 0.85))
 	ship.input_aim_target = _target.global_position
+	_flight_update()
 
 
 # ─── State: ENGAGE ──────────────────────────────────────────────────────────
 
-func _engage_process(delta: float) -> void:
+func _engage_process(_delta: float) -> void:
 	var ship := get_parent() as RigidBody3D
 
 	if not is_instance_valid(_target):
@@ -182,35 +272,29 @@ func _engage_process(delta: float) -> void:
 		_transition_to(State.IDLE)
 		return
 
-	# If NavigationController has a tactical move order, don't override nav
-	var nav_has_order := nav_controller and nav_controller.has_tactical_order()
-
 	var predicted_pos := _predict_aim_position(_target)
 	ship.input_aim_target = predicted_pos
 
-	if not nav_has_order:
-		var dist_to_target := ship.global_position.distance_to(_target.global_position)
-		var preferred: float = float(profile.get("preferred_engage_distance", 350.0))
-		var ratio: float = dist_to_target / maxf(preferred, 1.0)
-		var engage_thrust: float = float(profile.get("engage_thrust_fraction", 0.7))
+	var dist_to_target := ship.global_position.distance_to(_target.global_position)
+	var preferred: float = float(profile.get("preferred_engage_distance", 350.0))
+	var ratio: float = dist_to_target / maxf(preferred, 1.0)
+	var engage_thrust: float = float(profile.get("engage_thrust_fraction", 0.7))
 
-		if ratio < 0.7:
-			# Too close — reverse away
-			var away := (ship.global_position - _target.global_position).normalized()
-			nav_controller.set_destination(ship.global_position + away * 200.0)
-			nav_controller.set_thrust_fraction(engage_thrust)
-			nav_controller.update(delta)
-		elif ratio > 1.3:
-			# Too far — close in
-			nav_controller.set_destination(_target.global_position)
-			nav_controller.set_thrust_fraction(engage_thrust)
-			nav_controller.update(delta)
-		else:
-			# Sweet spot — hold position, orbit via strafe
-			nav_controller.set_destination(ship.global_position)
-			nav_controller.set_thrust_fraction(0.0)
-			nav_controller.update(delta)
-			ship.input_strafe = _circle_direction * profile.get("strafe_thrust_fraction", 0.3)
+	if ratio < 0.7:
+		var away := (ship.global_position - _target.global_position).normalized()
+		_set_flight_target(ship.global_position + away * 200.0, engage_thrust)
+		_flight_update()
+	elif ratio > 1.3:
+		_set_flight_target(_target.global_position, engage_thrust)
+		_flight_update()
+	else:
+		# Sweet spot — stop translation, orbit via strafe
+		_set_flight_target(ship.global_position, 0.0)
+		_flight_update()
+		ship.input_strafe = _circle_direction * profile.get("strafe_thrust_fraction", 0.3)
+
+	# Orbit always faces target — overrides _flight_update's facing.
+	ship.input_aim_target = predicted_pos
 
 	# Fire decision (check stance)
 	if _should_hold_fire():
@@ -232,7 +316,7 @@ func _engage_process(delta: float) -> void:
 
 # ─── State: TACTICAL_ATTACK ───────────────────────────────────────────────
 
-func _tactical_attack_process(delta: float) -> void:
+func _tactical_attack_process(_delta: float) -> void:
 	var ship := get_parent() as RigidBody3D
 
 	if not is_instance_valid(_tactical_target):
@@ -243,9 +327,7 @@ func _tactical_attack_process(delta: float) -> void:
 		return
 
 	var predicted_pos := _predict_aim_position(_tactical_target)
-	ship.input_aim_target = predicted_pos
 
-	# Navigate toward target — no leash range check for tactical orders
 	var dist_to_target := ship.global_position.distance_to(_tactical_target.global_position)
 	var preferred: float = float(profile.get("preferred_engage_distance", 350.0))
 	var ratio: float = dist_to_target / maxf(preferred, 1.0)
@@ -253,18 +335,17 @@ func _tactical_attack_process(delta: float) -> void:
 
 	if ratio < 0.7:
 		var away := (ship.global_position - _tactical_target.global_position).normalized()
-		nav_controller.set_destination(ship.global_position + away * 200.0)
-		nav_controller.set_thrust_fraction(engage_thrust)
-		nav_controller.update(delta)
+		_set_flight_target(ship.global_position + away * 200.0, engage_thrust)
+		_flight_update()
 	elif ratio > 1.3:
-		nav_controller.set_destination(_tactical_target.global_position)
-		nav_controller.set_thrust_fraction(engage_thrust)
-		nav_controller.update(delta)
+		_set_flight_target(_tactical_target.global_position, engage_thrust)
+		_flight_update()
 	else:
-		nav_controller.set_destination(ship.global_position)
-		nav_controller.set_thrust_fraction(0.0)
-		nav_controller.update(delta)
+		_set_flight_target(ship.global_position, 0.0)
+		_flight_update()
 		ship.input_strafe = _circle_direction * profile.get("strafe_thrust_fraction", 0.3)
+
+	ship.input_aim_target = predicted_pos
 
 	# Fire decision (check stance)
 	if _should_hold_fire():
@@ -284,7 +365,55 @@ func _tactical_attack_process(delta: float) -> void:
 		ship.input_fire[0] = false
 
 
-# ─── Tactical Order Handlers ──────────────────────────────────────────────
+# ─── Signal Handlers ──────────────────────────────────────────────────────
+
+func _on_request_tactical_move(ship_ids: Array, destination: Vector3, _queue_mode: String) -> void:
+	var my_id := get_parent().get_instance_id()
+	if my_id not in ship_ids:
+		return
+
+	# Defer to warp if active — queue the move for after warp ends.
+	var warp: WarpDrive = get_parent().get_node_or_null("WarpDrive") as WarpDrive
+	if warp != null and warp.is_warp_active():
+		warp.queue_move(destination)
+		return
+
+	_destination = Vector3(destination.x, 0.0, destination.z)
+	_arrived = false
+	_flight_mode = FlightMode.TACTICAL_ORDER
+	_thrust_fraction = float(profile.get("autopilot_thrust_fraction",
+			profile.get("pursue_thrust_fraction", 0.85)))
+
+
+func _on_request_tactical_stop(ship_ids: Array) -> void:
+	var my_id := get_parent().get_instance_id()
+	if my_id not in ship_ids:
+		return
+	if _flight_mode == FlightMode.TACTICAL_ORDER:
+		_flight_mode = FlightMode.NONE
+		_arrived = true
+		var ship := get_parent()
+		ship.input_forward = 0.0
+		ship.input_strafe = 0.0
+	# AI ships: also drop any tactical-attack state
+	if not _is_player and _current_state == State.TACTICAL_ATTACK:
+		_tactical_target = null
+		_transition_to(State.IDLE)
+
+
+func _on_request_formation_destination(ship_id: int, destination: Vector3) -> void:
+	if get_parent().get_instance_id() != ship_id:
+		return
+	if _flight_mode == FlightMode.TACTICAL_ORDER \
+			or _flight_mode == FlightMode.EMERGENCY_STOP:
+		return    # higher-priority override active
+
+	_destination = Vector3(destination.x, 0.0, destination.z)
+	_arrived = false
+	_flight_mode = FlightMode.FORMATION
+	_thrust_fraction = float(profile.get("formation_thrust_fraction",
+			profile.get("pursue_thrust_fraction", 0.85)))
+
 
 func _on_request_tactical_attack(ship_ids: Array, target_id: int, _queue_mode: String) -> void:
 	var my_id := get_parent().get_instance_id()
@@ -295,15 +424,6 @@ func _on_request_tactical_attack(ship_ids: Array, target_id: int, _queue_mode: S
 		return
 	_tactical_target = target_node as Node3D
 	_transition_to(State.TACTICAL_ATTACK)
-
-
-func _on_request_tactical_stop(ship_ids: Array) -> void:
-	var my_id := get_parent().get_instance_id()
-	if my_id not in ship_ids:
-		return
-	_tactical_target = null
-	if _current_state == State.TACTICAL_ATTACK:
-		_transition_to(State.IDLE)
 
 
 # ─── Stance ───────────────────────────────────────────────────────────────
