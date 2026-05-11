@@ -65,6 +65,8 @@ From `docs/spec/core_spec.md` §19. Update this table at the end of every sessio
 
 | 25 | StarField S1–S4 complete: galaxy catalog, galactic map UI, galaxy sky shader, nebula map zoom wiring. All four PerformanceMonitor metrics in overlay. | Implemented |
 | 26 | SolarSystem A–D complete. | Implemented |
+| 27 | Main Scene Integration — `Main.tscn`, `GameOrchestrator.gd`, warp transitions, hand-authored `sol_start` system. | Implemented |
+| 28 | Performance: removed superseded `StarRegistry` autoload, fixed `star_point.gdshader` `INSTANCE_CUSTOM` → `INSTANCE_CUSTOM_DATA`. | Implemented |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 

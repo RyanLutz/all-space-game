@@ -43,7 +43,9 @@ var _current_system: SFStarRecord = null
 
 
 func _ready() -> void:
-	_bus = get_node_or_null("/root/GameEventBus")
+	var sl := Engine.get_singleton("ServiceLocator")
+	if sl:
+		_bus = sl.GetService("GameEventBus")
 	if _bus:
 		_bus.galactic_map_toggled.connect(_on_map_toggled)
 	_starfield = get_node_or_null("/root/StarField")

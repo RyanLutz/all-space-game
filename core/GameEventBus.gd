@@ -88,5 +88,10 @@ signal loadout_changed(ship: Node, slot_id: String, item_id: String)
 # ─── Player State ──────────────────────────────────────────────────────────────
 signal player_ship_changed(ship: Node)
 
+# ─── Cinematics ────────────────────────────────────────────────────────────────
+signal cinematic_active_changed(active: bool)
+signal system_transition_started(destination_id: String)
+signal system_transition_complete(system_id: String)
+
 # ─── Debug ─────────────────────────────────────────────────────────────────────
 signal debug_toggled(visible: bool)

@@ -1180,3 +1180,85 @@ full flight loop on every ship (player + AI):
 - Modified: `test/ShipPhysicsTest.gd` (rebuilt around AIController autopilot)
 - Modified: `test/PerformanceMonitorTest.gd` (drop nav simulation)
 - Modified: `docs/SYSTEMS.md`, `docs/agent_brief.md` (build status)
+
+---
+
+## 2026-05-10 — Main Scene Integration: GameOrchestrator + Warp Transitions
+
+**Session:** Main scene build
+**Spec:** `docs/agent_brief.md` §Main Scene Integration
+**Spec updated:** yes
+
+**Problem:** The project had multiple test scenes (`PilotLoopTest.tscn`,
+`SolarSystemTest.tscn`, `StarFieldTest.tscn`) but no unified main scene that
+connects pilot loop, solar systems, galactic map, and warp transitions into a
+single playable experience.
+
+**Decision:** Built `Main.tscn` as the unified entry point with a new
+`GameOrchestrator.gd` system coordinator.
+
+### Key discoveries (deviations from brief assumptions)
+
+1. **NavigationController.gd does not exist.** It was dissolved into AIController
+   in the 2026-05-07 refactor. The brief assumed a separate NavigationController
+   with a public `set_destination()` API. Cinematic ship driving is done by
+   writing directly to the unified input interface (`input_aim_target`,
+   `input_forward`) while `cinematic_active_changed` disables InputManager.
+
+2. **GameEventBus is NOT at `/root/GameEventBus`.** It is created as a child of
+   `GameBootstrap` and registered with `ServiceLocator`. Code doing
+   `get_node_or_null("/root/GameEventBus")` (e.g. `GalacticMap.gd`) fails.
+   Fixed GalacticMap.gd to use `ServiceLocator.GetService("GameEventBus")`.
+
+3. **StarField has no `lookup_by_system_id()` method.** To find a destination
+   record, iterate `_starfield.get_destinations()`.
+
+4. **SolarSystem.load_system() must be deferred.** `_ready()` creates
+   `_star_group` and `_planet_group`; calling `load_system()` immediately after
+   `add_child()` races `_ready()`. Using `call_deferred("load_system", ...)`
+   fixes null-reference crashes.
+
+5. **Player ship spawn must be deferred one frame.** `GameCamera._ready()` looks
+   for the player ship in the `"player"` group. Since `ShipFactory` adds the ship
+   via `call_deferred`, spawning inside `GameOrchestrator._ready()` causes a race.
+   Deferring `_load_starting_system()` via `call_deferred` ensures GameCamera is
+   fully ready before the player exists.
+
+6. **galaxy_sky.gdshader has a pre-existing type bug.** Line 164 used
+   `COLOR = vec4(rgb, 1.0);` but sky shaders expose `COLOR` as `vec3`.
+   Fixed to `COLOR = rgb;`.
+
+7. **Actual ship class names are `axum-fighter-1` and `corvette_patrol`.**
+   The brief's placeholder `fighter_light` does not exist in `content/ships/`.
+
+### Files created
+
+- `content/systems/sol_start/system.json` — hand-authored starting system
+  (yellow dwarf + 4 planets + 2 asteroid belts + 3 pirate spawn zones)
+- `gameplay/world/GameOrchestrator.gd` — system coordinator; loads systems,
+  spawns player/enemies, executes warp transitions (exit thrust → fade → swap →
+  fade in → fly-in)
+- `Main.tscn` — connected main scene (World, GameCamera, UILayer, TransitionLayer)
+
+### Files modified
+
+- `data/world_config.json` — added `"orchestrator"` block with all tunables
+  (starting_system_id, player_ship_class/variant/faction, transition timings)
+- `core/GameEventBus.gd` — added `cinematic_active_changed`,
+  `system_transition_started`, `system_transition_complete`
+- `docs/spec/feature_spec-game_event_bus_signals.md` — documented new signals
+- `gameplay/fleet_command/InputManager.gd` — listens to `cinematic_active_changed`
+- `core/starfield/galaxy_sky.gdshader` — fixed `COLOR` type (vec3, not vec4)
+- `ui/galactic_map/GalacticMap.gd` — fixed ServiceLocator lookup path
+- `project.godot` — `run/main_scene` now points to `res://Main.tscn`
+
+### Success criteria verified
+
+- Player spawns in `sol_start` at (0, 0, 5000) ✓
+- Enemies spawn from hand-authored spawn zones ✓
+- Galactic map opens/closes with M key ✓
+- Clicking a reachable system triggers warp transition ✓
+- Exit thrust (2s), fade to black (0.6s), system swap, fade in, fly-in (2.5s) ✓
+- Skybox visibly different after warp ✓
+- No direct cross-system calls — all coordination via GameEventBus ✓
+- All timings/distances from `world_config.json` orchestrator block ✓

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="All Space"
-run/main_scene="res://scenes/tools/ShipViewer.tscn"
+run/main_scene="res://Main.tscn"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -22,7 +22,6 @@ ServiceLocator="*res://core/services/ServiceLocator.cs"
 GameBootstrap="*res://core/GameBootstrap.gd"
 UITokens="*res://ui/UITokens.gd"
 StarField="*res://core/starfield/StarField.gd"
-McpBridge="*res://mcp_bridge.gd"
 
 [display]
 

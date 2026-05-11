@@ -13,6 +13,7 @@ class_name InputManager
 var _current_mode: String = "pilot"
 var _player_ship: Node = null
 var _camera: Camera3D = null
+var _cinematic_active: bool = false
 
 var _event_bus: Node
 var _player_state: Node
@@ -25,6 +26,7 @@ func _ready() -> void:
 
 	if _event_bus:
 		_event_bus.connect("player_ship_changed", _on_player_ship_changed)
+		_event_bus.connect("cinematic_active_changed", _on_cinematic_active_changed)
 
 	# Pick up existing player ship if already spawned
 	if _player_state and _player_state.active_ship:
@@ -67,6 +69,8 @@ func _physics_process(_delta: float) -> void:
 		return
 	if _current_mode != "pilot":
 		return
+	if _cinematic_active:
+		return
 
 	_route_pilot_input()
 
@@ -82,6 +86,8 @@ func _route_pilot_input() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if _current_mode != "pilot":
 		return
+	if _cinematic_active:
+		return
 	if _player_ship == null or not is_instance_valid(_player_ship):
 		return
 
@@ -95,3 +101,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_player_ship_changed(ship: Node) -> void:
 	_player_ship = ship
+
+
+func _on_cinematic_active_changed(active: bool) -> void:
+	_cinematic_active = active
+	if active and _player_ship and is_instance_valid(_player_ship):
+		# Clear inputs when cinematic takes over
+		_player_ship.input_forward = 0.0
+		_player_ship.input_strafe = 0.0
+		_player_ship.input_fire[0] = false
+		_player_ship.input_fire[1] = false
+		_player_ship.input_fire[2] = false

@@ -1,0 +1,96 @@
+{
+  "_comment": "Hand-authored starting system for the main game loop.",
+  "system_id": "sol_start",
+  "archetype": "inhabited",
+  "galaxy_position": [15000, 400, 8000],
+
+  "stars": [
+    {
+      "star_type": "yellow_dwarf",
+      "position_offset": [0, 0, 0],
+      "star_center_depth": 2000.0,
+      "visual_radius": 3500.0,
+      "exclusion_radius": 2800.0,
+      "damage_per_second": 150.0,
+      "light_energy": 1.2,
+      "light_range": 100000.0
+    }
+  ],
+
+  "planets": [
+    {
+      "planet_type": "barren",
+      "orbit_radius": 4000.0,
+      "orbit_angle": 0.0,
+      "orbit_speed": 0.01,
+      "visual_radius": 400.0,
+      "planet_depth": 600.0,
+      "moons": [],
+      "stations": []
+    },
+    {
+      "planet_type": "terrestrial",
+      "orbit_radius": 8000.0,
+      "orbit_angle": 2.094,
+      "orbit_speed": 0.006,
+      "visual_radius": 600.0,
+      "planet_depth": 800.0,
+      "moons": [],
+      "stations": [
+        { "station_type": "generic" }
+      ]
+    },
+    {
+      "planet_type": "gas_giant",
+      "orbit_radius": 14000.0,
+      "orbit_angle": 4.189,
+      "orbit_speed": 0.003,
+      "visual_radius": 850.0,
+      "planet_depth": 1000.0,
+      "moons": [],
+      "stations": []
+    }
+  ],
+
+  "belts": [
+    {
+      "inner_radius": 10500.0,
+      "outer_radius": 13000.0,
+      "density_multiplier": 2.5,
+      "asteroid_type_weights": { "small": 0.50, "medium": 0.35, "large": 0.15 }
+    }
+  ],
+
+  "spawn_zones": [
+    {
+      "id": "outer_planet_patrol",
+      "position": [14000, 0, 1500],
+      "radius": 600,
+      "ship_count": 3,
+      "ship_class": "axum-fighter-1",
+      "variant": "axum_fighter_patrol",
+      "ai_profile": "default",
+      "faction": "pirate"
+    },
+    {
+      "id": "asteroid_cluster_ambush",
+      "position": [5000, 0, -9000],
+      "radius": 800,
+      "ship_count": 2,
+      "ship_class": "axum-fighter-1",
+      "variant": "axum_fighter_patrol",
+      "ai_profile": "default",
+      "faction": "pirate"
+    },
+    {
+      "id": "belt_patrol",
+      "position": [-11000, 0, 3000],
+      "radius": 1200,
+      "ship_count": 4,
+      "ship_class": "axum-fighter-1",
+      "variant": "axum_fighter_patrol",
+      "ai_profile": "default",
+      "faction": "pirate"
+    }
+  ]
+}

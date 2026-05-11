@@ -3,7 +3,7 @@
 // Each instance is a flat QuadMesh. The vertex stage projects the instance center
 // to clip space and offsets the quad vertices in clip space so the star always
 // occupies at least min_pixel_radius screen pixels regardless of world distance.
-// Color and alpha come from per-instance custom data (INSTANCE_CUSTOM.rgba).
+// Color and alpha come from per-instance custom data (INSTANCE_CUSTOM_DATA.rgba).
 //
 // Depth handling: all LOD 0 stars are pinned to a fixed depth just inside the
 // far plane (0.0001 in Godot 4 Forward+ reversed-Z, same as star_screen_pass).
@@ -57,9 +57,9 @@ void fragment() {
 	// Soft glow falloff from center.
 	float glow = 1.0 - smoothstep(0.1, 1.0, d);
 
-	ALBEDO = INSTANCE_CUSTOM.rgb;
-	// INSTANCE_CUSTOM.a carries the LOD 0 crossfade weight (set by StarRegistry._update_multimesh()).
+	ALBEDO = INSTANCE_CUSTOM_DATA.rgb;
+	// INSTANCE_CUSTOM_DATA.a carries the LOD 0 crossfade weight (set by StarRegistry._update_multimesh()).
 	// 1.0 = fully visible; fades toward 0 as the star transitions to the LOD 1 screen-pass.
 	// mix() is the spec-required crossfade idiom — avoids hard pop at the LOD 0→1 boundary.
-	ALPHA  = mix(0.0, glow, INSTANCE_CUSTOM.a);
+	ALPHA  = mix(0.0, glow, INSTANCE_CUSTOM_DATA.a);
 }

@@ -43,7 +43,7 @@
   },
 
   "star_field": {
-    "star_count": 124000,
+    "star_count": 80000,
     "spread_xz": 16000.0,
     "spread_y": 8000.0,
     "point_size": 1.0,
@@ -226,5 +226,18 @@
     "physics_bodies_group": "physics_bodies",
     "icon_lod_distance": 8000.0,
     "warp_key": "warp"
+  },
+
+  "orchestrator": {
+    "starting_system_id": "sol_start",
+    "player_ship_class": "axum-fighter-1",
+    "player_ship_variant": "axum_fighter_patrol",
+    "player_faction": "militia",
+    "entry_distance": 4500.0,
+    "exit_thrust_duration": 2.0,
+    "fly_in_duration": 2.5,
+    "fade_duration": 0.6,
+    "cinematic_thrust_fraction": 1.0,
+    "fly_in_thrust_fraction": 0.7
   }
 }

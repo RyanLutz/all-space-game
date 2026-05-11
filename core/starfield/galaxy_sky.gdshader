@@ -161,5 +161,5 @@ void sky() {
 		rgb += col_bright.rgb * glow;
 	}
 
-	COLOR = vec4(rgb, 1.0);
+	COLOR = rgb;
 }

@@ -121,6 +121,11 @@ signal exclusion_zone_exited(ship: Node, star_index: int)
 signal warp_state_changed(ship: Node, old_state: String, new_state: String)
 signal warp_interrupted(ship: Node, reason: String)
 
+# ─── Cinematics ────────────────────────────────────────────────────────────────
+signal cinematic_active_changed(active: bool)
+signal system_transition_started(destination_id: String)
+signal system_transition_complete(system_id: String)
+
 # ─── Debug ─────────────────────────────────────────────────────────────────────
 signal debug_toggled(visible: bool)
 ```
@@ -346,6 +351,18 @@ new ship. A `null` value is valid — signals that the player has no active ship
 | Signal | Args | Emitted By | Listened By |
 |---|---|---|---|
 | `debug_toggled` | `visible: bool` | PilotLoopTest (F3 key) | Future: Debug overlays |
+
+---
+
+## Cinematic Signals
+
+| Signal | Args | Emitted By | Listened By |
+|---|---|---|---|
+| `cinematic_active_changed` | `active: bool` | GameOrchestrator | InputManager (disables/enables player input routing) |
+| `system_transition_started` | `destination_id: String` | GameOrchestrator | UI, Audio (future) |
+| `system_transition_complete` | `system_id: String` | GameOrchestrator | UI, AI spawners (future) |
+
+**`cinematic_active_changed` note:** When `active` is `true`, InputManager stops writing to the player ship's unified input interface entirely. When `false`, it resumes normal routing. This is the mechanism by which GameOrchestrator disables player input during exit and fly-in sequences without making a direct call into InputManager.
 
 ---
 
