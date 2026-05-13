@@ -2,10 +2,11 @@
 
 [ext_resource type="Script" path="res://gameplay/world/GameOrchestrator.gd" id="1_orchestrator"]
 [ext_resource type="Script" path="res://gameplay/camera/GameCamera.gd" id="2_camera"]
+[ext_resource type="Script" path="res://ui/galactic_map/GalaxyContainer.gd" id="3_galaxycontainer"]
 [ext_resource type="PackedScene" path="res://ui/PilotHUD.tscn" id="3_pilothud"]
 [ext_resource type="PackedScene" path="res://ui/ModeSwitch.tscn" id="4_modeswitch"]
-[ext_resource type="PackedScene" path="res://ui/galactic_map/GalacticMap.tscn" id="5_galacticmap"]
 [ext_resource type="Script" path="res://gameplay/world/ChunkStreamer.gd" id="6_chunkstreamer"]
+[ext_resource type="PackedScene" path="res://ui/debug/PerformanceOverlay.tscn" id="7_perfoverlay"]
 
 [node name="Main" type="Node3D"]
 
@@ -21,6 +22,9 @@ script = ExtResource("6_chunkstreamer")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 500, 0)
 script = ExtResource("2_camera")
 
+[node name="GalaxyContainer" type="Node3D" parent="GameCamera"]
+script = ExtResource("3_galaxycontainer")
+
 [node name="StarfieldEnvironment" type="WorldEnvironment" parent="."]
 
 [node name="UILayer" type="CanvasLayer" parent="."]
@@ -33,7 +37,6 @@ layer = 1
 [node name="GalacticMapLayer" type="CanvasLayer" parent="UILayer"]
 layer = 10
 
-[node name="GalacticMap" parent="UILayer/GalacticMapLayer" instance=ExtResource("5_galacticmap")]
 
 [node name="TransitionLayer" type="CanvasLayer" parent="."]
 layer = 100
@@ -46,3 +49,5 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0)
 mouse_filter = 2
+
+[node name="PerformanceOverlay" parent="." instance=ExtResource("7_perfoverlay")]

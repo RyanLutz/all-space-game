@@ -105,12 +105,16 @@
     ],
 
     "nebula_sky_shader": {
-      "skybox_star_limit": 3000,
+      "skybox_star_limit": 300,
       "galaxy_noise_influence": 0.00002,
       "coarse_frequency": 1.2,
       "fine_frequency": 4.5,
       "noise_warp_strength": 0.6,
-      "nebula_base_opacity": 0.35
+      "nebula_base_opacity": 0.35,
+      "proc_star_density": 0.997,
+      "proc_star_brightness": 0.8,
+      "proc_core_boost": 2.0,
+      "proc_disc_falloff": 0.4
     },
 
     "warp_range_min": 8000.0,
@@ -125,11 +129,11 @@
     },
 
     "star_types": {
-      "red_dwarf":    { "color": [1.0, 0.3, 0.1], "brightness": 0.35, "apparent_size": 0.0004 },
-      "yellow_dwarf": { "color": [1.0, 0.9, 0.5], "brightness": 0.70, "apparent_size": 0.0006 },
-      "blue_giant":   { "color": [0.5, 0.7, 1.0], "brightness": 1.40, "apparent_size": 0.0012 },
-      "neutron_star": { "color": [0.8, 0.9, 1.0], "brightness": 0.90, "apparent_size": 0.0003 },
-      "white_dwarf":  { "color": [0.95, 0.97, 1.0],"brightness": 0.50, "apparent_size": 0.0004 }
+      "red_dwarf":    { "color": [1.0, 0.3, 0.1], "brightness": 0.35, "apparent_size": 1.5 },
+      "yellow_dwarf": { "color": [1.0, 0.9, 0.5], "brightness": 0.70, "apparent_size": 2.0 },
+      "blue_giant":   { "color": [0.5, 0.7, 1.0], "brightness": 1.40, "apparent_size": 3.5 },
+      "neutron_star": { "color": [0.8, 0.9, 1.0], "brightness": 0.90, "apparent_size": 1.2 },
+      "white_dwarf":  { "color": [0.95, 0.97, 1.0],"brightness": 0.50, "apparent_size": 1.5 }
     }
   },
 
@@ -219,6 +223,18 @@
 
       "light_attenuation": 1.0
     }
+  },
+
+  "galaxy_map": {
+    "galaxy_scale": 100.0,
+    "lod_mesh_distance": 80.0,
+    "lod_billboard_distance": 400.0,
+    "lod_fade_range": 40.0,
+    "camera_move_speed": 50.0,
+    "camera_rotation_speed": 0.003,
+    "star_spawn_check_interval": 0.25,
+    "proc_field_cell_size": 800.0,
+    "proc_field_sphere_radius": 8000.0
   },
 
   "solar_system": {

@@ -6,7 +6,7 @@ render_mode use_debanding;
 // Each texel corresponds to one star (backdrop or destination).
 //
 // star_directions: RGBAF — (dir.x, dir.y, dir.z, apparent_size)
-//   apparent_size is the angular dot-product threshold for the star glow.
+//   apparent_size is now pixel radius (repurposed from angular threshold).
 // star_colors:     RGBA8  — (r, g, b, brightness)
 //   brightness is the luminosity weight; blue giants > 1.0, red dwarfs < 0.5.
 uniform sampler2D star_directions : filter_nearest, repeat_disable;
@@ -14,6 +14,7 @@ uniform sampler2D star_colors     : filter_nearest, repeat_disable;
 uniform int star_count = 0;
 uniform int tex_width  = 64;
 uniform int tex_height = 64;
+uniform vec2 viewport_size = vec2(1920.0, 1080.0);
 
 // ─── Nebula volumes ──────────────────────────────────────────────────────────
 // Uniform arrays — small count (< 32), packed by StarField._upload_nebula_uniforms().
@@ -41,6 +42,12 @@ uniform float nebula_base_opacity = 0.35;
 // 1.0 = close zoom (full nebula color and cloud detail visible)
 // In normal gameplay, leave at 0.0.
 uniform float map_zoom = 0.0;
+
+// ─── Procedural hash star field ──────────────────────────────────────────────
+uniform float proc_star_density    = 0.997;
+uniform float proc_star_brightness = 0.8;
+uniform float proc_core_boost      = 2.0;
+uniform float proc_disc_falloff    = 0.4;
 
 // ────────────────────────────────────────────────────────────────────────────
 //  Value noise — 3D hash-based
@@ -135,20 +142,125 @@ void sky() {
 	float nebula_opacity = mix(nebula_base_opacity, 1.0, map_zoom);
 	rgb += nebula_color * cloud * nebula_opacity;
 
+	// ── Procedural hash star field ───────────────────────────────────────────
+	// Grid in spherical coordinates for uniform angular cell size everywhere.
+	float grid_scale = 400.0;
+
+	vec3 proc_dir = normalize(EYEDIR);
+
+	// Convert to spherical coordinates for uniform cell distribution
+	// azimuth: 0 to 2π around the equator
+	// elevation: -π/2 to π/2 from south to north pole
+	float azimuth   = atan(proc_dir.x, proc_dir.z);         // -π to π
+	float elevation = asin(clamp(proc_dir.y, -1.0, 1.0));   // -π/2 to π/2
+
+	// Grid in spherical space — cells are uniform angular size everywhere
+	float az_cells  = grid_scale;
+	float el_cells  = grid_scale * 0.5;   // half because elevation range is π vs 2π
+
+	float az_norm   = (azimuth   / (2.0 * PI)) + 0.5;   // 0 to 1
+	float el_norm   = (elevation / PI)          + 0.5;   // 0 to 1
+
+	vec2 cell_2d    = floor(vec2(az_norm, el_norm) * vec2(az_cells, el_cells));
+	vec3 cell_id    = vec3(cell_2d, 0.0);   // keep vec3 for hash compatibility
+
+	// Hash this cell to get a deterministic value [0, 1]
+	float cell_hash = hash(cell_id * 7.3 + vec3(13.7, 5.1, 9.3));
+
+	// Galaxy structure: modulate density by galaxy position
+	// Core region (player_galaxy_position near origin) is denser
+	// Disc structure: Y component of galaxy position thins the field at edges
+	float gal_dist   = length(player_galaxy_position.xz) / 100000.0;
+	float core_factor = mix(proc_core_boost, 1.0, clamp(gal_dist, 0.0, 1.0));
+
+	// Disc factor: stars thin out above/below galactic plane
+	float disc_y      = abs(player_galaxy_position.y) / 8000.0;
+	float disc_factor = 1.0 - clamp(disc_y * proc_disc_falloff, 0.0, 0.85);
+
+	// Arm factor: subtle density increase in spiral arm directions
+	// Uses the same noise infrastructure as nebula for coherence
+	float arm_noise  = vnoise(proc_dir * 3.0 + player_galaxy_position * 0.000005);
+	float arm_factor = mix(0.85, 1.0, arm_noise);
+
+	// Combined star probability for this cell.
+	// proc_star_density near 1.0 means sparse; lower means denser.
+	float star_probability = (1.0 - proc_star_density) * core_factor * disc_factor * arm_factor;
+	star_probability = clamp(star_probability, 0.0, 1.0);
+
+	if (cell_hash < star_probability) {
+		// Reconstruct star direction from spherical cell center
+		vec2 cell_center_norm = (cell_2d + 0.5) / vec2(az_cells, el_cells);
+		float star_az  = (cell_center_norm.x - 0.5) * 2.0 * PI;
+		float star_el  = (cell_center_norm.y - 0.5) * PI;
+
+		// Add sub-cell jitter from hash
+		float jitter_az = (hash(cell_id + vec3(1.3, 0.0, 0.0)) - 0.5) * (2.0 * PI / az_cells) * 0.8;
+		float jitter_el = (hash(cell_id + vec3(0.0, 2.7, 0.0)) - 0.5) * (PI / el_cells) * 0.8;
+		star_az += jitter_az;
+		star_el += jitter_el;
+
+		// Convert back to Cartesian unit vector
+		float cos_el = cos(star_el);
+		vec3 star_dir = vec3(
+		    sin(star_az) * cos_el,
+		    sin(star_el),
+		    cos(star_az) * cos_el
+		);
+
+		// Angular distance from this fragment to the star center
+		float star_alignment = dot(proc_dir, star_dir);
+		float angular_thresh  = PI / el_cells;
+
+		if (star_alignment > 1.0 - angular_thresh) {
+			// Color variation from cell hash
+			float color_h = hash(cell_id * 3.1 + vec3(7.0, 2.0, 5.0));
+			vec3 star_color = mix(
+				vec3(1.0, 0.85, 0.7),
+				vec3(0.8, 0.9, 1.0),
+				color_h
+			);
+
+			// Brightness variation
+			float brightness_h = hash(cell_id * 5.7 + vec3(1.0, 9.0, 3.0));
+			float star_bright   = mix(0.3, 1.0, brightness_h) * proc_star_brightness;
+
+			// Soft disc glow
+			float t    = (star_alignment - (1.0 - angular_thresh)) / angular_thresh;
+			float glow = smoothstep(0.0, 1.0, t) * star_bright;
+
+			rgb += star_color * glow;
+		}
+	}
+	// ── End procedural star field ────────────────────────────────────────────
+
 	// ── Backdrop stars (rendered on top of nebula) ───────────────────────────
 	//
-	// Each star is a texel in the star_directions / star_colors textures.
-	// The inner loop dot-product check exits early for the vast majority of
-	// stars in any given fragment (only a tiny angular region of the sky is
-	// within any star's threshold), keeping GPU cost proportional to star
-	// density visible in the fragment's direction.
+	// Pixel-radius approach: apparent_size is now pixel radius.
+	// We convert pixel radius → angular radius using fragment derivatives,
+	// then use the same dot-product threshold math with a much tighter threshold.
 	for (int i = 0; i < star_count; i++) {
-		vec2 uv        = texel_uv(i);
-		vec4 dir_size  = texture(star_directions, uv);
-		vec4 col_bright = texture(star_colors,   uv);
+		vec2 uv         = texel_uv(i);
+		vec4 dir_size   = texture(star_directions, uv);
+		vec4 col_bright = texture(star_colors,     uv);
+
+		// Fast reject: star behind camera hemisphere
+		if (dot(EYEDIR, dir_size.xyz) < 0.0) {
+			continue;
+		}
 
 		float alignment = dot(EYEDIR, dir_size.xyz);
-		float threshold = dir_size.w;
+
+		// Convert pixel radius to angular radius.
+		// We approximate the angular size of one pixel by assuming a typical
+		// ~80° vertical FOV. This is coarse but keeps stars point-like and
+		// consistent across the sky without needing projection matrices.
+		float pixel_angle = 1.4 / viewport_size.y;
+
+		float angular_radius = dir_size.w * pixel_angle;
+
+		// Small-angle approximation: 1 - cos(θ) ≈ θ²/2
+		// This keeps the same threshold math shape but with much smaller values.
+		float threshold = angular_radius * angular_radius * 0.5;
 
 		// Early exit: this fragment is outside the star's visible cone
 		if (alignment < 1.0 - threshold) {

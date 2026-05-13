@@ -276,6 +276,16 @@ func rebuild_skybox(system_position: Vector3) -> void:
 		float(sky_cfg.get("noise_warp_strength", 0.6)))
 	sky_material.set_shader_parameter("nebula_base_opacity",
 		float(sky_cfg.get("nebula_base_opacity", 0.35)))
+	sky_material.set_shader_parameter("viewport_size",
+		Vector2(get_viewport().get_visible_rect().size))
+	sky_material.set_shader_parameter("proc_star_density",
+		float(sky_cfg.get("proc_star_density", 0.997)))
+	sky_material.set_shader_parameter("proc_star_brightness",
+		float(sky_cfg.get("proc_star_brightness", 0.8)))
+	sky_material.set_shader_parameter("proc_core_boost",
+		float(sky_cfg.get("proc_core_boost", 2.0)))
+	sky_material.set_shader_parameter("proc_disc_falloff",
+		float(sky_cfg.get("proc_disc_falloff", 0.4)))
 
 	_upload_nebula_uniforms(system_position)
 

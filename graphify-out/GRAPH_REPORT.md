@@ -1,7 +1,7 @@
-# Graph Report - /home/lutz/Projects/All Space  (2026-05-09)
+# Graph Report - /home/lutz/Projects/All Space  (2026-05-10)
 
 ## Corpus Check
-- 2 files · ~101,505 words
+- 2 files · ~102,119 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

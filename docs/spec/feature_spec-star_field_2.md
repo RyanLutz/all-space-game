@@ -331,6 +331,11 @@ stars it is expected to be imperceptible.
 
 ## Galactic Map
 
+> **SUPERSEDED** — The galactic map described in this section has been replaced by
+> `docs/spec/feature_spec-galaxy_map.md`. The new implementation uses a camera-attached
+> 3D MultiMesh rather than a 2D canvas SubViewport. The star catalog and StarField
+> autoload are unchanged.
+
 The galactic map is a UI mode toggled via `GameEventBus.galactic_map_toggled`. It
 renders as a `CanvasLayer` drawn over the game world — the underlying 3D scene does not
 change or unload.

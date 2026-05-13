@@ -67,6 +67,7 @@ From `docs/spec/core_spec.md` §19. Update this table at the end of every sessio
 | 26 | SolarSystem A–D complete. | Implemented |
 | 27 | Main Scene Integration — `Main.tscn`, `GameOrchestrator.gd`, warp transitions, hand-authored `sol_start` system. | Implemented |
 | 28 | Performance: removed superseded `StarRegistry` autoload, fixed `star_point.gdshader` `INSTANCE_CUSTOM` → `INSTANCE_CUSTOM_DATA`. | Implemented |
+| — | Galaxy Map (3D, camera-attached) | Implemented |
 
 **Status values:** `Not started` / `In progress` / `Implemented` / `Tested ✓`
 

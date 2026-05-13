@@ -1,3 +1,5 @@
+# SUPERSEDED — replaced by GalaxyContainer.gd + GalaxyBillboardField.gd + GalaxyStar.gd
+# Do not extend or modify. Retained for reference only. Safe to delete after validation.
 extends Control
 class_name GalacticMap
 
@@ -41,6 +43,10 @@ var map_zoom: float = 0.0
 
 var _current_system: SFStarRecord = null
 
+var _backdrop_viewport: SubViewport = null
+var _backdrop_dirty: bool = true
+var _backdrop_texture: ViewportTexture = null
+
 
 func _ready() -> void:
 	var sl := Engine.get_singleton("ServiceLocator")
@@ -52,6 +58,7 @@ func _ready() -> void:
 	_sync_current_system()
 	visible = false
 	mouse_filter = MOUSE_FILTER_STOP
+	_setup_backdrop_viewport()
 
 
 ## Called by the warp system (or test scene) to tell the map which system the
@@ -78,6 +85,8 @@ func _on_map_toggled(open: bool) -> void:
 	if open:
 		_sync_current_system()
 		_reset_view()
+		_backdrop_dirty = true
+		_render_backdrop()
 		queue_redraw()
 	else:
 		_push_map_zoom_to_shader(0.0)
@@ -142,6 +151,8 @@ func _gui_input(event: InputEvent) -> void:
 				accept_event()
 	elif event is InputEventMouseMotion and _dragging:
 		_pan = _pan_at_drag + (event.position - _drag_start)
+		_backdrop_dirty = true
+		_render_backdrop()
 		queue_redraw()
 		accept_event()
 
@@ -165,6 +176,8 @@ func _zoom_at(factor: float, pivot: Vector2) -> void:
 	_pan = (pivot - center) * (1.0 - ratio) + _pan * ratio
 	_scale = new_scale
 	_recalc_map_zoom()
+	_backdrop_dirty = true
+	_render_backdrop()
 	queue_redraw()
 
 
@@ -188,6 +201,42 @@ func _try_select(screen_pos: Vector2) -> void:
 		_bus.warp_destination_selected.emit(best.system_id)
 
 
+# ── Backdrop caching ─────────────────────────────────────────────────────────
+
+func _setup_backdrop_viewport() -> void:
+	_backdrop_viewport = SubViewport.new()
+	_backdrop_viewport.size = Vector2i(int(size.x), int(size.y))
+	_backdrop_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	_backdrop_viewport.transparent_bg = true
+	add_child(_backdrop_viewport)
+	_backdrop_texture = _backdrop_viewport.get_texture()
+
+
+func _render_backdrop() -> void:
+	if _backdrop_viewport == null:
+		return
+
+	# Clear existing children
+	for child in _backdrop_viewport.get_children():
+		child.queue_free()
+
+	# Create a one-shot draw control
+	var draw_node := _BackdropDrawer.new()
+	draw_node.galaxy_map = self
+	draw_node.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_backdrop_viewport.add_child(draw_node)
+	_backdrop_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	_backdrop_dirty = false
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		if _backdrop_viewport != null:
+			_backdrop_viewport.size = Vector2i(int(size.x), int(size.y))
+		_backdrop_dirty = true
+		_render_backdrop()
+
+
 # ── Drawing ──────────────────────────────────────────────────────────────────
 
 func _draw() -> void:
@@ -203,21 +252,9 @@ func _draw() -> void:
 	var current_pos: Vector3 = \
 		_current_system.galaxy_position if _current_system != null else Vector3.ZERO
 
-	# ── Backdrop stars ───────────────────────────────────────────────────────
-	for star: SFStarRecord in _starfield.get_catalog():
-		if star.is_destination:
-			continue
-		var sp := _galaxy_to_screen(star.galaxy_position)
-		if sp.x < -4.0 or sp.x > size.x + 4.0 \
-				or sp.y < -4.0 or sp.y > size.y + 4.0:
-			continue
-		var col: Color
-		if is_close:
-			col = star.color
-			col.a = 0.55
-		else:
-			col = _BACKDROP_MONO
-		draw_circle(sp, _R_BACKDROP, col)
+	# ── Backdrop stars (cached) ──────────────────────────────────────────────
+	if _backdrop_texture != null:
+		draw_texture(_backdrop_texture, Vector2.ZERO)
 
 	# Galaxy boundary ring (orientation aid)
 	var gr := _galaxy_radius()
@@ -288,3 +325,25 @@ func _draw() -> void:
 		"Scroll=zoom  Drag=pan  Click=warp  Esc=close",
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 11,
 		Color(0.55, 0.65, 0.75, 0.65))
+
+
+class _BackdropDrawer extends Control:
+	var galaxy_map: GalacticMap
+
+	func _draw() -> void:
+		if galaxy_map == null:
+			return
+		var catalog = galaxy_map._starfield.get_catalog()
+		for star in catalog:
+			if star.is_destination:
+				continue
+			var screen_pos: Vector2 = galaxy_map._galaxy_to_screen(star.galaxy_position)
+			if screen_pos.x < -10 or screen_pos.x > galaxy_map.size.x + 10:
+				continue
+			if screen_pos.y < -10 or screen_pos.y > galaxy_map.size.y + 10:
+				continue
+			# Monochrome at full zoom, color at close zoom
+			var col: Color = Color(0.5, 0.5, 0.6, 0.3)
+			if galaxy_map.map_zoom > 0.55:
+				col = Color(star.color.r, star.color.g, star.color.b, 0.4)
+			draw_circle(screen_pos, 1.0, col)

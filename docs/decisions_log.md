@@ -1262,3 +1262,23 @@ single playable experience.
 - Skybox visibly different after warp ✓
 - No direct cross-system calls — all coordination via GameEventBus ✓
 - All timings/distances from `world_config.json` orchestrator block ✓
+
+---
+
+## 2026-05-12 — Galaxy Map: 2D canvas replaced with camera-attached 3D MultiMesh
+
+Agent:    Kimi K2.6
+System:   Galaxy Map
+Spec:     docs/spec/feature_spec-galaxy_map.md
+Decision: GalacticMap.gd (2D canvas SubViewport) superseded by GalaxyContainer.gd
+          (MultiMeshInstance3D attached to GameCamera). Old files retained for
+          reference, marked superseded. New architecture enables seamless scale
+          transition from pilot view to full galaxy without scene change.
+          GalaxyContainer manages three LOD tiers: procedural field shader sphere
+          (far), MultiMesh billboard field (mid), individual GalaxyStar mesh nodes
+          (close) with crossfade at boundaries. GameCamera extended with free-flight
+          galaxy map mode (WASD+RF, right-mouse rotate, click/double-click selection).
+          InputManager routes M key to toggle_galaxy_map action and suppresses ship
+          input during galaxy map mode. PerformanceMonitor metrics registered for
+          mesh star count, billboard instances, and population update time.
+Spec updated: yes
