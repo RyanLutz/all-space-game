@@ -3,7 +3,6 @@ render_mode unshaded, depth_draw_never, cull_disabled, blend_add;
 
 uniform float galaxy_scale : hint_range(1.0, 1000.0) = 100.0;
 uniform float proc_field_cell_size : hint_range(100.0, 5000.0) = 800.0;
-uniform float lod_billboard_distance : hint_range(100.0, 2000.0) = 400.0;
 uniform float proc_star_density : hint_range(0.9, 1.0) = 0.997;
 uniform float proc_core_boost : hint_range(0.5, 5.0) = 2.0;
 uniform float proc_disc_falloff : hint_range(0.0, 2.0) = 0.4;
@@ -66,9 +65,6 @@ void fragment() {
 	float star_prob = (1.0 - proc_star_density) * core_factor * disc_factor * arm_factor;
 	star_prob = clamp(star_prob, 0.0, 1.0);
 
-	// Fade out near lod_billboard_distance so field doesn't overlap MultiMesh stars
-	float field_alpha = smoothstep(lod_billboard_distance * 0.5, lod_billboard_distance, cam_dist);
-
 	vec3 color = vec3(0.0);
 	float alpha = 0.0;
 	if (cell_hash < star_prob) {
@@ -76,8 +72,8 @@ void fragment() {
 		vec3 star_color = mix(vec3(1.0, 0.85, 0.7), vec3(0.8, 0.9, 1.0), color_h);
 		float brightness_h = hash(cell_id * 5.7 + vec3(1.0, 9.0, 3.0));
 		float star_bright = mix(0.3, 1.0, brightness_h) * 0.8;
-		color = star_color * star_bright * field_alpha;
-		alpha = star_bright * field_alpha * 0.5;
+		color = star_color * star_bright;
+		alpha = star_bright * 0.5;
 	}
 
 	ALBEDO = color;

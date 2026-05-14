@@ -42,8 +42,8 @@ for readability — GDScript does not require them to be grouped, but maintain t
 extends Node
 
 # ─── Combat ────────────────────────────────────────────────────────────────────
-signal projectile_hit(target: Node, damage: float, damage_type: String,
-                      position: Vector3, component_ratio: float)
+signal projectile_hit(position: Vector3, normal: Vector3, surface_type: String)
+signal missile_detonated(position: Vector3, explosion_id: String)
 signal ship_destroyed(ship: Node, position: Vector3, faction: String)
 signal weapon_fired(ship: Node, weapon_id: String, position: Vector3)
 signal hardpoint_state_changed(ship: Node, hardpoint_id: String, new_state: String)
@@ -62,6 +62,7 @@ signal request_spawn_guided(position: Vector3, velocity: Vector3,
                             owner_id: int)
 
 # ─── Ship State ─────────────────────────────────────────────────────────────────
+signal ship_spawned(ship: Node)
 signal shield_depleted(ship: Node)
 signal hull_critical(ship: Node, percent: float)
 signal power_depleted(ship: Node)
@@ -99,7 +100,7 @@ signal request_formation_destination(ship_id: int, destination: Vector3)
 signal navigation_order_completed(ship_id: int)
 
 # ─── Damage ───────────────────────────────────────────────────────────────────
-signal ship_damaged(victim: Node, attacker: Node)
+signal ship_damaged(victim: Node, attacker: Node, amount: float)
 
 # ─── Station ───────────────────────────────────────────────────────────────────
 signal dock_requested(ship: Node, station: Node)
@@ -136,7 +137,8 @@ signal debug_toggled(visible: bool)
 
 | Signal | Args | Emitted By | Listened By |
 |---|---|---|---|
-| `projectile_hit` | `target: Node, damage: float, damage_type: String, position: Vector3, component_ratio: float` | ProjectileManager, GuidedProjectilePool | Ship (damage pipeline) |
+| `projectile_hit` | `position: Vector3, normal: Vector3, surface_type: String` | ProjectileManager | VFXManager |
+| `missile_detonated` | `position: Vector3, explosion_id: String` | GuidedProjectilePool | VFXManager |
 | `ship_destroyed` | `ship: Node, position: Vector3, faction: String` | Ship | SelectionState, EscortQueue, StanceController, future: VFX, Audio |
 | `weapon_fired` | `ship: Node, weapon_id: String, position: Vector3` | WeaponComponent, ProjectileManager (hitscan) | Future: VFX, Audio |
 | `hardpoint_state_changed` | `ship: Node, hardpoint_id: String, new_state: String` | HardpointComponent | Future: Ship (capability update), UI |
@@ -144,7 +146,9 @@ signal debug_toggled(visible: bool)
 
 **`hardpoint_state_changed` — `new_state` values:** `"nominal"`, `"damaged"`, `"critical"`, `"destroyed"`
 
-**`projectile_hit` — `component_ratio` note:** The ratio of damage routed to the hardpoint vs hull. `0.0` for a pure-hull hit. Determined by `weapon_data.component_damage_ratio`. The Ship damage pipeline splits the hit internally using this value — listeners do not need to re-derive it.
+**`projectile_hit` — note:** Emitted after damage has already been applied by ProjectileManager. Listeners use this for VFX and audio only — damage application is not their responsibility. `surface_type` values: `"hull"`, `"shield"`.
+
+**`missile_detonated` — `explosion_id` note:** References a content/effects/ folder defining the explosion layers. VFXManager uses this to select the appropriate layered explosion effect.
 
 **`projectile_spawned` — status:** Defined but not yet emitted by any system. Reserved for VFX tracer effects.
 
@@ -174,6 +178,7 @@ shadowing GDScript's built-in `range()` function.
 
 | Signal | Args | Emitted By | Listened By |
 |---|---|---|---|
+| `ship_spawned` | `ship: Node` | ShipFactory | VFXManager (caches explosion_id per ship) |
 | `shield_depleted` | `ship: Node` | Ship | Future: AI (press advantage), Audio, VFX |
 | `hull_critical` | `ship: Node, percent: float` | Ship | Future: AI (flee trigger), UI (hull warning) |
 | `power_depleted` | `ship: Node` | *(not yet emitted)* | Future: WeaponComponent (cease fire), UI (power warning) |
@@ -187,6 +192,8 @@ while shields remain depleted. Emitted again the next time shields are depleted 
 recovering above zero.
 
 **`power_depleted` — status:** Defined but not yet emitted. Reserved for future power management.
+
+**`ship_spawned` note:** Emitted after the ship is fully assembled and added to the scene tree by ShipFactory. VFXManager listens to cache an `explosion_id` per ship so the correct explosion effect is available immediately when `ship_destroyed` fires.
 
 ---
 
@@ -215,11 +222,15 @@ may have been freed between emission and receipt.
 
 | Signal | Args | Emitted By | Listened By |
 |---|---|---|---|
-| `ship_damaged` | `victim: Node, attacker: Node` | Ship | StanceController (defensive fan-out) |
+| `ship_damaged` | `victim: Node, attacker: Node, amount: float` | Ship | StanceController (defensive fan-out) |
 
 **`attacker` note:** May be `null` if the attacker is unknown or has been freed.
 Listeners must null-check. `attacker_id` is resolved via `instance_from_id()` in
 Ship.apply_damage before emitting.
+
+**`amount` note:** The final damage value after shield absorption. Listeners may use this
+to determine the significance of the hit — AI defensive response, screen shake magnitude,
+etc. `attacker` may be null if the source is unknown or has been freed.
 
 ---
 
@@ -428,6 +439,14 @@ undocumented listeners create invisible dependencies that break future refactori
 ---
 
 ## Audit Log
+
+**2026-05-14 — Spec corrections from codebase audit:**
+Spec updated to match authoritative code in all cases.
+- `projectile_hit`: replaced damage-application signature with VFX-notification signature `(position, normal, surface_type)`. Emitter updated to ProjectileManager only; listener updated to VFXManager only.
+- `ship_damaged`: added `amount: float` third parameter (final post-absorption damage value).
+- `ship_spawned`: added to Ship State Signals — emitted by ShipFactory after full assembly.
+- `missile_detonated`: added to Combat Signals — emitted by GuidedProjectilePool with `explosion_id`.
+- GDScript definitions block updated to match all table changes.
 
 **2026-05-04 — Solar System + Warp signals added (spec-only):**
 Added `system_loaded`, `system_unloaded`, `origin_shifted`, `exclusion_zone_entered`,

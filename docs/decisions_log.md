@@ -1282,3 +1282,18 @@ Decision: GalacticMap.gd (2D canvas SubViewport) superseded by GalaxyContainer.g
           input during galaxy map mode. PerformanceMonitor metrics registered for
           mesh star count, billboard instances, and population update time.
 Spec updated: yes
+
+---
+
+## 2026-05-14 — Spec corrections from codebase audit
+Agent:    Claude Sonnet (Claude Code)
+System:   GameEventBus / Galaxy Map / Dead Code
+Spec:     feature_spec-game_event_bus_signals.md, feature_spec-galaxy_map.md
+Problem:  Audit found five discrepancies between specs and implementation.
+Decision: Code was authoritative in all cases. Specs updated to match:
+          - projectile_hit: damage-application spec replaced with VFX-notification spec
+          - ship_damaged: amount parameter added to spec
+          - ship_spawned, missile_detonated: added to signal spec
+          - lod_billboard_distance: removed from shader and config (concept eliminated)
+          - core/stars/: deleted (superseded, no active references)
+Spec updated: yes
