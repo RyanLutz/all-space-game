@@ -2,8 +2,6 @@
 
 [ext_resource type="Script" uid="uid://cg7rdxijvq2ce" path="res://test/CombatTest.gd" id="1"]
 [ext_resource type="Script" uid="uid://jkdrnv1bl10d" path="res://gameplay/camera/GameCamera.gd" id="2"]
-[ext_resource type="PackedScene" path="res://gameplay/world/StarField.tscn" id="3"]
-
 [node name="CombatTest" type="Node3D" unique_id=1154561129]
 script = ExtResource("1")
 
@@ -35,4 +33,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -200, 0, -100)
 [node name="DummyTargetSpawn" type="Marker3D" parent="SpawnPoints" unique_id=380619831]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 300)
 
-[node name="StarField" parent="." unique_id=992006435 instance=ExtResource("3")]

@@ -227,8 +227,9 @@
 
   "galaxy_map": {
     "galaxy_scale": 100.0,
+    "billboard_pixel_size": 0.01,
+    "mesh_star_radius": 0.5,
     "lod_mesh_distance": 80.0,
-    "lod_billboard_distance": 400.0,
     "lod_fade_range": 40.0,
     "camera_move_speed": 50.0,
     "camera_rotation_speed": 0.003,

@@ -25,8 +25,6 @@ script = ExtResource("2_camera")
 [node name="GalaxyContainer" type="Node3D" parent="GameCamera"]
 script = ExtResource("3_galaxycontainer")
 
-[node name="StarfieldEnvironment" type="WorldEnvironment" parent="."]
-
 [node name="UILayer" type="CanvasLayer" parent="."]
 layer = 1
 

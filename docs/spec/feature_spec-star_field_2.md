@@ -628,8 +628,12 @@ entirely on the GPU.
 | `core/starfield/StarRecord.gd` | Data class for a single star or destination system |
 | `core/starfield/NebulaVolume.gd` | Data class for a nebula volume |
 | `core/starfield/galaxy_sky.gdshader` | Custom sky shader; renders backdrop stars and nebulae |
-| `ui/galactic_map/GalacticMap.tscn` | CanvasLayer; galactic map UI |
-| `ui/galactic_map/GalacticMap.gd` | Map rendering, zoom, pan, system selection |
+| `ui/galactic_map/GalaxyContainer.gd` | 3D galaxy map root; LOD manager, spatial hash |
+| `ui/galactic_map/GalaxyBillboardField.gd` | MultiMeshInstance3D far-LOD star renderer |
+| `ui/galactic_map/GalaxyStar.gd` | Close-LOD individual mesh star |
+| `ui/galactic_map/GalaxyStar.tscn` | Scene for GalaxyStar (Area3D + CollisionShape3D) |
+| `ui/galactic_map/galaxy_billboard.gdshader` | Per-instance billboard star shader |
+| `core/starfield/galaxy_map_field.gdshader` | Procedural density field backdrop shader |
 | `data/world_config.json` | Extended with `starfield` block |
 
 ---

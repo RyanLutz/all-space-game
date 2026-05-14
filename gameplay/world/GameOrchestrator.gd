@@ -19,7 +19,7 @@ var _ship_factory: ShipFactory = null
 var _world: Node3D = null
 var _game_camera: Camera3D = null
 var _fade_rect: ColorRect = null
-var _galactic_map: GalacticMap = null
+var _in_galaxy_map: bool = false
 
 # ─── Autoload references ────────────────────────────────────────────────────
 var _event_bus: Node = null
@@ -40,7 +40,6 @@ func _ready() -> void:
 
 	_load_config()
 	_resolve_sibling_references()
-	_setup_skybox()
 	_setup_fleet_command()
 	_setup_input()
 
@@ -79,43 +78,8 @@ func _resolve_sibling_references() -> void:
 	_world = main.get_node_or_null("World")
 	_game_camera = main.get_node_or_null("GameCamera")
 	_fade_rect = main.get_node_or_null("TransitionLayer/FadeRect")
-	_galactic_map = main.get_node_or_null("UILayer/GalacticMapLayer/GalacticMap")
+	# Galaxy map is now a camera-attached child; GameCamera owns toggle input
 
-
-# ─── Skybox setup ───────────────────────────────────────────────────────────
-
-func _setup_skybox() -> void:
-	if _starfield == null:
-		push_error("[GameOrchestrator] StarField autoload not found.")
-		return
-
-	var shader := load("res://core/starfield/galaxy_sky.gdshader") as Shader
-	if shader == null:
-		push_error("[GameOrchestrator] Cannot load galaxy_sky.gdshader")
-		return
-
-	var mat := ShaderMaterial.new()
-	mat.shader = shader
-
-	var sky_res := Sky.new()
-	sky_res.sky_material = mat
-	sky_res.process_mode = Sky.PROCESS_MODE_QUALITY
-
-	var env := Environment.new()
-	env.background_mode = Environment.BG_SKY
-	env.sky = sky_res
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_sky_contribution = 0.5
-
-	# Use existing WorldEnvironment if present, otherwise create one
-	var world_env: WorldEnvironment = get_parent().get_node_or_null("StarfieldEnvironment")
-	if world_env == null:
-		world_env = WorldEnvironment.new()
-		world_env.name = "StarfieldEnvironment"
-		get_parent().add_child.call_deferred(world_env)
-	world_env.environment = env
-
-	_starfield.sky_material = mat
 
 
 # ─── Fleet Command wiring ───────────────────────────────────────────────────
@@ -190,21 +154,14 @@ func _setup_fleet_command() -> void:
 # ─── Input ──────────────────────────────────────────────────────────────────
 
 func _setup_input() -> void:
-	# Galactic map toggle (M key)
-	# Note: Esc closes the map from within GalacticMap itself.
+	# Galaxy map toggle is handled by GameCamera.
 	pass
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.physical_keycode == KEY_M:
-			if _event_bus:
-				# Toggle: if map is visible, close it; otherwise open it
-				var is_open := false
-				if _galactic_map:
-					is_open = _galactic_map.visible
-				_event_bus.galactic_map_toggled.emit(not is_open)
-				get_viewport().set_input_as_handled()
+	# Galaxy map toggle (M key) is handled by GameCamera._unhandled_input.
+	# GameOrchestrator only reacts to the resulting signals (see _ready).
+	pass
 
 
 # ─── System Loading ─────────────────────────────────────────────────────────
@@ -243,12 +200,10 @@ func _load_system(system_id: String, galaxy_seed: int, is_initial: bool = false)
 	# 3. Spawn enemies
 	var spawn_zones: Array = manifest.get("spawn_zones", [])
 	_spawn_enemies(spawn_zones)
-
-	# 4. Look up / create StarRecord and rebuild skybox
+	# 4. Look up / create StarRecord
 	var galaxy_pos: Vector3 = _extract_galaxy_position(manifest)
 	var record := _find_or_create_star_record(system_id, galaxy_pos)
 	if _starfield:
-		_starfield.rebuild_skybox(galaxy_pos)
 		_starfield.current_system = record
 
 	# 5. Spawn player (initial load only)

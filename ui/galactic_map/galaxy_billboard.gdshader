@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, depth_draw_never;
+render_mode unshaded, depth_draw_never, blend_add;
 
 uniform float point_size : hint_range(0.5, 10.0) = 3.0;
 
@@ -32,5 +32,6 @@ void fragment() {
 	// Destination stars are brighter
 	float brightness = col.a * (1.0 + is_dest * 0.5);
 
-	ALBEDO = col.rgb * brightness * alpha * 2.0;
+	ALBEDO = col.rgb * brightness * 2.0;
+	ALPHA = alpha;
 }

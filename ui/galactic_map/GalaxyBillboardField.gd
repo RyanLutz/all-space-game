@@ -6,6 +6,7 @@ extends MultiMeshInstance3D
 var _multimesh: MultiMesh
 var _instance_map: Dictionary = {}   # star.id -> instance index
 var _galaxy_scale: float = 100.0
+var _billboard_pixel_size: float = 0.01
 
 
 func _ready() -> void:
@@ -16,7 +17,7 @@ func _ready() -> void:
 	multimesh = _multimesh
 
 	var quad := QuadMesh.new()
-	quad.size = Vector2(1.0, 1.0)
+	quad.size = Vector2(_billboard_pixel_size, _billboard_pixel_size)
 	_multimesh.mesh = quad
 
 	var mat := ShaderMaterial.new()
@@ -28,6 +29,10 @@ func _ready() -> void:
 
 func set_galaxy_scale(scale: float) -> void:
 	_galaxy_scale = scale
+
+
+func set_billboard_pixel_size(size: float) -> void:
+	_billboard_pixel_size = size
 
 
 func populate(stars: Array, _camera_pos: Vector3) -> void:
@@ -55,6 +60,12 @@ func set_instance_alpha(star_id: int, alpha: float) -> void:
 	var cur := _multimesh.get_instance_custom_data(i)
 	cur.r = alpha
 	_multimesh.set_instance_custom_data(i, cur)
+
+
+func clear() -> void:
+	if _multimesh:
+		_multimesh.instance_count = 0
+	_instance_map.clear()
 
 
 func instance_count() -> int:

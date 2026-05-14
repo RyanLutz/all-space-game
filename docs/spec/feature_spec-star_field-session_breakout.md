@@ -38,7 +38,7 @@ Takes the test scene camera and wraps it in a proper UI mode. The MultiMesh from
 Session 1 stays — this session adds interaction on top.
 
 **Delivers:**
-- `GalacticMap.gd` / `GalacticMap.tscn` as a `CanvasLayer`
+- `GalaxyContainer.gd` / `GalaxyBillboardField.gd` / `GalaxyStar.gd` — 3D camera-attached galaxy map
 - Toggle via `GameEventBus.galactic_map_toggled`
 - Destination systems highlighted distinctly from backdrop stars
 - Reachable systems glow based on warp range from current position

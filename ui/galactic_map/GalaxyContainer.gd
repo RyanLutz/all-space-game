@@ -31,8 +31,8 @@ var _grid_cell_size: float = 400.0
 # ─── Config (loaded from world_config.json) ───────────────────────────────────
 var galaxy_scale: float = 100.0
 var lod_mesh_distance: float = 80.0
-var lod_billboard_distance: float = 400.0
 var lod_fade_range: float = 40.0
+var billboard_pixel_size: float = 0.01
 var spawn_check_interval: float = 0.25
 var proc_field_cell_size: float = 800.0
 var proc_field_sphere_radius: float = 8000.0
@@ -87,8 +87,8 @@ func _load_config() -> void:
 	var cfg: Dictionary = data["galaxy_map"]
 	galaxy_scale = float(cfg.get("galaxy_scale", 100.0))
 	lod_mesh_distance = float(cfg.get("lod_mesh_distance", 80.0))
-	lod_billboard_distance = float(cfg.get("lod_billboard_distance", 400.0))
 	lod_fade_range = float(cfg.get("lod_fade_range", 40.0))
+	billboard_pixel_size = float(cfg.get("billboard_pixel_size", 0.01))
 	spawn_check_interval = float(cfg.get("star_spawn_check_interval", 0.25))
 	proc_field_cell_size = float(cfg.get("proc_field_cell_size", 800.0))
 	proc_field_sphere_radius = float(cfg.get("proc_field_sphere_radius", 8000.0))
@@ -166,6 +166,8 @@ func _build_tiers() -> void:
 		return
 	_billboard_field.name = "BillboardField"
 	_billboard_field.set_galaxy_scale(galaxy_scale)
+	_billboard_field.set_billboard_pixel_size(billboard_pixel_size)
+	_billboard_field.visible = false
 	add_child(_billboard_field)
 
 	# Procedural field sphere
@@ -182,14 +184,15 @@ func _build_tiers() -> void:
 	mat.shader = preload("res://core/starfield/galaxy_map_field.gdshader")
 	mat.set_shader_parameter("galaxy_scale", galaxy_scale)
 	mat.set_shader_parameter("proc_field_cell_size", proc_field_cell_size)
-	mat.set_shader_parameter("lod_billboard_distance", lod_billboard_distance)
 	_procedural_field.material_override = mat
 	_procedural_field.layers = 1
+	_procedural_field.visible = false
 	add_child(_procedural_field)
 
 	# Star container for mesh-tier nodes
 	_star_container = Node3D.new()
 	_star_container.name = "StarContainer"
+	_star_container.visible = false
 	add_child(_star_container)
 
 
@@ -198,7 +201,6 @@ func _update_procedural_field_uniforms() -> void:
 		var mat: ShaderMaterial = _procedural_field.material_override
 		mat.set_shader_parameter("galaxy_scale", galaxy_scale)
 		mat.set_shader_parameter("proc_field_cell_size", proc_field_cell_size)
-		mat.set_shader_parameter("lod_billboard_distance", lod_billboard_distance)
 
 
 # ─── Services & monitors ──────────────────────────────────────────────────────
@@ -235,10 +237,12 @@ func _update_star_populations() -> void:
 
 	_sync_current_system()
 
-	var cam_pos := global_position
+	# GalaxyContainer is positioned at the camera in _process(), so local origin
+	# is always the camera position. Use Vector3.ZERO for distance queries.
+	var cam_pos := Vector3.ZERO
 
 	# Skip if camera hasn't moved enough since last update
-	if cam_pos.distance_to(_last_cam_pos) < _cam_move_threshold:
+	if global_position.distance_to(_last_cam_pos) < _cam_move_threshold:
 		if _perf:
 			_perf.end("GalaxyMap.population_update")
 			_perf.set_count("GalaxyMap.mesh_star_nodes", _mesh_star_nodes.size())
@@ -251,37 +255,26 @@ func _update_star_populations() -> void:
 		if _perf:
 			_perf.end("GalaxyMap.crossfade_update")
 		return
-	_last_cam_pos = cam_pos
+	_last_cam_pos = global_position
 
 	var mesh_stars: Array = []
-	var billboard_stars: Array = []
 	# Crossfade data: star_id -> mesh_alpha (only for stars near boundaries)
 	var crossfade_data: Dictionary = {}
 
 	# Use spatial grid to only check stars near camera
-	var query_radius := lod_billboard_distance + lod_fade_range
+	var query_radius := lod_mesh_distance + lod_fade_range
 	var nearby_stars := _get_nearby_stars(cam_pos, query_radius)
 
 	for star: SFStarRecord in nearby_stars:
 		var pos := _scaled_pos(star)
 		var dist := cam_pos.distance_to(pos)
 		var in_mesh_zone := dist < lod_mesh_distance + lod_fade_range
-		var in_billboard_zone := dist < lod_billboard_distance + lod_fade_range
 
-		if in_mesh_zone:
+		if in_mesh_zone and lod_mesh_distance > 0.0:
 			mesh_stars.append(star)
 			crossfade_data[star.id] = _compute_blend(dist)
-		elif in_billboard_zone:
-			billboard_stars.append(star)
-			# Only compute crossfade if near the outer billboard boundary
-			if dist > lod_billboard_distance - lod_fade_range:
-				crossfade_data[star.id] = _compute_blend(dist)
 
 	_sync_mesh_nodes(mesh_stars)
-	if _billboard_field != null:
-		_billboard_field.populate(billboard_stars, cam_pos)
-	else:
-		push_warning("GalaxyContainer: _billboard_field is null in _update_star_populations")
 
 	if _perf:
 		_perf.end("GalaxyMap.population_update")
@@ -307,15 +300,15 @@ func _sync_mesh_nodes(mesh_stars: Array) -> void:
 		needed[star.id] = star
 		if _mesh_star_nodes.has(star.id):
 			var node: GalaxyStar = _mesh_star_nodes[star.id]
-			node.global_position = _scaled_pos(star)
+			node.position = _scaled_pos(star)
 			node.set_reachable(_is_reachable(star))
 		else:
 			var node: GalaxyStar = preload("res://ui/galactic_map/GalaxyStar.tscn").instantiate()
 			node.setup(star)
 			node.set_reachable(_is_reachable(star))
 			_star_container.add_child(node)
-			# Set position AFTER adding to tree to avoid !is_inside_tree() error
-			node.global_position = _scaled_pos(star)
+			# Position is LOCAL to StarContainer which is LOCAL to GalaxyContainer
+			node.position = _scaled_pos(star)
 			_mesh_star_nodes[star.id] = node
 
 	# Remove stars no longer needed
@@ -323,6 +316,14 @@ func _sync_mesh_nodes(mesh_stars: Array) -> void:
 		if not needed.has(id):
 			_mesh_star_nodes[id].queue_free()
 			_mesh_star_nodes.erase(id)
+
+
+# ─── Mesh node cleanup ─────────────────────────────────────────────────────────
+
+func _clear_mesh_nodes() -> void:
+	for node in _mesh_star_nodes.values():
+		node.queue_free()
+	_mesh_star_nodes.clear()
 
 
 # ─── Crossfade ─────────────────────────────────────────────────────────────────
@@ -370,12 +371,28 @@ func clear_selection() -> void:
 
 # ─── Event bus handlers ───────────────────────────────────────────────────────
 
-func _on_game_mode_changed(_old_mode: String, new_mode: String) -> void:
+func _on_game_mode_changed(old_mode: String, new_mode: String) -> void:
 	if new_mode == "galaxy_map":
+		_star_container.visible = true
+		if _billboard_field:
+			_billboard_field.visible = true
 		spawn_check_interval = _get_config_float("star_spawn_check_interval", 0.25)
-	else:
+		lod_mesh_distance = _get_config_float("lod_mesh_distance", 80.0)
+		if _procedural_field:
+			_procedural_field.visible = true
+		_billboard_field.populate(_catalog, Vector3.ZERO)
+		_update_star_populations()
+	elif old_mode == "galaxy_map":
+		_star_container.visible = false
+		_clear_mesh_nodes()
+		if _billboard_field:
+			_billboard_field.clear()
+			_billboard_field.visible = false
 		spawn_check_interval = _get_config_float("star_spawn_check_interval", 0.25) * 2.0
+		lod_mesh_distance = 0.0
 		clear_selection()
+		if _procedural_field:
+			_procedural_field.visible = false
 
 
 func _on_system_transition_complete(_system_id: String) -> void:

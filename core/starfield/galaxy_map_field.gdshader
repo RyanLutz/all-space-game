@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, depth_draw_never, cull_disabled;
+render_mode unshaded, depth_draw_never, cull_disabled, blend_add;
 
 uniform float galaxy_scale : hint_range(1.0, 1000.0) = 100.0;
 uniform float proc_field_cell_size : hint_range(100.0, 5000.0) = 800.0;
@@ -70,13 +70,16 @@ void fragment() {
 	float field_alpha = smoothstep(lod_billboard_distance * 0.5, lod_billboard_distance, cam_dist);
 
 	vec3 color = vec3(0.0);
+	float alpha = 0.0;
 	if (cell_hash < star_prob) {
 		float color_h = hash(cell_id * 3.1 + vec3(7.0, 2.0, 5.0));
 		vec3 star_color = mix(vec3(1.0, 0.85, 0.7), vec3(0.8, 0.9, 1.0), color_h);
 		float brightness_h = hash(cell_id * 5.7 + vec3(1.0, 9.0, 3.0));
 		float star_bright = mix(0.3, 1.0, brightness_h) * 0.8;
 		color = star_color * star_bright * field_alpha;
+		alpha = star_bright * field_alpha * 0.5;
 	}
 
 	ALBEDO = color;
+	ALPHA = alpha;
 }

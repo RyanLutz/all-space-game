@@ -12,13 +12,19 @@ var _blend_alpha: float = 1.0
 var _base_color: Color = Color.WHITE
 var _reachable: bool = false
 
+static var _config_loaded: bool = false
+static var _mesh_star_radius: float = 0.5
+
 
 func _ready() -> void:
+	if not _config_loaded:
+		_load_config()
+
 	# Simple emissive sphere
 	_mesh_instance = MeshInstance3D.new()
 	var sphere := SphereMesh.new()
-	sphere.radius = 2.0
-	sphere.height = 4.0
+	sphere.radius = _mesh_star_radius
+	sphere.height = _mesh_star_radius * 2.0
 	_mesh_instance.mesh = sphere
 
 	var mat := StandardMaterial3D.new()
@@ -31,7 +37,7 @@ func _ready() -> void:
 
 	_collision = CollisionShape3D.new()
 	var shape := SphereShape3D.new()
-	shape.radius = 3.0
+	shape.radius = _mesh_star_radius
 	_collision.shape = shape
 	add_child(_collision)
 
@@ -82,3 +88,15 @@ func _update_appearance() -> void:
 	if _reachable:
 		c = c.lerp(Color(0.25, 0.82, 1.0), 0.3)
 	mat.albedo_color = Color(c.r, c.g, c.b, _blend_alpha)
+
+
+func _load_config() -> void:
+	var file := FileAccess.open("res://data/world_config.json", FileAccess.READ)
+	if file:
+		var json := JSON.new()
+		json.parse(file.get_as_text())
+		file.close()
+		var data: Dictionary = json.data
+		if data.has("galaxy_map"):
+			_mesh_star_radius = float(data["galaxy_map"].get("mesh_star_radius", 0.5))
+	_config_loaded = true
