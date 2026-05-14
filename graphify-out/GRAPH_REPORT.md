@@ -1,16 +1,16 @@
 # Graph Report - all-space-game  (2026-05-14)
 
 ## Corpus Check
-- 34 files · ~88,776 words
+- 34 files · ~89,041 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1333 nodes · 1298 edges · 127 communities (90 shown, 37 thin omitted)
+- 1334 nodes · 1299 edges · 133 communities (96 shown, 37 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 24 edges (avg confidence: 0.77)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `aad4f87c`
+- Built from commit: `1e600f41`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -133,9 +133,15 @@
 - [[_COMMUNITY_Community 124|Community 124]]
 - [[_COMMUNITY_Community 125|Community 125]]
 - [[_COMMUNITY_Community 126|Community 126]]
+- [[_COMMUNITY_Community 127|Community 127]]
+- [[_COMMUNITY_Community 128|Community 128]]
+- [[_COMMUNITY_Community 129|Community 129]]
+- [[_COMMUNITY_Community 130|Community 130]]
+- [[_COMMUNITY_Community 131|Community 131]]
+- [[_COMMUNITY_Community 132|Community 132]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `All Space — Decisions Log` - 39 edges
+1. `All Space — Decisions Log` - 40 edges
 2. `ProjectileManager` - 24 edges
 3. `GameEventBus — Signal Contract` - 24 edges
 4. `All Space — Core Specification` - 22 edges
@@ -171,7 +177,7 @@
 - **Data-driven tuning: world_config star_field, effect.json types, UITokens constants** — star_field_world_config, combat_vfx_effect_types_table, ui_design_uitokens_autoload [INFERRED 0.72]
 - **Graphify output trio — report, HTML viewer, embedded graph data** — graph_report_doc, graph_html_doc, graph_html_vis_raw_embed [INFERRED 1.00]
 
-## Communities (127 total, 37 thin omitted)
+## Communities (133 total, 37 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -198,8 +204,8 @@ Cohesion: 0.33
 Nodes (10): Base color (albedo) texture map, Axum-class fighter surface livery, Accent marking color (high-chroma red), Solid circular red hull mark, Crescent or jagged-bottom red marking, Primary hull base color (matte dark gray field), Minimalist high-contrast industrial sci-fi look, Mirrored angled line pairs (lower layout) (+2 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.04
-Nodes (47): 10. Success Criteria, 1. Overview, 2. Architecture, 3.1 InputManager, 3.2 SelectionState, 3.3 EscortQueue, 3.4 StanceController, 3.5 FormationController (+39 more)
+Cohesion: 0.17
+Nodes (12): 3.1 InputManager, 3.2 SelectionState, 3.3 EscortQueue, 3.4 StanceController, 3.5 FormationController, 3. Core Properties / Data Model, code:gdscript (# StanceController.gd), code:gdscript (func get_effective_stance(ship_id: int) -> Stance:) (+4 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.53
@@ -291,7 +297,7 @@ Nodes (26): AI Signals, Audit Log, Cinematic Signals, code:gdscript (# core/Game
 
 ### Community 72 - "Community 72"
 Cohesion: 0.08
-Nodes (24): 2026-04-16 — Pre-implementation spec audit and 3D cleanup, 2026-04-17 — Custom monitor registration moved to GameBootstrap, 2026-04-17 — DumbProjectile struct stores combat values directly, 2026-04-17 — Fire group indexing: 1-based in JSON, 0-based internally, 2026-04-17 — Hitscan requests queued for physics tick, 2026-04-17 — input_forward sign convention: positive = forward, 2026-04-17 — NavigationController monitor registration in PerformanceMonitor, 2026-04-17 — NavigationController tuning in base_stats (flat schema) (+16 more)
+Nodes (25): 2026-04-16 — Pre-implementation spec audit and 3D cleanup, 2026-04-17 — Custom monitor registration moved to GameBootstrap, 2026-04-17 — DumbProjectile struct stores combat values directly, 2026-04-17 — Fire group indexing: 1-based in JSON, 0-based internally, 2026-04-17 — Hitscan requests queued for physics tick, 2026-04-17 — input_forward sign convention: positive = forward, 2026-04-17 — NavigationController monitor registration in PerformanceMonitor, 2026-04-17 — NavigationController tuning in base_stats (flat schema) (+17 more)
 
 ### Community 73 - "Community 73"
 Cohesion: 0.08
@@ -306,8 +312,8 @@ Cohesion: 0.09
 Nodes (21): Architecture, Assumptions, code:block1 (StarField (Node3D — child of the world root, sibling of Chun), code:gdscript (func _generate_star_mesh() -> ArrayMesh:), code:glsl (shader_type spatial;), code:json ({), code:gdscript (func _ready() -> void:), code:gdscript (Performance.add_custom_monitor("AllSpace/star_count",) (+13 more)
 
 ### Community 76 - "Community 76"
-Cohesion: 0.09
-Nodes (22): 4.1 Tab Key & Mode Transition, 4.2 Right-Click Target Classification, 4.3 Context Menu Actions, 4.4 Escort Queue Operations, 4.5 "Away on Orders" Tracking, 4.6 Formation Tick, 4.7 Stop / Cancel, 4.8 Defensive Stance Response (+14 more)
+Cohesion: 0.12
+Nodes (16): 4.2 Right-Click Target Classification, 4.3 Context Menu Actions, 4.4 Escort Queue Operations, 4.5 "Away on Orders" Tracking, 4.7 Stop / Cancel, 4.8 Defensive Stance Response, 4.9 Mouse-to-World (Ray-Plane Intersection), 4. Key Algorithms (+8 more)
 
 ### Community 77 - "Community 77"
 Cohesion: 0.12
@@ -497,8 +503,32 @@ Nodes (3): code:block4 (UITheme.tres), code:gdscript (# UITokens.gd), Godot Them
 Cohesion: 0.67
 Nodes (3): 12. Performance Instrumentation, code:csharp (// ProjectileManager.cs), code:gdscript (Performance.add_custom_monitor("AllSpace/projectiles_active")
 
+### Community 127 - "Community 127"
+Cohesion: 0.2
+Nodes (9): 1. Overview, 6. Performance Instrumentation, 7. Files, 8. Dependencies, 9. Assumptions, code:gdscript (# InputManager), code:block30 (/systems/fleet_command/), Fleet Command & Tactical Mode — Feature Specification (+1 more)
+
+### Community 128 - "Community 128"
+Cohesion: 0.2
+Nodes (10): 10. Success Criteria, Architectural, Behavioral — Context Menu, Behavioral — Escort Queue, Behavioral — Formation, Behavioral — Mode & Camera, Behavioral — Player Ship Routing, Behavioral — Right-Click Dispatch (+2 more)
+
+### Community 129 - "Community 129"
+Cohesion: 0.22
+Nodes (9): 2. Architecture, code:block1 (Scene Root), code:block2 (Player presses Tab), code:block3 (Player right-clicks in Tactical mode on empty XZ-plane groun), code:block4 (Player right-clicks a fleet ship (any mode, any selection st), code:block5 (Player selects "Escort → Add to escort" on a fleet ship's co), code:block6 (Enemy fires at a queue member; Ship emits ship_damaged(victi), Responsibility Split (+1 more)
+
+### Community 130 - "Community 130"
+Cohesion: 0.29
+Nodes (7): 5.1 Formation Definitions, 5.2 Stance Values, 5. JSON Data Format, code:block25 (/content/formations/), code:json ({), code:gdscript (enum Stance { HOLD_FIRE, DEFENSIVE, AGGRESSIVE }), code:json ({)
+
+### Community 131 - "Community 131"
+Cohesion: 0.67
+Nodes (3): 4.1 Tab Key & Mode Transition, code:gdscript (# InputManager._input(event)), code:gdscript (func _physics_process(delta: float) -> void:)
+
+### Community 132 - "Community 132"
+Cohesion: 0.67
+Nodes (3): 4.6 Formation Tick, code:gdscript (func _formation_tick() -> void:), code:gdscript (signal request_formation_destination(ship_id: int, destinati)
+
 ## Knowledge Gaps
-- **792 isolated node(s):** `int`, `float`, `DumbProjectile`, `List`, `MultiMesh` (+787 more)
+- **793 isolated node(s):** `int`, `float`, `DumbProjectile`, `List`, `MultiMesh` (+788 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **37 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -507,12 +537,12 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `All Space — Decisions Log` connect `Community 72` to `Community 102`, `Community 103`, `Community 104`, `Community 110`, `Community 111`, `Community 112`, `Community 113`, `Community 114`, `Community 115`, `Community 118`, `Community 119`, `Community 120`, `Community 89`, `Community 125`, `Community 126`?**
   _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `Fleet Command & Tactical Mode — Feature Specification` connect `Community 127` to `Community 128`, `Community 129`, `Community 130`, `Community 6`, `Community 76`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Why does `Ship System Specification` connect `Community 78` to `Community 96`, `Community 105`, `Community 106`, `Community 107`, `Community 79`, `Community 88`, `Community 121`, `Community 90`, `Community 92`, `Community 93`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `Fleet Command & Tactical Mode — Feature Specification` connect `Community 6` to `Community 76`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **What connects `int`, `float`, `DumbProjectile` to the rest of the system?**
-  _792 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _793 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.06 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
