@@ -1,43 +1,170 @@
 {
-  "/home/lutz/Projects/All Space/core/services/ServiceLocator.cs": 1776550924.5285096,
-  "/home/lutz/Projects/All Space/gameplay/weapons/ProjectileManager.cs": 1777520339.4435747,
-  "/home/lutz/Projects/All Space/AGENTS.md": 1778117618.658518,
-  "/home/lutz/Projects/All Space/CLAUDE.md": 1778117523.906255,
-  "/home/lutz/Projects/All Space/docs/All_Space_Project_Vision.md": 1776302890.1621063,
-  "/home/lutz/Projects/All Space/docs/phase_plan-combat_vfx.md": 1777945968.7722015,
-  "/home/lutz/Projects/All Space/docs/SYSTEMS.md": 1777947377.1259897,
-  "/home/lutz/Projects/All Space/docs/decisions_log.md": 1778028945.6236615,
-  "/home/lutz/Projects/All Space/docs/star_system_tuning_guide.md": 1777735147.6915214,
-  "/home/lutz/Projects/All Space/docs/development_guide.md": 1778028918.662992,
-  "/home/lutz/Projects/All Space/docs/agent_brief.md": 1778117610.7814927,
-  "/home/lutz/Projects/All Space/docs/spec/core_spec.md": 1777945953.1463928,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-ai_patrol_behavior.md": 1776309630.8549488,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-camera_system.md": 1776309630.8549488,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-chunk_streamer.md": 1776309630.8551772,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-combat_vfx.md": 1777520339.442559,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-fleet_command.md": 1777945969.362202,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-game_event_bus_signals.md": 1777947491.089356,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-nav_controller.md": 1776464620.796896,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-performance_monitor.md": 1776473412.8585346,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-physics_and_movement.md": 1776309630.8552682,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-ship_system.md": 1776549439.8515248,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-solar_system.md": 1778035978.3476756,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-star_field_2.md": 1777945216.1632783,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-star_field.md": 1777948527.153246,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-star_field-session_breakout.md": 1777945246.6883337,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-star_system.md": 1777947326.1482885,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-ui_design.md": 1777945969.0442016,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-weapons_and_projectiles.md": 1776309630.8558035,
-  "/home/lutz/Projects/All Space/docs/spec/feature_spec-solar_system-session_breakout.md": 1778036028.826466,
-  "/home/lutz/Projects/All Space/assets/fonts/Orbitron,Share_Tech_Mono/Orbitron/OFL.txt": 1777735147.6879976,
-  "/home/lutz/Projects/All Space/assets/fonts/Orbitron,Share_Tech_Mono/Orbitron/README.txt": 1777735147.6880825,
-  "/home/lutz/Projects/All Space/assets/fonts/Orbitron,Share_Tech_Mono/Share_Tech_Mono/OFL.txt": 1777735147.6890159,
-  "/home/lutz/Projects/All Space/graphify-out/GRAPH_REPORT.md": 1778117868.9392521,
-  "/home/lutz/Projects/All Space/graphify-out/graph.html": 1778117868.9461863,
-  "/home/lutz/Projects/All Space/graphify-out/memory/query_20260502_012820_why_does_gameeventbus_signal_contract_specificatio.md": 1777735147.6937344,
-  "/home/lutz/Projects/All Space/icon.svg": 1776303838.8921955,
-  "/home/lutz/Projects/All Space/assets/blender/Fighter Base Color.png": 1775789297.7271988,
-  "/home/lutz/Projects/All Space/assets/blender/textures/Fighter Base Color.png": 1775785513.645011,
-  "/home/lutz/Projects/All Space/assets/textures/debug/grid.png": 1777520339.4378116,
-  "/home/lutz/Projects/All Space/content/ships/axum-fighter-1/model_Fighter Base Color.png": 1775789853.949312
+  "/home/user/all-space-game/gameplay/weapons/ProjectileManager.cs": {
+    "mtime": 1778762172.3240542,
+    "hash": "de2c3b5804c52b5dff6807c6a2eddb2e"
+  },
+  "/home/user/all-space-game/core/services/ServiceLocator.cs": {
+    "mtime": 1778762172.2873197,
+    "hash": "9d076e4f8ef118d122e6c7060f7053bf"
+  },
+  "/home/user/all-space-game/CLAUDE.md": {
+    "mtime": 1778762170.2404306,
+    "hash": "f0076cde04a22f45e897d3d54e777aa5"
+  },
+  "/home/user/all-space-game/AGENTS.md": {
+    "mtime": 1778762170.2404306,
+    "hash": "8ae7451c6fbdd5559a01800aa73f051d"
+  },
+  "/home/user/all-space-game/assets/fonts/Orbitron,Share_Tech_Mono/Share_Tech_Mono/OFL.txt": {
+    "mtime": 1778762172.2463396,
+    "hash": "0c2d91f2dfc9c02f4a653df90ba3c722"
+  },
+  "/home/user/all-space-game/assets/fonts/Orbitron,Share_Tech_Mono/Orbitron/README.txt": {
+    "mtime": 1778762172.2441432,
+    "hash": "b4bcb18a7905864207b9b12962f45930"
+  },
+  "/home/user/all-space-game/assets/fonts/Orbitron,Share_Tech_Mono/Orbitron/OFL.txt": {
+    "mtime": 1778762172.2432814,
+    "hash": "2e15efbea1bcc4aeeb7a44e81d3d6cab"
+  },
+  "/home/user/all-space-game/docs/star_system_tuning_guide.md": {
+    "mtime": 1778762172.3063395,
+    "hash": "da043ced4a515821acadaaa49db7ed20"
+  },
+  "/home/user/all-space-game/docs/All_Space_Project_Vision.md": {
+    "mtime": 1778762172.2954316,
+    "hash": "59c5fa244b6323f56f65c4f36f1fdf06"
+  },
+  "/home/user/all-space-game/docs/SYSTEMS.md": {
+    "mtime": 1778762172.2976465,
+    "hash": "b17857e68244853fe8c1f127e4bf2cb0"
+  },
+  "/home/user/all-space-game/docs/decisions_log.md": {
+    "mtime": 1778762172.2976465,
+    "hash": "60d92cf4a3fe5e487d353c489f0c5d75"
+  },
+  "/home/user/all-space-game/docs/phase_plan-combat_vfx.md": {
+    "mtime": 1778762172.2976465,
+    "hash": "59c5621c42b7bacbb06eefdcb9ab7cca"
+  },
+  "/home/user/all-space-game/docs/agent_brief.md": {
+    "mtime": 1778762172.2976465,
+    "hash": "f6a8f5464a0005c02d7c02e2a7a2b956"
+  },
+  "/home/user/all-space-game/docs/development_guide.md": {
+    "mtime": 1778762172.2976465,
+    "hash": "94153c98140881d4ba9e495073b951ce"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-nav_controller.md": {
+    "mtime": 1778762172.3023396,
+    "hash": "e262da6c70f74a8c5916930be86d30f3"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-ship_system.md": {
+    "mtime": 1778762172.3023396,
+    "hash": "57a21167afc6c9e37f110b8aeceb2432"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-weapons_and_projectiles.md": {
+    "mtime": 1778762172.3063395,
+    "hash": "efecf4af178fdc21421b36b601f41f73"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-fleet_command.md": {
+    "mtime": 1778762172.301999,
+    "hash": "1d9d419b252ddddab1b596fc6584a3aa"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-solar_system-session_breakout.md": {
+    "mtime": 1778762172.3023396,
+    "hash": "62441ec27de2558267e0257a371ca235"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-ai_patrol_behavior.md": {
+    "mtime": 1778762172.301999,
+    "hash": "a6d7679a4308a2b9bf9fdb7e01d4daed"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-ui_design.md": {
+    "mtime": 1778762172.3063395,
+    "hash": "0d421444de568530d797f8506cfeca2b"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-chunk_streamer.md": {
+    "mtime": 1778762172.301999,
+    "hash": "1e678e7500829fff6b1d051d89971ac1"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-star_system.md": {
+    "mtime": 1778762172.3063395,
+    "hash": "bc67b4cb425d66ef88dd891a267ae665"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-physics_and_movement.md": {
+    "mtime": 1778762172.3023396,
+    "hash": "eb1d04b15759f6708ee5cc9f407e9333"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-star_field.md": {
+    "mtime": 1778762172.3063395,
+    "hash": "aa16b1f21bac3362e37da64ff5e1fc7f"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-ai_flight_refactor.md": {
+    "mtime": 1778762172.301999,
+    "hash": "87135dbc34c82266fd913ebafb0703fc"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-camera_system.md": {
+    "mtime": 1778762172.301999,
+    "hash": "b873f6157e79f5127ea0f3d5e5d2d7b6"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-galaxy_map.md": {
+    "mtime": 1778762172.3023396,
+    "hash": "86a7d62c2d2612b9f6b157eb59005ad4"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-game_event_bus_signals.md": {
+    "mtime": 1778762172.3023396,
+    "hash": "21153eb8245d59d6260d23781f22d8ea"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-combat_vfx.md": {
+    "mtime": 1778762172.301999,
+    "hash": "1268da2634a1eac9266c55286cc8df52"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-star_field-session_breakout.md": {
+    "mtime": 1778762172.3063395,
+    "hash": "b80f8fbff3b052f7d034ce0cf2809128"
+  },
+  "/home/user/all-space-game/docs/spec/core_spec.md": {
+    "mtime": 1778762172.2983396,
+    "hash": "9125048c17ed31b199fd796dd4e72aa4"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-performance_monitor.md": {
+    "mtime": 1778762172.3023396,
+    "hash": "e9581aa239c80b5f6e53bc9503639043"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-ship_viewer.md": {
+    "mtime": 1778762172.3023396,
+    "hash": "03e2819769684b7d202c8a14a39a1311"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-solar_system.md": {
+    "mtime": 1778762172.3063395,
+    "hash": "101159f72dd4c44138f78ee21a9d3183"
+  },
+  "/home/user/all-space-game/docs/spec/feature_spec-star_field_2.md": {
+    "mtime": 1778762172.3063395,
+    "hash": "191e602e82ac42c1ac97c4b4352abbdd"
+  },
+  "/home/user/all-space-game/graphify-out/memory/query_20260502_012820_why_does_gameeventbus_signal_contract_specificatio.md": {
+    "mtime": 1778762172.3583395,
+    "hash": "aa1afacbb57a6d4d1571e6c88cb893f1"
+  },
+  "/home/user/all-space-game/icon.svg": {
+    "mtime": 1778762172.3583395,
+    "hash": "a16f2eed1b4496c4abf03d329708ba09"
+  },
+  "/home/user/all-space-game/assets/blender/Fighter Base Color.png": {
+    "mtime": 1778762172.1623397,
+    "hash": "fe151bd1ef7935aa1ea626cefb959f9e"
+  },
+  "/home/user/all-space-game/assets/blender/textures/Fighter Base Color.png": {
+    "mtime": 1778762172.2343397,
+    "hash": "c5f68d082fcc499badaa1b759eb6aded"
+  },
+  "/home/user/all-space-game/assets/textures/debug/grid.png": {
+    "mtime": 1778762172.254455,
+    "hash": "ec175e27d5934c88c02b53eadc335193"
+  },
+  "/home/user/all-space-game/content/ships/axum-fighter-1/model_Fighter Base Color.png": {
+    "mtime": 1778762172.2705073,
+    "hash": "fe151bd1ef7935aa1ea626cefb959f9e"
+  }
 }
