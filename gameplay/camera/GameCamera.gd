@@ -54,6 +54,11 @@ var _event_bus: Node = null
 var _player_state: Node = null
 var _galaxy_container: GalaxyContainer = null
 
+# Procedural field (camera-aligned backdrop)
+var _proc_field: MeshInstance3D = null
+var _proc_field_cell_size: float = 800.0
+var _proc_field_sphere_radius: float = 8000.0
+
 
 func _ready() -> void:
 	_current_height = height_default
@@ -71,7 +76,8 @@ func _ready() -> void:
 			_event_bus.connect("player_ship_changed", _on_player_ship_changed)
 			_event_bus.connect("game_mode_changed", _on_game_mode_changed)
 
-	_galaxy_container = get_node_or_null("GalaxyContainer")
+	_galaxy_container = get_node_or_null("../GalaxyContainer")
+	_create_procedural_field()
 
 	var player := get_tree().get_first_node_in_group("player")
 	if player is Node3D:
@@ -93,6 +99,35 @@ func _load_galaxy_map_config() -> void:
 	var cfg: Dictionary = data["galaxy_map"]
 	_camera_move_speed = float(cfg.get("camera_move_speed", 50.0))
 	_camera_rotation_speed = float(cfg.get("camera_rotation_speed", 0.003))
+	_proc_field_cell_size = float(cfg.get("proc_field_cell_size", 800.0))
+	_proc_field_sphere_radius = float(cfg.get("proc_field_sphere_radius", 8000.0))
+
+
+func _create_procedural_field() -> void:
+	_proc_field = MeshInstance3D.new()
+	_proc_field.name = "ProceduralField"
+	var sphere := SphereMesh.new()
+	sphere.radius = _proc_field_sphere_radius
+	sphere.height = _proc_field_sphere_radius * 2.0
+	sphere.radial_segments = 64
+	sphere.rings = 32
+	_proc_field.mesh = sphere
+
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://core/starfield/galaxy_map_field.gdshader")
+	mat.set_shader_parameter("galaxy_scale", 100.0)
+	mat.set_shader_parameter("proc_field_cell_size", _proc_field_cell_size)
+	_proc_field.material_override = mat
+	_proc_field.layers = 1
+	_proc_field.visible = true
+	add_child(_proc_field)
+
+
+func _update_procedural_field() -> void:
+	if _proc_field and _proc_field.material_override:
+		var mat: ShaderMaterial = _proc_field.material_override
+		mat.set_shader_parameter("galaxy_scale", 100.0)
+		mat.set_shader_parameter("proc_field_cell_size", _proc_field_cell_size)
 
 
 # ─── Target Management ────────────────────────────────────────────────────────
@@ -186,9 +221,14 @@ func _enter_galaxy_map() -> void:
 	_galaxy_map_camera_yaw = rotation.y
 	_galaxy_map_camera_pitch = rotation.x
 	release()
-	# Teleport camera to current system's galaxy position so the map is centered
-	if _galaxy_container:
-		global_position = _galaxy_container._current_system_pos
+	# Position camera above galaxy origin for overview
+	var overview_height: float = 80000.0
+	global_position = Vector3(0, overview_height, 0)
+	rotation_degrees = Vector3(-90, 0, 0)
+	_current_height = overview_height
+	_target_height = overview_height
+	# Galaxy-scale zoom limits
+	set_zoom_limits(5000.0, 200000.0)
 	if _event_bus:
 		_event_bus.cinematic_active_changed.emit(false)
 	print("[GameCamera] Entering galaxy map mode")
@@ -198,6 +238,8 @@ func _exit_galaxy_map() -> void:
 	_galaxy_map_active = false
 	_rmb_held = false
 	_active_selection = null
+	# Restore pilot zoom limits
+	set_zoom_limits(_pilot_height_min, _pilot_height_max)
 	var ship = _player_state.get_active_ship() if _player_state else null
 	if ship:
 		follow(ship)
@@ -218,6 +260,10 @@ func _galaxy_map_input(event: InputEvent) -> void:
 				_try_select(pos)
 			_last_click_time = now
 			_last_click_pos = pos
+		elif e.button_index == MOUSE_BUTTON_WHEEL_UP and e.pressed:
+			_target_height = clampf(_target_height - zoom_step * 10.0, height_min, height_max)
+		elif e.button_index == MOUSE_BUTTON_WHEEL_DOWN and e.pressed:
+			_target_height = clampf(_target_height + zoom_step * 10.0, height_min, height_max)
 
 	if event is InputEventMouseMotion and _rmb_held:
 		_galaxy_map_camera_yaw -= event.relative.x * _camera_rotation_speed
@@ -232,15 +278,16 @@ func _galaxy_map_input(event: InputEvent) -> void:
 
 func _galaxy_map_process(delta: float) -> void:
 	var move := Vector3.ZERO
-	if Input.is_action_pressed("move_forward"):     move -= basis.z
-	if Input.is_action_pressed("move_backward"):    move += basis.z
-	if Input.is_action_pressed("move_left"):        move -= basis.x
-	if Input.is_action_pressed("move_right"):       move += basis.x
+	if Input.is_action_pressed("move_forward"):     move -= Vector3.FORWARD
+	if Input.is_action_pressed("move_backward"):    move += Vector3.FORWARD
+	if Input.is_action_pressed("move_left"):        move -= Vector3.RIGHT
+	if Input.is_action_pressed("move_right"):       move += Vector3.RIGHT
 	if Input.is_action_pressed("galaxy_map_up"):    move += Vector3.UP
 	if Input.is_action_pressed("galaxy_map_down"):  move -= Vector3.UP
 
 	if move.length_squared() > 0.0:
-		global_position += move.normalized() * _camera_move_speed * delta
+		var speed := _camera_move_speed * (_current_height / 50000.0)
+		global_position += move.normalized() * speed * delta
 
 
 func _try_select(screen_pos: Vector2) -> void:
@@ -419,6 +466,8 @@ func _physics_process(delta: float) -> void:
 		release()
 
 	_update_zoom(delta)
+
+	_update_procedural_field()
 
 	if _galaxy_map_active:
 		_galaxy_map_process(delta)

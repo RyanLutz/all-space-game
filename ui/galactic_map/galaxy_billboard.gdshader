@@ -13,7 +13,13 @@ void vertex() {
 		INV_VIEW_MATRIX[2],
 		MODEL_MATRIX[3]
 	);
-	VERTEX.xy *= point_size;
+	// Distance-based size: maintain consistent screen-space size
+	// so stars stay ~5 pixels across at all viewing distances.
+	vec3 world_pos = MODEL_MATRIX[3].xyz;
+	vec3 cam_pos = INV_VIEW_MATRIX[3].xyz;
+	float dist = distance(world_pos, cam_pos);
+	float screen_scale = max(0.5, dist / 500.0);
+	VERTEX.xy *= point_size * screen_scale;
 	v_instance_custom = INSTANCE_CUSTOM;
 }
 

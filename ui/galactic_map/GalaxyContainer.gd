@@ -2,7 +2,12 @@ class_name GalaxyContainer
 extends Node3D
 
 ## Galaxy rendering root. Reads catalog from StarField autoload, manages LOD
-## population updates, and drives the procedural field + billboard + mesh tiers.
+## population updates, and drives the billboard + mesh tiers.
+##
+## Billboards are visible in ALL modes. In pilot/tactical, GalaxyContainer
+## follows the camera so stars appear fixed in the background. In galaxy map,
+## it stays world-aligned so the camera can fly through the galaxy.
+## Mesh stars are galaxy-map only.
 
 # ─── Catalog refs ─────────────────────────────────────────────────────────────
 var _catalog: Array[SFStarRecord] = []
@@ -14,7 +19,6 @@ const _GalaxyBillboardFieldScript := preload("res://ui/galactic_map/GalaxyBillbo
 # ─── Tier managers ────────────────────────────────────────────────────────────
 var _billboard_field: GalaxyBillboardField
 var _star_container: Node3D
-var _procedural_field: MeshInstance3D
 var _mesh_star_nodes: Dictionary = {}   # star.id -> GalaxyStar node
 
 # ─── State ────────────────────────────────────────────────────────────────────
@@ -23,6 +27,7 @@ var _current_system_pos: Vector3 = Vector3.ZERO
 var _active_selection: SFStarRecord = null
 var _last_cam_pos: Vector3 = Vector3.INF
 var _cam_move_threshold: float = 5.0
+var _follow_camera: bool = true
 
 # ─── Spatial grid ─────────────────────────────────────────────────────────────
 var _spatial_grid: Dictionary = {}   # Vector3i -> Array[SFStarRecord]
@@ -34,12 +39,11 @@ var lod_mesh_distance: float = 80.0
 var lod_fade_range: float = 40.0
 var billboard_pixel_size: float = 0.01
 var spawn_check_interval: float = 0.25
-var proc_field_cell_size: float = 800.0
-var proc_field_sphere_radius: float = 8000.0
 
 # ─── Services ─────────────────────────────────────────────────────────────────
 var _perf: Node = null
 var _event_bus: Node = null
+var _camera: Camera3D = null
 
 
 func _ready() -> void:
@@ -50,14 +54,21 @@ func _ready() -> void:
 	_register_monitors()
 	_sync_current_system()
 
+	# Camera ref for world-aligned queries in galaxy map mode
+	_camera = get_node_or_null("/root/Main/GameCamera")
+
+	# Billboards always visible; populate immediately so pilot mode shows stars
+	if _billboard_field:
+		_billboard_field.visible = true
+		_billboard_field.populate(_catalog, Vector3.ZERO)
+
 
 func _process(delta: float) -> void:
-	# GalaxyContainer follows camera position but keeps world-aligned rotation
-	var cam := get_parent()
-	if cam is Node3D:
-		global_transform = Transform3D(Basis.IDENTITY, cam.global_position)
-
-	_update_procedural_field_uniforms()
+	if _follow_camera:
+		# In pilot/tactical mode, follow the camera so stars appear fixed on screen
+		if _camera:
+			global_transform = Transform3D(Basis.IDENTITY, _camera.global_position)
+	# else: galaxy map mode — stay world-aligned at origin
 
 	_spawn_check_timer += delta
 	if _spawn_check_timer >= spawn_check_interval:
@@ -90,8 +101,6 @@ func _load_config() -> void:
 	lod_fade_range = float(cfg.get("lod_fade_range", 40.0))
 	billboard_pixel_size = float(cfg.get("billboard_pixel_size", 0.01))
 	spawn_check_interval = float(cfg.get("star_spawn_check_interval", 0.25))
-	proc_field_cell_size = float(cfg.get("proc_field_cell_size", 800.0))
-	proc_field_sphere_radius = float(cfg.get("proc_field_sphere_radius", 8000.0))
 
 
 # ─── Catalog ──────────────────────────────────────────────────────────────────
@@ -167,40 +176,14 @@ func _build_tiers() -> void:
 	_billboard_field.name = "BillboardField"
 	_billboard_field.set_galaxy_scale(galaxy_scale)
 	_billboard_field.set_billboard_pixel_size(billboard_pixel_size)
-	_billboard_field.visible = false
+	_billboard_field.visible = true
 	add_child(_billboard_field)
 
-	# Procedural field sphere
-	_procedural_field = MeshInstance3D.new()
-	_procedural_field.name = "ProceduralField"
-	var sphere := SphereMesh.new()
-	sphere.radius = proc_field_sphere_radius
-	sphere.height = proc_field_sphere_radius * 2.0
-	sphere.radial_segments = 64
-	sphere.rings = 32
-	_procedural_field.mesh = sphere
-
-	var mat := ShaderMaterial.new()
-	mat.shader = preload("res://core/starfield/galaxy_map_field.gdshader")
-	mat.set_shader_parameter("galaxy_scale", galaxy_scale)
-	mat.set_shader_parameter("proc_field_cell_size", proc_field_cell_size)
-	_procedural_field.material_override = mat
-	_procedural_field.layers = 1
-	_procedural_field.visible = false
-	add_child(_procedural_field)
-
-	# Star container for mesh-tier nodes
+	# Star container for mesh-tier nodes (galaxy map only)
 	_star_container = Node3D.new()
 	_star_container.name = "StarContainer"
 	_star_container.visible = false
 	add_child(_star_container)
-
-
-func _update_procedural_field_uniforms() -> void:
-	if _procedural_field and _procedural_field.material_override:
-		var mat: ShaderMaterial = _procedural_field.material_override
-		mat.set_shader_parameter("galaxy_scale", galaxy_scale)
-		mat.set_shader_parameter("proc_field_cell_size", proc_field_cell_size)
 
 
 # ─── Services & monitors ──────────────────────────────────────────────────────
@@ -237,12 +220,17 @@ func _update_star_populations() -> void:
 
 	_sync_current_system()
 
-	# GalaxyContainer is positioned at the camera in _process(), so local origin
-	# is always the camera position. Use Vector3.ZERO for distance queries.
+	# In pilot/tactical mode GalaxyContainer follows the camera, so local origin
+	# is the camera position. In galaxy map mode we stay at origin, so we must
+	# query from the actual camera world position.
 	var cam_pos := Vector3.ZERO
+	var check_pos := Vector3.ZERO
+	if not _follow_camera and _camera:
+		cam_pos = _camera.global_position
+		check_pos = cam_pos
 
 	# Skip if camera hasn't moved enough since last update
-	if global_position.distance_to(_last_cam_pos) < _cam_move_threshold:
+	if _last_cam_pos.distance_to(check_pos) < _cam_move_threshold:
 		if _perf:
 			_perf.end("GalaxyMap.population_update")
 			_perf.set_count("GalaxyMap.mesh_star_nodes", _mesh_star_nodes.size())
@@ -255,7 +243,7 @@ func _update_star_populations() -> void:
 		if _perf:
 			_perf.end("GalaxyMap.crossfade_update")
 		return
-	_last_cam_pos = global_position
+	_last_cam_pos = check_pos
 
 	var mesh_stars: Array = []
 	# Crossfade data: star_id -> mesh_alpha (only for stars near boundaries)
@@ -373,26 +361,20 @@ func clear_selection() -> void:
 
 func _on_game_mode_changed(old_mode: String, new_mode: String) -> void:
 	if new_mode == "galaxy_map":
+		_follow_camera = false
+		global_position = Vector3.ZERO
 		_star_container.visible = true
-		if _billboard_field:
-			_billboard_field.visible = true
 		spawn_check_interval = _get_config_float("star_spawn_check_interval", 0.25)
 		lod_mesh_distance = _get_config_float("lod_mesh_distance", 80.0)
-		if _procedural_field:
-			_procedural_field.visible = true
 		_billboard_field.populate(_catalog, Vector3.ZERO)
 		_update_star_populations()
 	elif old_mode == "galaxy_map":
+		_follow_camera = true
 		_star_container.visible = false
 		_clear_mesh_nodes()
-		if _billboard_field:
-			_billboard_field.clear()
-			_billboard_field.visible = false
 		spawn_check_interval = _get_config_float("star_spawn_check_interval", 0.25) * 2.0
 		lod_mesh_distance = 0.0
 		clear_selection()
-		if _procedural_field:
-			_procedural_field.visible = false
 
 
 func _on_system_transition_complete(_system_id: String) -> void:

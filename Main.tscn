@@ -22,7 +22,7 @@ script = ExtResource("6_chunkstreamer")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 500, 0)
 script = ExtResource("2_camera")
 
-[node name="GalaxyContainer" type="Node3D" parent="GameCamera"]
+[node name="GalaxyContainer" type="Node3D" parent="."]
 script = ExtResource("3_galaxycontainer")
 
 [node name="UILayer" type="CanvasLayer" parent="."]

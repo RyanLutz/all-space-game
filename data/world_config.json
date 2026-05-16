@@ -42,16 +42,6 @@
     "speed_max": 160.0
   },
 
-  "star_field": {
-    "star_count": 80000,
-    "spread_xz": 16000.0,
-    "spread_y": 8000.0,
-    "point_size": 1.0,
-    "brightness_min": 0.2,
-    "brightness_max": 1.0,
-    "seed": 42
-  },
-
   "starfield": {
     "_comment": "StarField autoload — procedural galaxy catalog. Change galaxy_seed for a different galaxy.",
     "galaxy_seed": 8675309,
@@ -137,97 +127,9 @@
     }
   },
 
-  "galaxy": {
-    "_comment": "StarRegistry — procedural galaxy. Change seed for a different galaxy layout.",
-    "seed": 8675309,
-    "star_count": 3000,
-    "galaxy_radius": 500000.0,
-    "galaxy_thickness": 8000.0,
-    "destination_y_threshold": 1200.0,
-    "exclusion_margin": 1.4,
-
-    "star_type_weights": {
-      "red_dwarf":    0.60,
-      "yellow_dwarf": 0.25,
-      "blue_giant":   0.08,
-      "neutron_star": 0.05,
-      "white_dwarf":  0.02
-    },
-
-    "star_types": {
-      "red_dwarf": {
-        "color": [1.0, 0.3, 0.1, 1.0],
-        "radius_range": [800, 1400],
-        "light_energy_range": [1.0, 2.0],
-        "light_range_multiplier": 6.0
-      },
-      "yellow_dwarf": {
-        "color": [1.0, 0.9, 0.5, 1.0],
-        "radius_range": [1200, 2000],
-        "light_energy_range": [2.0, 4.0],
-        "light_range_multiplier": 8.0
-      },
-      "blue_giant": {
-        "color": [0.5, 0.7, 1.0, 1.0],
-        "radius_range": [3000, 6000],
-        "light_energy_range": [6.0, 12.0],
-        "light_range_multiplier": 14.0
-      },
-      "neutron_star": {
-        "color": [0.8, 0.9, 1.0, 1.0],
-        "radius_range": [200, 400],
-        "light_energy_range": [8.0, 16.0],
-        "light_range_multiplier": 10.0
-      },
-      "white_dwarf": {
-        "color": [0.95, 0.97, 1.0, 1.0],
-        "radius_range": [300, 600],
-        "light_energy_range": [1.5, 3.0],
-        "light_range_multiplier": 5.0
-      }
-    },
-
-    "lod": {
-      "lod1_distance": 80000.0,
-      "lod2_spawn_distance": 8000.0,
-      "lod_crossfade_frames": 30,
-
-      "_screen_pass_comment": "LOD 0 + LOD 1 visual tunables. min_pixel_radius is the floor on a star's apparent size (in pixels) and is shared by BOTH the LOD 0 MultiMesh point shader AND the LOD 1 screen-pass glow shader so the LOD 0->1 handoff cannot have a size discontinuity. screen_pass_max_stars is capped to MAX_SCREEN_PASS_STARS in StarRegistry.gd (256). glow_world_radius_multiplier scales StarRecord.radius into a perceived glow halo radius. glow_max_pixel_radius clamps how big a near-LOD-2 star can get so it doesn't dominate the screen. glow_core_radius is the [0,1] threshold inside the glow disc where the bright inner core falls off into the soft halo.",
-      "min_pixel_radius": 2.0,
-      "screen_pass_max_stars": 5280,
-      "glow_world_radius_multiplier": 3.0,
-      "glow_max_pixel_radius": 64.0,
-      "glow_intensity": 1.5,
-      "glow_core_radius": 0.15
-    },
-
-    "star_mesh": {
-      "_comment": "LOD 2 close-range mesh tunables. core_radius_scale: visual core sphere size relative to StarRecord.radius. atmosphere_*_scale: outer plasma layers (always > 1.0). corona_scale: additive halo billboard size relative to radius. surface_*: noise/animation parameters for the plasma surface shader. corona_*: corona shader falloff and intensity. light_attenuation: OmniLight3D attenuation curve (1.0 = inverse-square).",
-      "core_radius_scale": 1.0,
-      "atmosphere_inner_scale": 1.04,
-      "atmosphere_outer_scale": 1.10,
-      "corona_scale": 3.5,
-
-      "surface_noise_scale": 2.5,
-      "surface_flow_speed": 0.05,
-      "surface_brightness": 1.4,
-      "surface_contrast": 1.6,
-      "atmosphere_inner_alpha": 0.55,
-      "atmosphere_outer_alpha": 0.30,
-      "atmosphere_inner_speed": 0.08,
-      "atmosphere_outer_speed": 0.03,
-
-      "corona_intensity": 1.8,
-      "corona_inner_falloff": 0.18,
-      "corona_outer_falloff": 1.0,
-
-      "light_attenuation": 1.0
-    }
-  },
-
   "galaxy_map": {
     "galaxy_scale": 100.0,
-    "billboard_pixel_size": 0.01,
+    "billboard_pixel_size": 1,
     "mesh_star_radius": 0.5,
     "lod_mesh_distance": 80.0,
     "lod_fade_range": 40.0,
