@@ -47,7 +47,24 @@ var _last_click_time: int = 0
 var _last_click_pos: Vector2 = Vector2.ZERO
 var _active_selection: SFStarRecord = null
 
-var _camera_move_speed: float = 50.0
+# Focus / orbit state
+var _galaxy_focused: bool = false
+var _focus_target: SFStarRecord = null
+var _focus_index: int = -1
+var _focus_distance: float = 120.0
+var _focus_yaw: float = 0.0
+var _focus_pitch: float = 0.0
+var _navigable_stars: Array[SFStarRecord] = []
+
+# Galaxy map config (loaded from world_config.json)
+var _free_flight_speed: float = 80.0
+var _free_flight_fast_mult: float = 4.0
+var _pan_speed: float = 1.2
+var _focus_orbit_speed: float = 1.0
+var _focus_zoom_speed: float = 120.0
+var _focus_distance_min: float = 15.0
+var _focus_distance_max: float = 600.0
+var _focus_default_distance: float = 100.0
 var _camera_rotation_speed: float = 0.003
 var _overview_height: float = 800.0
 
@@ -100,7 +117,14 @@ func _load_galaxy_map_config() -> void:
 		return
 	var cfg: Dictionary = data["galaxy_map"]
 	_overview_height = float(cfg.get("overview_height", 800.0))
-	_camera_move_speed = float(cfg.get("camera_move_speed", 50.0))
+	_free_flight_speed = float(cfg.get("free_flight_speed", 80.0))
+	_free_flight_fast_mult = float(cfg.get("free_flight_fast_multiplier", 4.0))
+	_pan_speed = float(cfg.get("pan_speed", 1.2))
+	_focus_orbit_speed = float(cfg.get("focus_orbit_speed", 1.0))
+	_focus_zoom_speed = float(cfg.get("focus_zoom_speed", 120.0))
+	_focus_distance_min = float(cfg.get("focus_distance_min", 15.0))
+	_focus_distance_max = float(cfg.get("focus_distance_max", 600.0))
+	_focus_default_distance = float(cfg.get("focus_default_distance", 100.0))
 	_camera_rotation_speed = float(cfg.get("camera_rotation_speed", 0.003))
 	_proc_field_cell_size = float(cfg.get("proc_field_cell_size", 800.0))
 	_proc_field_sphere_radius = float(cfg.get("proc_field_sphere_radius", 8000.0))
@@ -221,24 +245,26 @@ func _exit_tactical() -> void:
 
 func _enter_galaxy_map() -> void:
 	_galaxy_map_active = true
-	_galaxy_map_camera_yaw = rotation.y
-	_galaxy_map_camera_pitch = rotation.x
 	release()
 	# Hide the local solar system so the galaxy map shows only galaxy stars
 	var solar_system := get_tree().get_first_node_in_group("solar_systems")
 	if solar_system:
 		solar_system.visible = false
 	# Position camera above galaxy origin for overview
-	# galaxy_scale=100 → scaled galaxy radius ≈1000 units.
-	# Default overview height (800) gives the galaxy an angular diameter of ~100°.
 	var overview_height: float = _overview_height
 	global_position = Vector3(0, overview_height, 0)
 	rotation_degrees = Vector3(-90, 0, 0)
+	# Sync free-flight rotation variables to the snapped orientation
+	_galaxy_map_camera_yaw = rotation.y
+	_galaxy_map_camera_pitch = rotation.x
 	_current_height = overview_height
 	_target_height = overview_height
 	# Galaxy-scale zoom limits: min allows getting close to individual mesh stars
 	# (mesh LOD kicks in at ~80 units), max prevents zooming out to useless scale.
 	set_zoom_limits(50.0, 10000.0)
+	# Load navigable stars for Tab cycling
+	if _galaxy_container:
+		_navigable_stars = _galaxy_container.get_navigable_stars()
 	if _event_bus:
 		_event_bus.cinematic_active_changed.emit(false)
 	print("[GameCamera] Entering galaxy map mode")
@@ -247,7 +273,9 @@ func _enter_galaxy_map() -> void:
 func _exit_galaxy_map() -> void:
 	_galaxy_map_active = false
 	_rmb_held = false
+	_unfocus()
 	_active_selection = null
+	_navigable_stars.clear()
 	# Restore pilot zoom limits
 	set_zoom_limits(_pilot_height_min, _pilot_height_max)
 	# Reset height to pilot default so we don't inherit galaxy-map close zoom
@@ -264,6 +292,18 @@ func _exit_galaxy_map() -> void:
 
 
 func _galaxy_map_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		match event.keycode:
+			KEY_TAB:
+				_cycle_focus(not event.shift_pressed)
+				return
+			KEY_ESCAPE:
+				if _galaxy_focused:
+					_unfocus()
+				else:
+					_close_galaxy_map()
+				return
+
 	if event is InputEventMouseButton:
 		var e := event as InputEventMouseButton
 		if e.button_index == MOUSE_BUTTON_RIGHT:
@@ -274,43 +314,172 @@ func _galaxy_map_input(event: InputEvent) -> void:
 			if now - _last_click_time < 300 and pos.distance_to(_last_click_pos) < 10.0:
 				_try_warp_select(pos)
 			else:
-				_try_select(pos)
+				_try_select_or_focus(pos)
 			_last_click_time = now
 			_last_click_pos = pos
 		elif e.button_index == MOUSE_BUTTON_WHEEL_UP and e.pressed:
-			_target_height = clampf(_target_height - zoom_step * 10.0, height_min, height_max)
+			if _galaxy_focused:
+				_focus_distance = clampf(_focus_distance - zoom_step * 2.0, _focus_distance_min, _focus_distance_max)
+			else:
+				# Move camera forward along view direction
+				global_position -= transform.basis.z * zoom_step * 2.0
+				_current_height = global_position.y
+				_target_height = _current_height
 		elif e.button_index == MOUSE_BUTTON_WHEEL_DOWN and e.pressed:
-			_target_height = clampf(_target_height + zoom_step * 10.0, height_min, height_max)
+			if _galaxy_focused:
+				_focus_distance = clampf(_focus_distance + zoom_step * 2.0, _focus_distance_min, _focus_distance_max)
+			else:
+				# Move camera backward along view direction
+				global_position += transform.basis.z * zoom_step * 2.0
+				_current_height = global_position.y
+				_target_height = _current_height
 
 	if event is InputEventMouseMotion and _rmb_held:
-		_galaxy_map_camera_yaw -= event.relative.x * _camera_rotation_speed
-		_galaxy_map_camera_pitch -= event.relative.y * _camera_rotation_speed
-		_galaxy_map_camera_pitch = clampf(
-			_galaxy_map_camera_pitch,
-			deg_to_rad(-80.0),
-			deg_to_rad(80.0)
-		)
-		rotation = Vector3(_galaxy_map_camera_pitch, _galaxy_map_camera_yaw, 0.0)
+		if _galaxy_focused:
+			_focus_yaw -= event.relative.x * _camera_rotation_speed
+			_focus_pitch -= event.relative.y * _camera_rotation_speed
+			_focus_pitch = clampf(_focus_pitch, deg_to_rad(-80.0), deg_to_rad(80.0))
+		else:
+			_galaxy_map_camera_yaw -= event.relative.x * _camera_rotation_speed
+			_galaxy_map_camera_pitch -= event.relative.y * _camera_rotation_speed
+			_galaxy_map_camera_pitch = clampf(
+				_galaxy_map_camera_pitch,
+				deg_to_rad(-80.0),
+				deg_to_rad(80.0)
+			)
+			rotation = Vector3(_galaxy_map_camera_pitch, _galaxy_map_camera_yaw, 0.0)
 
 
 func _galaxy_map_process(delta: float) -> void:
-	# Apply zoom height — _current_height is lerped by _update_zoom
-	global_position.y = _current_height
+	if _galaxy_focused:
+		_process_focused(delta)
+	else:
+		_process_unfocused(delta)
 
+
+func _process_unfocused(delta: float) -> void:
+	# Camera-relative WASD movement
 	var move := Vector3.ZERO
-	if Input.is_action_pressed("move_forward"):     move -= Vector3.FORWARD
-	if Input.is_action_pressed("move_backward"):    move += Vector3.FORWARD
-	if Input.is_action_pressed("move_left"):        move -= Vector3.RIGHT
-	if Input.is_action_pressed("move_right"):       move += Vector3.RIGHT
-	if Input.is_action_pressed("galaxy_map_up"):    move += Vector3.UP
-	if Input.is_action_pressed("galaxy_map_down"):  move -= Vector3.UP
+	if Input.is_action_pressed("move_forward"):   move -= transform.basis.z
+	if Input.is_action_pressed("move_backward"):  move += transform.basis.z
+	if Input.is_action_pressed("move_left"):      move -= transform.basis.x
+	if Input.is_action_pressed("move_right"):     move += transform.basis.x
+
+	var speed := _free_flight_speed
+	if Input.is_key_pressed(KEY_SHIFT):
+		speed *= _free_flight_fast_mult
 
 	if move.length_squared() > 0.0:
-		var speed := _camera_move_speed * (_current_height / 2000.0)
 		global_position += move.normalized() * speed * delta
 
+	# Track Y for mode transitions
+	_current_height = global_position.y
 
-func _try_select(screen_pos: Vector2) -> void:
+	# Q/E pan (adjust pitch directly)
+	var pan_input := 0.0
+	if Input.is_action_pressed("galaxy_pan_up"):   pan_input += 1.0
+	if Input.is_action_pressed("galaxy_pan_down"): pan_input -= 1.0
+	if pan_input != 0.0:
+		var pan_speed := _pan_speed
+		if Input.is_key_pressed(KEY_SHIFT):
+			pan_speed *= _free_flight_fast_mult
+		_galaxy_map_camera_pitch += pan_input * pan_speed * delta
+		_galaxy_map_camera_pitch = clampf(_galaxy_map_camera_pitch, deg_to_rad(-80.0), deg_to_rad(80.0))
+		rotation = Vector3(_galaxy_map_camera_pitch, _galaxy_map_camera_yaw, 0.0)
+
+
+func _process_focused(delta: float) -> void:
+	if _focus_target == null or _galaxy_container == null:
+		_unfocus()
+		return
+
+	var focus_pos := _galaxy_container.get_star_world_position(_focus_target)
+
+	# W/S zoom in/out
+	var zoom_input := Input.get_axis("move_backward", "move_forward")
+	if zoom_input != 0.0:
+		var zoom_speed := _focus_zoom_speed
+		if Input.is_key_pressed(KEY_SHIFT):
+			zoom_speed *= _free_flight_fast_mult
+		_focus_distance = clampf(_focus_distance - zoom_input * zoom_speed * delta, _focus_distance_min, _focus_distance_max)
+
+	# A/D orbit yaw (left/right around target)
+	var yaw_input := Input.get_axis("move_left", "move_right")
+	if yaw_input != 0.0:
+		var orbit_speed := _focus_orbit_speed
+		if Input.is_key_pressed(KEY_SHIFT):
+			orbit_speed *= _free_flight_fast_mult
+		_focus_yaw += yaw_input * orbit_speed * delta
+
+	# Q/E orbit pitch (up/down around target)
+	var pitch_input := 0.0
+	if Input.is_action_pressed("galaxy_pan_up"):   pitch_input += 1.0
+	if Input.is_action_pressed("galaxy_pan_down"): pitch_input -= 1.0
+	if pitch_input != 0.0:
+		var orbit_speed := _focus_orbit_speed
+		if Input.is_key_pressed(KEY_SHIFT):
+			orbit_speed *= _free_flight_fast_mult
+		_focus_pitch += pitch_input * orbit_speed * delta
+		_focus_pitch = clampf(_focus_pitch, deg_to_rad(-80.0), deg_to_rad(80.0))
+
+	# Spherical offset from focus target
+	var offset := Vector3.FORWARD.rotated(Vector3.RIGHT, _focus_pitch).rotated(Vector3.UP, _focus_yaw) * _focus_distance
+	global_position = focus_pos + offset
+	look_at(focus_pos, Vector3.UP)
+
+
+func _focus_on_star(star: SFStarRecord, index: int = -1) -> void:
+	if star == null:
+		return
+	_galaxy_focused = true
+	_focus_target = star
+	_focus_index = index
+	_focus_distance = _focus_default_distance
+	_focus_yaw = 0.0
+	_focus_pitch = deg_to_rad(-25.0)
+
+	# Also select it
+	_active_selection = star
+	if _galaxy_container:
+		_galaxy_container.select_star(star)
+	if _event_bus:
+		_event_bus.tactical_selection_changed.emit([star.system_id])
+
+	print("[GameCamera] Focused on star: %s" % star.system_id)
+
+
+func _unfocus() -> void:
+	if not _galaxy_focused:
+		return
+	_galaxy_focused = false
+	_focus_target = null
+	_focus_index = -1
+	# Reset camera to position above the last focus point at overview height
+	if _active_selection != null and _galaxy_container != null:
+		var star_pos := _galaxy_container.get_star_world_position(_active_selection)
+		global_position = Vector3(star_pos.x, _current_height, star_pos.z)
+	# Restore free-flight rotation from current look direction
+	_galaxy_map_camera_yaw = rotation.y
+	_galaxy_map_camera_pitch = rotation.x
+	rotation = Vector3(_galaxy_map_camera_pitch, _galaxy_map_camera_yaw, 0.0)
+	print("[GameCamera] Unfocused")
+
+
+func _cycle_focus(forward: bool) -> void:
+	if _navigable_stars.is_empty():
+		return
+	var count := _navigable_stars.size()
+	var next_index: int
+	if _focus_index < 0 or _focus_index >= count:
+		next_index = 0 if forward else count - 1
+	else:
+		next_index = (_focus_index + (1 if forward else -1)) % count
+		if next_index < 0:
+			next_index += count
+	_focus_on_star(_navigable_stars[next_index], next_index)
+
+
+func _try_select_or_focus(screen_pos: Vector2) -> void:
 	var space := get_world_3d().direct_space_state
 	var origin := project_ray_origin(screen_pos)
 	var end := origin + project_ray_normal(screen_pos) * 10000.0
@@ -321,11 +490,18 @@ func _try_select(screen_pos: Vector2) -> void:
 	if hit and hit.collider is GalaxyStar:
 		var star := (hit.collider as GalaxyStar).star_record
 		if star.is_destination:
-			_active_selection = star
-			if _galaxy_container:
-				_galaxy_container.select_star(star)
-			if _event_bus:
-				_event_bus.tactical_selection_changed.emit([star.system_id])
+			# Find index in navigable list for Tab cycling continuity
+			var idx := -1
+			for i in _navigable_stars.size():
+				if _navigable_stars[i].id == star.id:
+					idx = i
+					break
+			_focus_on_star(star, idx)
+			return
+
+	# Clicked off — unfocus if focused, else clear selection
+	if _galaxy_focused:
+		_unfocus()
 	else:
 		_active_selection = null
 		if _galaxy_container:
@@ -333,9 +509,10 @@ func _try_select(screen_pos: Vector2) -> void:
 
 
 func _try_warp_select(screen_pos: Vector2) -> void:
-	if _active_selection == null:
-		_try_select(screen_pos)
-	if _active_selection != null and _is_reachable(_active_selection):
+	# Only warp if we have an active selection that's focused and reachable
+	if _active_selection == null or not _galaxy_focused:
+		return
+	if _is_reachable(_active_selection):
 		if _event_bus:
 			_event_bus.warp_destination_selected.emit(_active_selection.system_id)
 		_close_galaxy_map()

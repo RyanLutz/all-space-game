@@ -300,18 +300,36 @@ func _update_crossfades() -> void:
         _billboard_field.set_instance_alpha(star_id, 1.0 - mesh_alpha)
 ```
 
-### 4.6 Camera free flight
+### 4.6 Camera free flight (unfocused)
 
-Active only when `_galaxy_map_active` is true.
+Active only when `_galaxy_map_active` is true and `_galaxy_focused` is false.
 
 ```gdscript
-# In GameCamera.gd or GalaxyContainer.gd depending on implementation
 # Controls:
-#   WASD       — move in local XZ
-#   R          — move up (galaxy_map_up action)
-#   F          — move down (galaxy_map_down action)
-#   Right drag — rotate (yaw and pitch, pitch clamped ±80°)
-#   Left click — select star
+#   WASD       — camera-relative movement (forward/back/left/right)
+#   Q / E      — pan camera up / down (pitch, clamped ±80°)
+#   Shift+WASD/QE — move/rotate faster
+#   Right drag — rotate camera (yaw and pitch, pitch clamped ±80°)
+#   Tab        — focus next navigable system
+#   Shift+Tab  — focus previous navigable system
+#   Left click on mesh star — focus that system
+#   Scroll     — move forward/backward along view direction
+```
+
+### 4.6b Camera orbit (focused)
+
+Active when `_galaxy_map_active` is true and `_galaxy_focused` is true.
+
+```gdscript
+# Controls:
+#   W / S      — zoom in / out (change orbit distance)
+#   A / D      — orbit left / right around focus target
+#   Q / E      — orbit up / down around focus target
+#   Shift+any  — zoom/orbit faster
+#   Right drag — orbit (yaw and pitch around target)
+#   Esc        — unfocus (return to free flight)
+#   Left click off star — unfocus
+#   Scroll     — zoom in / out
 ```
 
 ### 4.7 Star selection
@@ -389,11 +407,18 @@ void fragment() {
     "galaxy_scale": 100.0,
     "lod_mesh_distance": 10.0,
     "lod_fade_range": 4.0,
-    "camera_move_speed": 50.0,
     "camera_rotation_speed": 0.003,
     "star_spawn_check_interval": 0.25,
     "proc_field_cell_size": 800.0,
     "proc_field_sphere_radius": 8000.0,
+    "free_flight_speed": 80.0,
+    "free_flight_fast_multiplier": 4.0,
+    "pan_speed": 1.2,
+    "focus_orbit_speed": 1.0,
+    "focus_zoom_speed": 120.0,
+    "focus_distance_min": 15.0,
+    "focus_distance_max": 600.0,
+    "focus_default_distance": 100.0,
     "star_sdf": {
         "corona_intensity_scale": 0.4,
         "noise_scale": 3.0,
@@ -485,8 +510,16 @@ PerformanceMonitor.set_count("GalaxyMap.billboard_instances",
 - [ ] Galaxy stars visible in pilot mode as background — no mode switch required
 - [ ] Stars do not parallax during ship movement — attached to camera correctly
 - [ ] M key detaches camera and enables free flight
-- [ ] WASD moves in local axes, R/F moves vertically
+- [ ] WASD moves camera-relative in free flight (forward/back/left/right)
+- [ ] Q/E pans camera up/down in free flight (pitch clamped ±80°)
+- [ ] Shift modifies speed in free flight
 - [ ] Right mouse drag rotates camera, pitch clamped ±80°
+- [ ] Tab / Shift+Tab cycles focus through navigable systems
+- [ ] Left click on mesh star focuses that system
+- [ ] Left click off star unfocuses
+- [ ] When focused: W/S zooms, A/D orbits yaw, Q/E orbits pitch
+- [ ] When focused: Esc unfocuses; unfocused Esc exits galaxy map
+- [ ] Scroll wheel moves forward/backward in free flight, zooms in focus
 - [ ] `populate()` is never called in pilot mode
 - [ ] Mesh star nodes never visible in pilot mode
 - [ ] Entering galaxy map calls `populate()` exactly once
@@ -494,9 +527,8 @@ PerformanceMonitor.set_count("GalaxyMap.billboard_instances",
 - [ ] Mesh star positions use local `position` not `global_position`
 - [ ] Mesh/billboard crossfade is smooth — no pop
 - [ ] Procedural field shows galaxy structure — core bright, arms visible, disc thin
-- [ ] Left click on destination star selects it
 - [ ] Reachable systems visually distinct from out-of-range
-- [ ] Double-click reachable system emits `warp_destination_selected`
+- [ ] Double-click focused reachable system emits `warp_destination_selected`
 - [ ] M again returns to pilot mode following ship
 - [ ] `galaxy_scale` change requires no code changes
 - [ ] `GalaxyMap.billboard_instances` reads 80,400 in overlay

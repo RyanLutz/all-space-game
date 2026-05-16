@@ -176,6 +176,20 @@ func _scaled_pos(star: SFStarRecord) -> Vector3:
 	return star.galaxy_position / galaxy_scale
 
 
+func get_navigable_stars() -> Array[SFStarRecord]:
+	return _destinations.duplicate()
+
+
+func get_star_world_position(star: SFStarRecord) -> Vector3:
+	return _scaled_pos(star)
+
+
+func get_mesh_star_node(star_id: int) -> GalaxyStar:
+	if _mesh_star_nodes.has(star_id):
+		return _mesh_star_nodes[star_id]
+	return null
+
+
 # ─── Tier construction ────────────────────────────────────────────────────────
 
 func _build_tiers() -> void:

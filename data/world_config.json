@@ -128,17 +128,24 @@
   },
 
   "galaxy_map": {
-    "galaxy_scale": 100.0,
-    "billboard_pixel_size": 1,
+    "galaxy_scale": 200.0,
+    "billboard_pixel_size": 0.5,
     "mesh_star_radius": 0.5,
     "lod_mesh_distance": 80.0,
     "lod_fade_range": 40.0,
-    "overview_height": 800.0,
-    "camera_move_speed": 50.0,
+    "overview_height": 400.0,
     "camera_rotation_speed": 0.003,
     "star_spawn_check_interval": 0.25,
     "proc_field_cell_size": 800.0,
-    "proc_field_sphere_radius": 8000.0
+    "proc_field_sphere_radius": 8000.0,
+    "free_flight_speed": 80.0,
+    "free_flight_fast_multiplier": 4.0,
+    "pan_speed": 1.2,
+    "focus_orbit_speed": 1.0,
+    "focus_zoom_speed": 120.0,
+    "focus_distance_min": 15.0,
+    "focus_distance_max": 600.0,
+    "focus_default_distance": 100.0
   },
 
   "solar_system": {
