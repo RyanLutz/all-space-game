@@ -130,8 +130,15 @@ var galaxy_scale: float          # KEY TUNABLE — divide all galaxy positions b
 var lod_mesh_distance: float     # camera distance below which mesh nodes spawn
 var lod_fade_range: float        # crossfade overlap zone at mesh/billboard boundary
 var star_spawn_check_interval: float
-var camera_move_speed: float
 var camera_rotation_speed: float
+var free_flight_speed: float
+var free_flight_fast_multiplier: float
+var pan_speed: float
+var focus_orbit_speed: float
+var focus_zoom_speed: float
+var focus_distance_min: float
+var focus_distance_max: float
+var focus_default_distance: float
 ```
 
 ### GalaxyBillboardField.gd
@@ -474,7 +481,7 @@ PerformanceMonitor.set_count("GalaxyMap.billboard_instances",
 | `ui/galactic_map/GalacticMap.gd` | **SUPERSEDED** | Old 2D canvas — do not extend |
 | `ui/galactic_map/GalacticMap.tscn` | **SUPERSEDED** | Old scene — do not extend |
 | `data/world_config.json` | Modified | `galaxy_map` block added |
-| `project.godot` | Modified | `galaxy_map_up` (R) and `galaxy_map_down` (F) |
+| `project.godot` | Modified | `galaxy_pan_up` (Q), `galaxy_pan_down` (E), `galaxy_focus_next` (Tab) |
 
 ---
 
