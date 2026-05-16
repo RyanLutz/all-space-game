@@ -27,6 +27,7 @@ func _ready() -> void:
 	if _event_bus:
 		_event_bus.connect("player_ship_changed", _on_player_ship_changed)
 		_event_bus.connect("cinematic_active_changed", _on_cinematic_active_changed)
+		_event_bus.connect("game_mode_changed", _on_game_mode_changed)
 
 	# Pick up existing player ship if already spawned
 	if _player_state and _player_state.active_ship:
@@ -127,6 +128,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_player_ship_changed(ship: Node) -> void:
 	_player_ship = ship
+
+
+func _on_game_mode_changed(_old_mode: String, new_mode: String) -> void:
+	_current_mode = new_mode
 
 
 func _on_cinematic_active_changed(active: bool) -> void:

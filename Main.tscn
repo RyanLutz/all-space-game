@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://b_main_scene"]
+[gd_scene load_steps=8 format=3 uid="uid://b_main_scene"]
 
 [ext_resource type="Script" path="res://gameplay/world/GameOrchestrator.gd" id="1_orchestrator"]
 [ext_resource type="Script" path="res://gameplay/camera/GameCamera.gd" id="2_camera"]
@@ -8,7 +8,15 @@
 [ext_resource type="Script" path="res://gameplay/world/ChunkStreamer.gd" id="6_chunkstreamer"]
 [ext_resource type="PackedScene" path="res://ui/debug/PerformanceOverlay.tscn" id="7_perfoverlay"]
 
+[sub_resource type="Environment" id="Environment_blackspace"]
+background_mode = 1
+background_color = Color(0, 0, 0, 1)
+ambient_light_color = Color(0, 0, 0, 1)
+
 [node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_blackspace")
 
 [node name="GameOrchestrator" type="Node" parent="."]
 script = ExtResource("1_orchestrator")

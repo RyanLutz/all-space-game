@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, depth_draw_never, cull_disabled, blend_add;
+render_mode unshaded, depth_draw_never, cull_front, blend_add;
 
 uniform float galaxy_scale : hint_range(1.0, 1000.0) = 100.0;
 uniform float proc_field_cell_size : hint_range(100.0, 5000.0) = 800.0;

@@ -28,6 +28,7 @@ var _active_selection: SFStarRecord = null
 var _last_cam_pos: Vector3 = Vector3.INF
 var _cam_move_threshold: float = 5.0
 var _follow_camera: bool = true
+var _alphas_reset_for_pilot: bool = true
 
 # ─── Spatial grid ─────────────────────────────────────────────────────────────
 var _spatial_grid: Dictionary = {}   # Vector3i -> Array[SFStarRecord]
@@ -56,6 +57,15 @@ func _ready() -> void:
 
 	# Camera ref for world-aligned queries in galaxy map mode
 	_camera = get_node_or_null("/root/Main/GameCamera")
+	if _camera == null:
+		# Fallback: search by group or by viewport camera
+		var viewport := get_viewport()
+		if viewport:
+			_camera = viewport.get_camera_3d()
+		if _camera == null:
+			_camera = get_tree().get_first_node_in_group("game_camera")
+	if _camera == null:
+		push_error("GalaxyContainer: Could not find GameCamera — billboard follow will fail.")
 
 	# Billboards always visible; populate immediately so pilot mode shows stars
 	if _billboard_field:
@@ -68,6 +78,10 @@ func _process(delta: float) -> void:
 		# In pilot/tactical mode, follow the camera so stars appear fixed on screen
 		if _camera:
 			global_transform = Transform3D(Basis.IDENTITY, _camera.global_position)
+		# Safety: if we ever enter pilot mode without a clean reset, force alphas back
+		if not _alphas_reset_for_pilot and _billboard_field:
+			_billboard_field.reset_alphas()
+			_alphas_reset_for_pilot = true
 	# else: galaxy map mode — stay world-aligned at origin
 
 	_spawn_check_timer += delta
@@ -362,6 +376,7 @@ func clear_selection() -> void:
 func _on_game_mode_changed(old_mode: String, new_mode: String) -> void:
 	if new_mode == "galaxy_map":
 		_follow_camera = false
+		_alphas_reset_for_pilot = false
 		global_position = Vector3.ZERO
 		_star_container.visible = true
 		spawn_check_interval = _get_config_float("star_spawn_check_interval", 0.25)
@@ -375,6 +390,9 @@ func _on_game_mode_changed(old_mode: String, new_mode: String) -> void:
 		spawn_check_interval = _get_config_float("star_spawn_check_interval", 0.25) * 2.0
 		lod_mesh_distance = 0.0
 		clear_selection()
+		if _billboard_field:
+			_billboard_field.reset_alphas()
+		_alphas_reset_for_pilot = true
 
 
 func _on_system_transition_complete(_system_id: String) -> void:

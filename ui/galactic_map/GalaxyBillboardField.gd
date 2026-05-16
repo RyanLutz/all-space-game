@@ -53,6 +53,14 @@ func populate(stars: Array, _camera_pos: Vector3) -> void:
 		_instance_map[star.id] = i
 
 
+func reset_alphas() -> void:
+	for star_id in _instance_map.keys():
+		var i: int = _instance_map[star_id]
+		var cur := _multimesh.get_instance_custom_data(i)
+		cur.r = 1.0
+		_multimesh.set_instance_custom_data(i, cur)
+
+
 func set_instance_alpha(star_id: int, alpha: float) -> void:
 	if not _instance_map.has(star_id):
 		return

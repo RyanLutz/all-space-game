@@ -49,6 +49,7 @@ var _active_selection: SFStarRecord = null
 
 var _camera_move_speed: float = 50.0
 var _camera_rotation_speed: float = 0.003
+var _overview_height: float = 800.0
 
 var _event_bus: Node = null
 var _player_state: Node = null
@@ -61,6 +62,7 @@ var _proc_field_sphere_radius: float = 8000.0
 
 
 func _ready() -> void:
+	add_to_group("game_camera")
 	_current_height = height_default
 	_target_height = height_default
 	_pilot_height_min = height_min
@@ -97,6 +99,7 @@ func _load_galaxy_map_config() -> void:
 	if not data.has("galaxy_map"):
 		return
 	var cfg: Dictionary = data["galaxy_map"]
+	_overview_height = float(cfg.get("overview_height", 800.0))
 	_camera_move_speed = float(cfg.get("camera_move_speed", 50.0))
 	_camera_rotation_speed = float(cfg.get("camera_rotation_speed", 0.003))
 	_proc_field_cell_size = float(cfg.get("proc_field_cell_size", 800.0))
@@ -221,14 +224,21 @@ func _enter_galaxy_map() -> void:
 	_galaxy_map_camera_yaw = rotation.y
 	_galaxy_map_camera_pitch = rotation.x
 	release()
+	# Hide the local solar system so the galaxy map shows only galaxy stars
+	var solar_system := get_tree().get_first_node_in_group("solar_systems")
+	if solar_system:
+		solar_system.visible = false
 	# Position camera above galaxy origin for overview
-	var overview_height: float = 80000.0
+	# galaxy_scale=100 → scaled galaxy radius ≈1000 units.
+	# Default overview height (800) gives the galaxy an angular diameter of ~100°.
+	var overview_height: float = _overview_height
 	global_position = Vector3(0, overview_height, 0)
 	rotation_degrees = Vector3(-90, 0, 0)
 	_current_height = overview_height
 	_target_height = overview_height
-	# Galaxy-scale zoom limits
-	set_zoom_limits(5000.0, 200000.0)
+	# Galaxy-scale zoom limits: min allows getting close to individual mesh stars
+	# (mesh LOD kicks in at ~80 units), max prevents zooming out to useless scale.
+	set_zoom_limits(50.0, 10000.0)
 	if _event_bus:
 		_event_bus.cinematic_active_changed.emit(false)
 	print("[GameCamera] Entering galaxy map mode")
@@ -240,6 +250,13 @@ func _exit_galaxy_map() -> void:
 	_active_selection = null
 	# Restore pilot zoom limits
 	set_zoom_limits(_pilot_height_min, _pilot_height_max)
+	# Reset height to pilot default so we don't inherit galaxy-map close zoom
+	_target_height = clampf(height_default, height_min, height_max)
+	_current_height = _target_height
+	# Show the local solar system again
+	var solar_system := get_tree().get_first_node_in_group("solar_systems")
+	if solar_system:
+		solar_system.visible = true
 	var ship = _player_state.get_active_ship() if _player_state else null
 	if ship:
 		follow(ship)
@@ -277,6 +294,9 @@ func _galaxy_map_input(event: InputEvent) -> void:
 
 
 func _galaxy_map_process(delta: float) -> void:
+	# Apply zoom height — _current_height is lerped by _update_zoom
+	global_position.y = _current_height
+
 	var move := Vector3.ZERO
 	if Input.is_action_pressed("move_forward"):     move -= Vector3.FORWARD
 	if Input.is_action_pressed("move_backward"):    move += Vector3.FORWARD
@@ -286,7 +306,7 @@ func _galaxy_map_process(delta: float) -> void:
 	if Input.is_action_pressed("galaxy_map_down"):  move -= Vector3.UP
 
 	if move.length_squared() > 0.0:
-		var speed := _camera_move_speed * (_current_height / 50000.0)
+		var speed := _camera_move_speed * (_current_height / 2000.0)
 		global_position += move.normalized() * speed * delta
 
 

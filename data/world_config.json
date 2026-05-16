@@ -133,6 +133,7 @@
     "mesh_star_radius": 0.5,
     "lod_mesh_distance": 80.0,
     "lod_fade_range": 40.0,
+    "overview_height": 800.0,
     "camera_move_speed": 50.0,
     "camera_rotation_speed": 0.003,
     "star_spawn_check_interval": 0.25,
