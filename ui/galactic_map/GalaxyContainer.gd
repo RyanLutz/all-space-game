@@ -39,6 +39,13 @@ var galaxy_scale: float = 100.0
 var lod_mesh_distance: float = 80.0
 var lod_fade_range: float = 40.0
 var billboard_pixel_size: float = 0.01
+var billboard_dist_ref: float = 500.0
+var billboard_scale_min: float = 0.5
+var billboard_scale_max: float = 5.0
+var billboard_scale_factor: float = 1.0
+var billboard_core_size: float = 0.08
+var billboard_core_intensity: float = 1.0
+var billboard_halo_strength: float = 0.3
 var spawn_check_interval: float = 0.25
 
 # ─── Services ─────────────────────────────────────────────────────────────────
@@ -114,6 +121,13 @@ func _load_config() -> void:
 	lod_mesh_distance = float(cfg.get("lod_mesh_distance", 80.0))
 	lod_fade_range = float(cfg.get("lod_fade_range", 40.0))
 	billboard_pixel_size = float(cfg.get("billboard_pixel_size", 0.01))
+	billboard_dist_ref = float(cfg.get("billboard_dist_ref", 500.0))
+	billboard_scale_min = float(cfg.get("billboard_scale_min", 0.5))
+	billboard_scale_max = float(cfg.get("billboard_scale_max", 5.0))
+	billboard_scale_factor = float(cfg.get("billboard_scale_factor", 1.0))
+	billboard_core_size = float(cfg.get("billboard_core_size", 0.08))
+	billboard_core_intensity = float(cfg.get("billboard_core_intensity", 1.0))
+	billboard_halo_strength = float(cfg.get("billboard_halo_strength", 0.3))
 	spawn_check_interval = float(cfg.get("star_spawn_check_interval", 0.25))
 
 
@@ -204,6 +218,8 @@ func _build_tiers() -> void:
 	_billboard_field.name = "BillboardField"
 	_billboard_field.set_galaxy_scale(galaxy_scale)
 	_billboard_field.set_billboard_pixel_size(billboard_pixel_size)
+	_billboard_field.set_scale_params(billboard_dist_ref, billboard_scale_min, billboard_scale_max, billboard_scale_factor)
+	_billboard_field.set_glow_params(billboard_core_size, billboard_core_intensity, billboard_halo_strength)
 	_billboard_field.visible = true
 	add_child(_billboard_field)
 

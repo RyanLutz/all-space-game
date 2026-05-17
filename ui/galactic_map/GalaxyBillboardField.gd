@@ -35,6 +35,23 @@ func set_billboard_pixel_size(size: float) -> void:
 	_billboard_pixel_size = size
 
 
+func set_scale_params(dist_ref: float, scale_min: float, scale_max: float, scale_factor: float) -> void:
+	if material_override is ShaderMaterial:
+		var mat: ShaderMaterial = material_override
+		mat.set_shader_parameter("u_dist_ref", dist_ref)
+		mat.set_shader_parameter("u_scale_min", scale_min)
+		mat.set_shader_parameter("u_scale_max", scale_max)
+		mat.set_shader_parameter("u_scale_factor", scale_factor)
+
+
+func set_glow_params(core_size: float, core_intensity: float, halo_strength: float) -> void:
+	if material_override is ShaderMaterial:
+		var mat: ShaderMaterial = material_override
+		mat.set_shader_parameter("u_core_size", core_size)
+		mat.set_shader_parameter("u_core_intensity", core_intensity)
+		mat.set_shader_parameter("u_halo_strength", halo_strength)
+
+
 func populate(stars: Array, _camera_pos: Vector3) -> void:
 	_multimesh.instance_count = stars.size()
 	_instance_map.clear()
